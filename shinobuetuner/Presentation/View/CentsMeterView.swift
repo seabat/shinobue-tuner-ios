@@ -19,6 +19,42 @@ struct CentsMeterView: View {
         return CGFloat((cents.clamped(to: -50...50) + 50) / 100)
     }
 
+    /// 背景グラデーションバー（赤→黄→緑→黄→赤）
+    private func gradientBar(width w: CGFloat, height h: CGFloat) -> some View {
+        HStack(spacing: 0) {
+            LinearGradient(
+                colors: [.red, .orange, .yellow],
+                startPoint: .leading,
+                endPoint: .trailing
+            )
+            .frame(width: w * 0.35)
+
+            LinearGradient(
+                colors: [.yellow, .green],
+                startPoint: .leading,
+                endPoint: .trailing
+            )
+            .frame(width: w * 0.15)
+
+            LinearGradient(
+                colors: [.green, .yellow],
+                startPoint: .leading,
+                endPoint: .trailing
+            )
+            .frame(width: w * 0.15)
+
+            LinearGradient(
+                colors: [.yellow, .orange, .red],
+                startPoint: .leading,
+                endPoint: .trailing
+            )
+            .frame(width: w * 0.35)
+        }
+        .frame(height: h * 0.45)
+        .clipShape(Capsule())
+        .opacity(isActive ? 1.0 : 0.3)
+    }
+
     var body: some View {
         VStack(spacing: 6) {
             GeometryReader { geo in
@@ -28,51 +64,26 @@ struct CentsMeterView: View {
 
                 ZStack(alignment: .top) {
                     // 背景グラデーションバー
-                    HStack(spacing: 0) {
-                        LinearGradient(
-                            colors: [.red, .orange, .yellow],
-                            startPoint: .leading,
-                            endPoint: .trailing
-                        )
-                        .frame(width: w * 0.35)
-
-                        LinearGradient(
-                            colors: [.yellow, .green],
-                            startPoint: .leading,
-                            endPoint: .trailing
-                        )
-                        .frame(width: w * 0.15)
-
-                        LinearGradient(
-                            colors: [.green, .yellow],
-                            startPoint: .leading,
-                            endPoint: .trailing
-                        )
-                        .frame(width: w * 0.15)
-
-                        LinearGradient(
-                            colors: [.yellow, .orange, .red],
-                            startPoint: .leading,
-                            endPoint: .trailing
-                        )
-                        .frame(width: w * 0.35)
-                    }
-                    .frame(height: h * 0.45)
-                    .clipShape(Capsule())
-                    .opacity(isActive ? 1.0 : 0.3)
+                    gradientBar(width: w, height: h)
 
                     // 中央ライン（0セント）
                     Rectangle()
                         .fill(.white.opacity(0.6))
-                        .frame(width: 2, height: h * 0.6)
-                        .offset(x: w / 2 - 1)
+                        .frame(width: 2, height: h * 0.45)
 
                     // インジケーター三角形
-                    Triangle()
-                        .fill(isActive ? .white : .gray.opacity(0.3))
-                        .frame(width: 14, height: 10)
-                        .offset(x: indicatorX - w / 2)
-                        .animation(.spring(response: 0.15, dampingFraction: 0.7), value: indicatorX)
+                    ZStack {
+                        // アウトライン（視認性向上）
+                        Triangle()
+                            .fill(.black.opacity(0.5))
+                            .frame(width: 22, height: 16)
+                        Triangle()
+                            .fill(isActive ? .white : .gray.opacity(0.3))
+                            .frame(width: 18, height: 13)
+                    }
+                    .shadow(color: .black.opacity(0.6), radius: 3, x: 0, y: 1)
+                    .offset(x: indicatorX - w / 2)
+                    .animation(.spring(response: 0.15, dampingFraction: 0.7), value: indicatorX)
 
                     // 目盛りラベル
                     HStack {
