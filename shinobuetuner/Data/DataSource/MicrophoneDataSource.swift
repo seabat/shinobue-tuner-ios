@@ -24,6 +24,9 @@ final class MicrophoneDataSource {
     private let engine = AVAudioEngine()
     private var sessionStartTime: Date = Date()
 
+    /// 録音中に書き込むファイル（nonisolated(unsafe) でバックグラウンドスレッドからアクセス）
+    nonisolated(unsafe) private var recordingFile: AVAudioFile? = nil
+
     /// マイクのアクセス許可を要求する
     /// - Returns: 許可されたかどうか
     func requestPermission() async -> Bool {
@@ -59,6 +62,11 @@ final class MicrophoneDataSource {
         ) { [weak self] buffer, _ in
             guard let self else { return }
 
+            // 録音中はバッファをファイルに書き込む（バックグラウンドスレッドで安全）
+            if let file = self.recordingFile {
+                try? file.write(from: buffer)
+            }
+
             // ピッチ検出（バックグラウンドスレッドで実行可能）
             let pitch = MicrophoneDataSource.detectPitch(
                 buffer: buffer,
@@ -87,6 +95,24 @@ final class MicrophoneDataSource {
         #if os(iOS)
         try? AVAudioSession.sharedInstance().setActive(false)
         #endif
+    }
+
+    /// 録音を開始する（startCapture() の後に呼ぶ）
+    /// - Parameter url: 保存先URL（.m4a）
+    func startRecording(to url: URL) throws {
+        let inputFormat = engine.inputNode.inputFormat(forBus: 0)
+        let settings: [String: Any] = [
+            AVFormatIDKey: kAudioFormatMPEG4AAC,
+            AVSampleRateKey: inputFormat.sampleRate,
+            AVNumberOfChannelsKey: 1,
+            AVEncoderAudioQualityKey: AVAudioQuality.high.rawValue
+        ]
+        recordingFile = try AVAudioFile(forWriting: url, settings: settings)
+    }
+
+    /// 録音を停止してファイルを閉じる
+    func stopRecording() {
+        recordingFile = nil  // nilにするとAVAudioFileが閉じられる
     }
 
     // MARK: - ピッチ検出（静的メソッド・スレッドセーフ）

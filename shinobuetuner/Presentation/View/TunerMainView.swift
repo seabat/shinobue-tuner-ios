@@ -9,9 +9,16 @@
 import SwiftUI
 import Combine
 
+/// チューナーメインビューのモード
+enum TunerMode: String, CaseIterable {
+    case monitoring = "計測"
+    case recording  = "録音"
+}
+
 /// チューナーメインビュー
 struct TunerMainView: View {
     @ObservedObject var viewModel: TunerViewModel
+    @State private var selectedMode: TunerMode = .monitoring
 
     var body: some View {
         VStack(spacing: 0) {
@@ -20,17 +27,17 @@ struct TunerMainView: View {
                 noteResult: viewModel.noteResult,
                 currentPitch: viewModel.currentPitch
             )
-            .frame(height: 160)
-            .padding(.top, 8)
+            .frame(height: 130)
+            .padding(.vertical, 1)
 
             // ─── チューナーメーター ───
             CentsMeterView(
                 cents: viewModel.noteResult?.cents ?? 0,
                 isActive: viewModel.currentPitch > 0
             )
-            .frame(height: 90)
+            .frame(height: 72)
             .padding(.horizontal, 24)
-            .padding(.vertical, 8)
+            .padding(.vertical, 4)
 
             // ─── ピッチグラフ（5秒間） ───
             PitchGraphView(
@@ -39,17 +46,60 @@ struct TunerMainView: View {
             )
             .frame(maxHeight: .infinity)
             .padding(.horizontal, 16)
-            .padding(.bottom, 8)
+            .padding(.bottom, 20)
 
-            // ─── 録音開始/停止ボタン ───
-            RecordButton(isRunning: viewModel.isRunning) {
-                if viewModel.isRunning {
-                    viewModel.stopMonitoring()
-                } else {
-                    viewModel.startMonitoring()
+            // ─── 開始/停止ボタン + モード切替 ───
+            ZStack {
+                // 計測/停止ボタン（中央固定）
+                RecordButton(
+                    isRunning: viewModel.isRunning,
+                    isRecordingMode: selectedMode == .recording
+                ) {
+                    switch selectedMode {
+                    case .monitoring:
+                        viewModel.isRunning ? viewModel.stopMonitoring() : viewModel.startMonitoring()
+                    case .recording:
+                        viewModel.isRunning ? viewModel.stopRecording() : viewModel.startRecording()
+                    }
+                }
+
+                // 計測/録音 モード切替（右端）
+                HStack {
+                    Spacer()
+                    ModeSwitcher(selectedMode: $selectedMode)
+                        .disabled(viewModel.isRunning)
+                        .padding(.trailing, 20)
                 }
             }
             .padding(.bottom, 24)
+        }
+    }
+}
+
+// MARK: - ModeSwitcher
+
+/// 計測/録音モード切替コンポーネント（ボタンの右側に配置）
+private struct ModeSwitcher: View {
+    @Binding var selectedMode: TunerMode
+
+    var body: some View {
+        VStack(spacing: 6) {
+            ForEach(TunerMode.allCases, id: \.self) { mode in
+                Button {
+                    selectedMode = mode
+                } label: {
+                    HStack(spacing: 4) {
+                        Image(systemName: mode == .monitoring ? "mic.circle.fill" : "record.circle")
+                            .font(.system(size: 12))
+                        Text(mode.rawValue)
+                            .font(.system(size: 11, weight: .medium))
+                    }
+                    .foregroundStyle(selectedMode == mode
+                        ? (mode == .monitoring ? Color.cyan : Color.orange)
+                        : Color(white: 0.4)
+                    )
+                }
+            }
         }
     }
 }
@@ -64,6 +114,8 @@ private final class PreviewUseCase: MonitorPitchUseCaseProtocol {
     func start() {}
     func stop() {}
     func requestPermission() async -> Bool { true }
+    func startRecording(to url: URL) throws {}
+    func stopRecording() {}
 }
 
 #Preview("録音中（レ/D4 +8セント）") {

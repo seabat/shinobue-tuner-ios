@@ -12,39 +12,52 @@ import Combine
 /// アプリのルートビュー（ViewModelを保有する）
 struct ContentView: View {
     @StateObject private var viewModel: TunerViewModel
+    @StateObject private var recordingListViewModel: RecordingListViewModel
 
     /// 本番用（デフォルト）
     init() {
         _viewModel = StateObject(wrappedValue: TunerViewModel())
+        _recordingListViewModel = StateObject(wrappedValue: RecordingListViewModel())
     }
 
     /// プレビュー・テスト用（ViewModel を外から注入）
     init(viewModel: TunerViewModel) {
         _viewModel = StateObject(wrappedValue: viewModel)
+        _recordingListViewModel = StateObject(wrappedValue: RecordingListViewModel())
     }
 
     var body: some View {
-        NavigationStack {
-            ZStack {
-                // 背景（ダークテーマ）
-                Color(red: 0.08, green: 0.08, blue: 0.12)
-                    .ignoresSafeArea()
+        TabView {
+            // ─── チューナータブ ───
+            Tab("チューナー", systemImage: "tuningfork") {
+                ZStack {
+                    Color(red: 0.08, green: 0.08, blue: 0.12)
+                        .ignoresSafeArea()
 
-                if viewModel.permissionGranted {
-                    TunerMainView(viewModel: viewModel)
-                } else {
-                    PermissionRequestView(viewModel: viewModel)
+                    if viewModel.permissionGranted {
+                        TunerMainView(viewModel: viewModel)
+                    } else {
+                        PermissionRequestView(viewModel: viewModel)
+                    }
                 }
             }
-            .navigationTitle("ぞめきチューナー")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbarColorScheme(.dark, for: .navigationBar)
-            .toolbarBackground(Color(red: 0.10, green: 0.10, blue: 0.16), for: .navigationBar)
-            .toolbarBackground(.visible, for: .navigationBar)
+
+            // ─── 録音一覧タブ ───
+            Tab("録音一覧", systemImage: "list.bullet.rectangle") {
+                NavigationStack {
+                    RecordingListView(viewModel: recordingListViewModel)
+                        .navigationTitle("録音一覧")
+                        .navigationBarTitleDisplayMode(.inline)
+                }
+            }
         }
         .task {
             // 起動時にマイク権限を確認
             await viewModel.requestPermission()
+        }
+        .onChange(of: viewModel.lastSavedRecording) { _, _ in
+            // 録音保存後に一覧を自動更新
+            recordingListViewModel.loadRecordings()
         }
     }
 }
@@ -58,6 +71,8 @@ private final class PreviewUseCase: MonitorPitchUseCaseProtocol {
     func start() {}
     func stop() {}
     func requestPermission() async -> Bool { true }
+    func startRecording(to url: URL) throws {}
+    func stopRecording() {}
 }
 
 #Preview("権限未許可（初期状態）") {

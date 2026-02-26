@@ -7,6 +7,7 @@
 //  ピッチ監視のユースケース（Protocol + 具体実装）
 
 import Combine
+import Foundation
 
 /// ピッチ監視ユースケースのプロトコル（ViewModel が依存するインターフェース）
 protocol MonitorPitchUseCaseProtocol {
@@ -22,6 +23,12 @@ protocol MonitorPitchUseCaseProtocol {
     /// マイクのアクセス許可を要求する
     /// - Returns: 許可されたかどうか
     func requestPermission() async -> Bool
+
+    /// 録音を開始する（start() の後に呼ぶ）
+    func startRecording(to url: URL) throws
+
+    /// 録音を停止する
+    func stopRecording()
 }
 
 /// ピッチ監視ユースケースの具体実装
@@ -46,5 +53,13 @@ final class MonitorPitchUseCase: MonitorPitchUseCaseProtocol {
 
     func requestPermission() async -> Bool {
         await repository.requestPermission()
+    }
+
+    func startRecording(to url: URL) throws {
+        try repository.startRecording(to: url)
+    }
+
+    func stopRecording() {
+        repository.stopRecording()
     }
 }

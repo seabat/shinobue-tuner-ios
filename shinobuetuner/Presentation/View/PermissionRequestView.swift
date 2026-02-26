@@ -57,6 +57,8 @@ private final class PreviewUseCase: MonitorPitchUseCaseProtocol {
     func start() {}
     func stop() {}
     func requestPermission() async -> Bool { true }
+    func startRecording(to url: URL) throws {}
+    func stopRecording() {}
 }
 
 #Preview {

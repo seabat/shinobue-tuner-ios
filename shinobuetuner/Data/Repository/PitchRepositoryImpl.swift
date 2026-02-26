@@ -7,6 +7,7 @@
 //  PitchRepository プロトコルの具体実装（MicrophoneDataSource に委譲）
 
 import Combine
+import Foundation
 
 /// PitchRepository の具体実装
 final class PitchRepositoryImpl: PitchRepository {
@@ -30,5 +31,13 @@ final class PitchRepositoryImpl: PitchRepository {
 
     func requestPermission() async -> Bool {
         await dataSource.requestPermission()
+    }
+
+    func startRecording(to url: URL) throws {
+        try dataSource.startRecording(to: url)
+    }
+
+    func stopRecording() {
+        dataSource.stopRecording()
     }
 }

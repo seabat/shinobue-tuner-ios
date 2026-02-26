@@ -7,13 +7,24 @@
 
 ---
 
-## 要件定義（アプリ新規作成プロンプト.md より）
+## 要件定義
 
-### 機能要件
+### チューナー機能要件
 - マイクから音声を取得し、ピッチ（Hz）をリアルタイム計測
 - 検出した音が正しい周波数からどれだけ離れているかをセント単位で表示
 - y軸: ピッチ（Hz）、x軸: 経過時間（5秒幅）の折れ線グラフをリアルタイム表示
 - 録音中は無音時でもグラフの時間軸が常に流れ、音が鳴った瞬間に折れ線が描画される
+
+### 録音機能要件
+- TunerMainView は「計測モード」と「録音モード」をセグメントで切り替え可能（動作中は切替禁止）
+  - 計測モード: ピッチ検出のみ。ボタンは「計測開始」/「計測停止」
+  - 録音モード: ピッチ検出 + m4a 録音。ボタンは「録音開始」/「録音停止」
+- ファイル名は録音開始日時（例: `2026-02-26_21-30-00.m4a`）
+- 録音一覧タブに保存済みファイルを新しい順に一覧表示
+- 一覧でファイルをタップすると再生。再生中は下部にコントロールバーを表示
+- 再生コントロール: 再生/一時停止、停止（選択解除）、シークバー
+- 一覧でスワイプするとファイルを削除可能
+- 録音保存後、一覧タブを自動更新する
 
 ### チューニング設定
 - 基準音: **A4 = 442 Hz**（篠笛６本調子）
@@ -56,38 +67,46 @@ Presentation ──依存──▶ Domain ◀──依存── Data
 
 ```
 shinobuetuner/
-├── shinobuetunerApp.swift          # エントリポイント（SwiftDataなし）
-├── Item.swift                      # 不使用（空ファイル）
-├── ContentView.swift               # 空（Presentation/View/ に移動済み）
-├── AudioEngine.swift               # 空（Data/DataSource/ に移動済み）
-├── NoteHelper.swift                # 空（Domain/Model/ に移動済み）
+├── shinobuetunerApp.swift
 │
 ├── Domain/
 │   ├── Model/
-│   │   ├── NoteInfo.swift          # NoteInfo 構造体 + NoteHelper enum（442Hz基準変換）
-│   │   └── PitchSample.swift       # ピッチサンプル（時刻 + 周波数）
+│   │   ├── NoteInfo.swift             # NoteInfo 構造体 + NoteHelper enum
+│   │   ├── PitchSample.swift          # ピッチサンプル（時刻 + 周波数）
+│   │   └── RecordingFile.swift        # 録音ファイルのドメインモデル
 │   ├── Repository/
-│   │   └── PitchRepository.swift   # ピッチ取得リポジトリのプロトコル
+│   │   ├── PitchRepository.swift      # ピッチ取得 + 録音操作のプロトコル
+│   │   ├── RecordingRepository.swift  # 録音ファイル管理のプロトコル
+│   │   └── PlaybackRepository.swift   # 音声再生のプロトコル
 │   └── UseCase/
-│       └── MonitorPitchUseCase.swift  # MonitorPitchUseCaseProtocol + 具体実装
+│       ├── MonitorPitchUseCase.swift  # ピッチ監視 + 録音開始/停止
+│       ├── ManageRecordingsUseCase.swift  # 一覧取得・削除
+│       └── PlaybackUseCase.swift      # 再生操作
 │
 ├── Data/
 │   ├── DataSource/
-│   │   └── MicrophoneDataSource.swift  # AVAudioEngine + FFT/HPS ピッチ検出
+│   │   ├── MicrophoneDataSource.swift    # AVAudioEngine + FFT/HPS + AVAudioFile録音
+│   │   └── AudioPlayerDataSource.swift   # AVAudioEngine + PlayerNode 再生
 │   └── Repository/
-│       └── PitchRepositoryImpl.swift   # PitchRepository の具体実装
+│       ├── PitchRepositoryImpl.swift
+│       ├── RecordingRepositoryImpl.swift  # Documents ディレクトリへの m4a 保存
+│       └── PlaybackRepositoryImpl.swift
 │
 └── Presentation/
     ├── ViewModel/
-    │   └── TunerViewModel.swift     # @MainActor ObservableObject（状態管理）
+    │   ├── TunerViewModel.swift          # ピッチ監視 + 録音制御
+    │   └── RecordingListViewModel.swift  # 録音一覧・再生の状態管理
     └── View/
-        ├── ContentView.swift        # ルートView（@StateObject を保有）
-        ├── TunerMainView.swift      # メイン画面レイアウト
-        ├── PermissionRequestView.swift  # 権限要求画面
-        ├── NoteDisplayView.swift    # 音名・周波数表示
-        ├── CentsMeterView.swift     # セントメーター（カラーグラデーション）
-        ├── PitchGraphView.swift     # ピッチ折れ線グラフ（Canvas描画）
-        └── RecordButton.swift       # 録音開始/停止ボタン
+        ├── ContentView.swift             # TabView（チューナー / 録音一覧）
+        ├── TunerMainView.swift           # 計測/録音モード切替セグメント付きメイン画面
+        ├── PermissionRequestView.swift
+        ├── NoteDisplayView.swift
+        ├── CentsMeterView.swift
+        ├── PitchGraphView.swift
+        ├── RecordButton.swift            # 計測/録音モード対応ボタン
+        ├── RecordingListView.swift       # 録音一覧画面
+        ├── RecordingRowView.swift        # 一覧の各行コンポーネント
+        └── PlaybackControlView.swift     # 再生コントロールバー
 ```
 
 ### 依存ライブラリ
@@ -117,10 +136,26 @@ shinobuetuner/
 **PitchRepository.swift**（Protocol のみ）
 - `pitchPublisher: AnyPublisher<Float, Never>` — ピッチ（Hz）の非同期ストリーム
 - `startMonitoring()` / `stopMonitoring()` / `requestPermission() async -> Bool`
+- `startRecording(to url: URL) throws` / `stopRecording()` — 録音操作
+
+**RecordingRepository.swift**（Protocol のみ）
+- `fetchAll() -> [RecordingFile]` — 保存済み録音ファイルを新しい順に返す
+- `delete(url: URL) throws` — ファイル削除
+- `newRecordingURL() -> URL` — 保存先URL生成（ファイル名: `yyyy-MM-dd_HH-mm-ss.m4a`）
+
+**PlaybackRepository.swift**（Protocol のみ）
+- `playbackTimePublisher` / `isPlayingPublisher` — 再生状態のパブリッシャー
+- `play(url:)` / `pause()` / `resume()` / `stop()`
 
 **MonitorPitchUseCase.swift**
-- `MonitorPitchUseCaseProtocol` — ViewModel が依存するインターフェース
+- `MonitorPitchUseCaseProtocol` — ViewModel が依存するインターフェース（録音メソッド含む）
 - `MonitorPitchUseCase` — `PitchRepository` に委譲する具体実装
+
+**ManageRecordingsUseCase.swift**
+- `fetchAll()` / `delete(recording:)` — 録音一覧取得・削除
+
+**PlaybackUseCase.swift**
+- `play(recording:)` / `pause()` / `resume()` / `stop()`
 
 ### Data/DataSource・Repository
 
@@ -133,42 +168,67 @@ shinobuetuner/
 - `nonisolated static func detectPitch(...)` — バックグラウンドスレッドで安全に実行
 - タップコールバック内: `Task { @MainActor [weak self] in subject.send(pitch) }` でメインスレッドに切り替え
 - マイク権限: `AVAudioApplication.requestRecordPermission()` (iOS 17+ API)
+- **録音**: `nonisolated(unsafe) var recordingFile: AVAudioFile?` をタップコールバックから直接書き込み
+  - `startRecording(to:)` — AVAudioFile（AAC/m4a）を生成して録音開始
+  - `stopRecording()` — `recordingFile = nil` でファイルを閉じる
 
-**PitchRepositoryImpl.swift**
-- `PitchRepository` プロトコルの具体実装（`MicrophoneDataSource` に委譲）
+**AudioPlayerDataSource.swift**
+- `AVAudioEngine` + `AVAudioPlayerNode` で m4a ファイルを再生
+- `play(url:)` — AVAudioSession を `.playback` に設定してファイルを再生
+- `pause()` / `resume()` / `stop()`
+- `Timer.publish(every: 0.1)` で再生位置を `playbackTimePublisher` にemit
+- 再生位置: `playerNode.playerTime(forNodeTime:)` で取得
+
+**PitchRepositoryImpl.swift** / **RecordingRepositoryImpl.swift** / **PlaybackRepositoryImpl.swift**
+- 各 Repository プロトコルの具体実装（DataSource に委譲）
+- `RecordingRepositoryImpl` は Documents ディレクトリの m4a を列挙し `AVAudioFile` で duration を取得
 
 ### Presentation/ViewModel
 
 **TunerViewModel.swift**（`@MainActor final class TunerViewModel: ObservableObject`）
 
-| プロパティ | 型 | 役割 |
-|------------|--------------------------|------------------------|
-| `currentPitch` | `@Published Float` | 現在の周波数（Hz） |
-| `noteResult` | `@Published (NoteInfo, Float)?` | 最近傍音符とセント偏差 |
-| `pitchHistory` | `@Published [PitchSample]` | 過去5秒のピッチ履歴 |
-| `isRunning` | `@Published Bool` | 録音中フラグ |
-| `permissionGranted` | `@Published Bool` | マイク許可フラグ |
+主要 @Published プロパティ:
+- `currentPitch: Float` — 現在の周波数（Hz）
+- `noteResult: (note: NoteInfo, cents: Float)?` — 最近傍音符とセント偏差
+- `pitchHistory: [PitchSample]` — 過去5秒のピッチ履歴
+- `currentTime: TimeInterval` — 経過時間（0.05秒タイマーで常時更新）
+- `isRunning: Bool` — 計測/録音中フラグ
+- `permissionGranted: Bool` — マイク許可フラグ
+- `isSavingRecording: Bool` — 録音中フラグ（isRunning とは独立）
+- `lastSavedRecording: RecordingFile?` — 最後に保存したファイル（一覧更新トリガー）
 
-- `init(useCase: any MonitorPitchUseCaseProtocol)` — プロトコルに依存（テスト時にモック注入可能）
-- `startMonitoring()` — UseCase.start() + `Timer.publish(every: 0.05)` で `currentTime` を常時更新 + Combine sink → `handleNewPitch()`
-- `stopMonitoring()` — `cancellables.removeAll()` でタイマーも自動停止、`currentTime` を 0 にリセット
+主要メソッド:
+- `startMonitoring()` — ピッチ検出のみ開始 + `Timer.publish(every: 0.05)` で `currentTime` を常時更新
+- `stopMonitoring()` — 停止。`cancellables.removeAll()` でタイマーも自動停止
+- `startRecording()` — `startMonitoring()` + `useCase.startRecording(to:)` で録音も開始
+- `stopRecording()` — 録音停止 → `stopMonitoring()` → `lastSavedRecording` を更新
 - `handleNewPitch(_:)` — 音符変換・pitchHistory 更新（5秒ウィンドウ）。サンプルの時刻は `currentTime` を使用
 
 **グラフ時間軸の設計**:
-録音中は無音でも `currentTime` が 0.05秒ごとに進み、グラフの時間軸が常に流れる。
+無音時でも `currentTime` が 0.05秒ごとに進み、グラフの時間軸が常に流れる。
 音が鳴ると `PitchSample(time: currentTime, frequency: pitch)` としてその時刻に折れ線が描画される。
+
+**RecordingListViewModel.swift**（`@MainActor final class RecordingListViewModel: ObservableObject`）
+- `recordings: [RecordingFile]` — 録音ファイル一覧
+- `selectedRecording: RecordingFile?` — 再生中ファイル
+- `isPlaying: Bool` / `playbackTime: TimeInterval` — 再生状態
+- `loadRecordings()` / `deleteRecording(_:)` / `selectAndPlay(_:)` / `togglePlayPause()` / `stopPlayback()`
 
 ### Presentation/View
 
-| ファイル | 役割 |
-|------------------------|----------------------------------------|
-| `ContentView.swift` | `@StateObject var viewModel` を保有するルートView |
-| `TunerMainView.swift` | `@ObservedObject var viewModel` を受け取るメイン画面 |
-| `PermissionRequestView.swift` | マイク未許可時の権限要求画面 |
-| `NoteDisplayView.swift` | 音名（日本語・西洋）と周波数の大きな表示 |
-| `CentsMeterView.swift` | セントメーター（-50〜+50、カラーグラデーション） |
-| `PitchGraphView.swift` | 5秒間のピッチ折れ線グラフ（Canvas描画、対数スケール） |
-| `RecordButton.swift` | 録音開始/停止ボタン |
+チューナータブ:
+- `ContentView.swift` — `TabView`（チューナー / 録音一覧）のルートView。`TunerViewModel` + `RecordingListViewModel` を `@StateObject` で保有。`onChange(of: lastSavedRecording)` で一覧を自動更新
+- `TunerMainView.swift` — 上部に計測/録音モード切替セグメント付きのメイン画面
+- `PermissionRequestView.swift` — マイク未許可時の権限要求画面
+- `NoteDisplayView.swift` — 音名（日本語・西洋）と周波数の大きな表示
+- `CentsMeterView.swift` — セントメーター（-50〜+50、カラーグラデーション）
+- `PitchGraphView.swift` — 5秒間のピッチ折れ線グラフ（Canvas描画、対数スケール）
+- `RecordButton.swift` — `isRecordingMode` でラベルを切り替え（計測開始/停止 or 録音開始/停止）
+
+録音一覧タブ:
+- `RecordingListView.swift` — 録音一覧（空状態表示、スワイプ削除）。下部に `PlaybackControlView`
+- `RecordingRowView.swift` — ファイル名（拡張子なし）・録音時間・サイズを表示
+- `PlaybackControlView.swift` — シークバー + 再生/一時停止 + 停止ボタン
 
 UIのポイント:
 - セントメーター: ±10セントが緑、±25セントが黄、それ以上が赤
@@ -182,6 +242,7 @@ UIのポイント:
 - `detectPitch` は `nonisolated static func` でバックグラウンド実行OK
 - タップコールバック → `Task { @MainActor [weak self] in subject.send(pitch) }` でメインに切り替え
 - `TunerViewModel` の `sink` 内 → subject.send が MainActor から呼ばれるため受信も MainActor 上
+- `MicrophoneDataSource.recordingFile` は `nonisolated(unsafe) var` として宣言し、タップコールバック（バックグラウンドスレッド）から直接 `AVAudioFile.write(from:)` を呼ぶ
 
 ---
 
@@ -218,5 +279,6 @@ INFOPLIST_KEY_NSMicrophoneUsageDescription = "マイクを使って篠笛の音�
 
 - Beethoven ライブラリの導入（より高精度なピッチ検出）
 - 音量（dB）メーターの追加
-- 録音履歴の保存・再生機能
 - 他の調子（本数）への対応（基準周波数の切り替え）
+- 再生中に篠笛のピッチ解析をリアルタイム表示（再生モードのチューナー連携）
+- 録音ファイルの共有（Share Sheet）

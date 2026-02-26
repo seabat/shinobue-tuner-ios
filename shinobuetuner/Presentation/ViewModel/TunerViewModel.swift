@@ -26,10 +26,15 @@ final class TunerViewModel: ObservableObject {
     @Published var permissionGranted: Bool = false
     /// セッション開始からの経過時間（録音中は常に更新される）
     @Published var currentTime: TimeInterval = 0
+    /// 録音中かどうか（ピッチ監視とは独立）
+    @Published var isSavingRecording: Bool = false
+    /// 直近に保存した録音ファイル（ContentView が一覧を更新するトリガーに使う）
+    @Published var lastSavedRecording: RecordingFile? = nil
 
     // MARK: - 内部
 
     private let useCase: any MonitorPitchUseCaseProtocol
+    private let recordingRepository: any RecordingRepository
     private var cancellables = Set<AnyCancellable>()
     private var sessionStartTime: Date = Date()
 
@@ -37,12 +42,13 @@ final class TunerViewModel: ObservableObject {
     convenience init() {
         let repository = PitchRepositoryImpl()
         let useCase = MonitorPitchUseCase(repository: repository)
-        self.init(useCase: useCase)
+        self.init(useCase: useCase, recordingRepository: RecordingRepositoryImpl())
     }
 
     /// テスト時にモックを注入できる初期化
-    init(useCase: any MonitorPitchUseCaseProtocol) {
+    init(useCase: any MonitorPitchUseCaseProtocol, recordingRepository: any RecordingRepository = RecordingRepositoryImpl()) {
         self.useCase = useCase
+        self.recordingRepository = recordingRepository
     }
 
     // MARK: - 操作
@@ -86,6 +92,27 @@ final class TunerViewModel: ObservableObject {
         currentPitch = 0
         currentTime = 0
         noteResult = nil
+    }
+
+    /// ピッチ監視 + 録音を開始する
+    func startRecording() {
+        let url = recordingRepository.newRecordingURL()
+        startMonitoring()
+        do {
+            try useCase.startRecording(to: url)
+            isSavingRecording = true
+        } catch {
+            print("録音開始エラー: \(error)")
+        }
+    }
+
+    /// 録音を停止してファイルを保存する
+    func stopRecording() {
+        useCase.stopRecording()
+        isSavingRecording = false
+        stopMonitoring()
+        // ContentView が onChange で検知して録音一覧をリロードする
+        lastSavedRecording = recordingRepository.fetchAll().first
     }
 
     // MARK: - 内部処理
