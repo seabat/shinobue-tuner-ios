@@ -55,3 +55,42 @@ struct NoteDisplayView: View {
         .animation(.easeInOut(duration: 0.1), value: noteResult?.note.midiNote)
     }
 }
+
+// MARK: - Preview
+
+#Preview {
+    VStack(spacing: 0) {
+        // チューニング完了（±10セント以内 → 緑）
+        NoteDisplayView(
+            noteResult: NoteHelper.closestNote(for: 295.5),
+            currentPitch: 295.5
+        )
+        .frame(height: 160)
+
+        Divider().background(.gray.opacity(0.3))
+
+        // シャープ寄り（±25セント以内 → 黄）
+        NoteDisplayView(
+            noteResult: NoteHelper.closestNote(for: 305.0),
+            currentPitch: 305.0
+        )
+        .frame(height: 160)
+
+        Divider().background(.gray.opacity(0.3))
+
+        // 大きくズレている（±25セント超 → 赤）
+        NoteDisplayView(
+            noteResult: NoteHelper.closestNote(for: 320.0),
+            currentPitch: 320.0
+        )
+        .frame(height: 160)
+
+        Divider().background(.gray.opacity(0.3))
+
+        // 無音
+        NoteDisplayView(noteResult: nil, currentPitch: 0)
+            .frame(height: 160)
+    }
+    .background(Color(red: 0.078, green: 0.078, blue: 0.118))
+    .preferredColorScheme(.dark)
+}

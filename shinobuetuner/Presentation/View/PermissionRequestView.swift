@@ -7,6 +7,7 @@
 //  マイク権限が未許可のときに表示する権限要求ビュー
 
 import SwiftUI
+import Combine
 
 /// マイク権限要求ビュー
 struct PermissionRequestView: View {
@@ -45,4 +46,23 @@ struct PermissionRequestView: View {
         }
         .padding(32)
     }
+}
+
+// MARK: - Preview
+
+private final class PreviewUseCase: MonitorPitchUseCaseProtocol {
+    var pitchPublisher: AnyPublisher<Float, Never> {
+        Empty().eraseToAnyPublisher()
+    }
+    func start() {}
+    func stop() {}
+    func requestPermission() async -> Bool { true }
+}
+
+#Preview {
+    let vm = TunerViewModel(useCase: PreviewUseCase())
+    return PermissionRequestView(viewModel: vm)
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(Color(red: 0.078, green: 0.078, blue: 0.118))
+        .preferredColorScheme(.dark)
 }

@@ -32,3 +32,18 @@ struct RecordButton: View {
         .padding(.horizontal, 24)
     }
 }
+
+// MARK: - Preview
+
+#Preview {
+    VStack(spacing: 32) {
+        // 停止中
+        RecordButton(isRunning: false) {}
+
+        // 録音中
+        RecordButton(isRunning: true) {}
+    }
+    .padding(40)
+    .background(Color(red: 0.078, green: 0.078, blue: 0.118))
+    .preferredColorScheme(.dark)
+}

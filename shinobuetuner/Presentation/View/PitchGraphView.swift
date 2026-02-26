@@ -136,3 +136,27 @@ struct PitchGraphView: View {
         return rect.maxY - CGFloat(normalized) * rect.height
     }
 }
+
+// MARK: - Preview
+
+#Preview("ピッチあり（レ付近を揺れながら上昇）") {
+    // 0〜5秒間、D4（295Hz）付近からE4（331Hz）に向かってサイン波で揺れながら上昇するデータ
+    let history: [PitchSample] = stride(from: 0.0, to: 5.0, by: 0.05).map { t in
+        let base = 295.0 + (t / 5.0) * 36.0          // D4 → E4 に向かう
+        let freq = base + 8.0 * sin(t * 4.0)          // サイン波で揺れ
+        return PitchSample(time: t, frequency: Float(freq))
+    }
+    return PitchGraphView(pitchHistory: history, currentTime: 5.0)
+        .frame(height: 240)
+        .padding(16)
+        .background(Color(red: 0.078, green: 0.078, blue: 0.118))
+        .preferredColorScheme(.dark)
+}
+
+#Preview("データなし（無音）") {
+    PitchGraphView(pitchHistory: [], currentTime: 0)
+        .frame(height: 240)
+        .padding(16)
+        .background(Color(red: 0.078, green: 0.078, blue: 0.118))
+        .preferredColorScheme(.dark)
+}
