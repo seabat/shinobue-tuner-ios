@@ -14,14 +14,14 @@ struct PitchGraphView: View {
     let currentTime: TimeInterval
 
     // グラフのHz範囲（篠笛の実用音域）
-    private let minHz: Float = 100
+    private let minHz: Float = 120
     private let maxHz: Float = 800
 
     // グラフに表示する主要音符の周波数ライン
     private let noteLines: [(freq: Float, label: String)] = {
-        var lines: [(Float, String)] = []
-        // A3 ～ F5 の範囲で自然音のみ表示
+        // C3 ～ F5 の範囲で自然音のみ表示
         let targets = [
+            (131.4, "C3"), (147.5, "D3"), (165.6, "E3"), (175.4, "F3"), (196.9, "G3"),
             (221.0, "A3"), (248.1, "B3"), (262.8, "C4"), (295.0, "D4"),
             (331.1, "E4"), (350.8, "F4"), (393.8, "G4"), (442.0, "A4"),
             (496.1, "B4"), (525.6, "C5"), (590.0, "D5"), (662.3, "E5"), (701.6, "F5")
@@ -37,9 +37,12 @@ struct PitchGraphView: View {
                 .padding(.leading, 8)
 
             Canvas { context, size in
+                // 左: Hz値ラベル、右: 音名ラベル のエリアを確保
+                let leftMargin: CGFloat = 42
+                let rightMargin: CGFloat = 38
                 let graphRect = CGRect(
-                    x: 40, y: 0,
-                    width: size.width - 50,
+                    x: leftMargin, y: 0,
+                    width: size.width - leftMargin - rightMargin,
                     height: size.height
                 )
 
@@ -65,13 +68,23 @@ struct PitchGraphView: View {
                         style: StrokeStyle(lineWidth: 1, dash: [4, 4])
                     )
 
-                    // 音名ラベル（左側）
-                    let text = Text(line.label)
+                    // Hz値ラベル（左側）
+                    let hzText = Text(String(format: "%.0f", line.freq))
                         .font(.system(size: 9))
-                        .foregroundColor(.gray.opacity(0.7))
+                        .foregroundColor(.gray)
                     context.draw(
-                        text,
-                        at: CGPoint(x: 20, y: y),
+                        hzText,
+                        at: CGPoint(x: leftMargin / 2, y: y),
+                        anchor: .center
+                    )
+
+                    // 音名ラベル（右側）
+                    let noteText = Text(line.label)
+                        .font(.system(size: 9))
+                        .foregroundColor(.gray)
+                    context.draw(
+                        noteText,
+                        at: CGPoint(x: size.width - rightMargin / 2, y: y),
                         anchor: .center
                     )
                 }
