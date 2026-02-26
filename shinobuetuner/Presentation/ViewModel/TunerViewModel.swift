@@ -24,6 +24,8 @@ final class TunerViewModel: ObservableObject {
     @Published var isRunning: Bool = false
     /// マイクの許可が得られているかどうか
     @Published var permissionGranted: Bool = false
+    /// セッション開始からの経過時間（録音中は常に更新される）
+    @Published var currentTime: TimeInterval = 0
 
     // MARK: - 内部
 
@@ -55,7 +57,17 @@ final class TunerViewModel: ObservableObject {
     func startMonitoring() {
         sessionStartTime = Date()
         pitchHistory = []
+        currentTime = 0
         isRunning = true
+
+        // グラフの時間軸を動かすタイマー（0.05秒ごと）
+        Timer.publish(every: 0.05, on: .main, in: .common)
+            .autoconnect()
+            .sink { [weak self] _ in
+                guard let self else { return }
+                currentTime = Date().timeIntervalSince(sessionStartTime)
+            }
+            .store(in: &cancellables)
 
         useCase.pitchPublisher
             .sink { [weak self] pitch in
@@ -72,6 +84,7 @@ final class TunerViewModel: ObservableObject {
         cancellables.removeAll()
         isRunning = false
         currentPitch = 0
+        currentTime = 0
         noteResult = nil
     }
 
@@ -85,14 +98,12 @@ final class TunerViewModel: ObservableObject {
             // 音符情報を更新
             noteResult = NoteHelper.closestNote(for: pitch)
 
-            // ピッチ履歴を更新
-            let elapsed = Date().timeIntervalSince(sessionStartTime)
-            let sample = PitchSample(time: elapsed, frequency: pitch)
+            // ピッチ履歴を更新（currentTime はタイマーが管理）
+            let sample = PitchSample(time: currentTime, frequency: pitch)
             pitchHistory.append(sample)
 
             // 5秒より古いデータを削除
-            let cutoff = elapsed - 5.0
-            pitchHistory.removeAll { $0.time < cutoff }
+            pitchHistory.removeAll { $0.time < currentTime - 5.0 }
         } else {
             noteResult = nil
         }

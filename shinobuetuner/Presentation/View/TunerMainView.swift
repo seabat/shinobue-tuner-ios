@@ -35,7 +35,7 @@ struct TunerMainView: View {
             // ─── ピッチグラフ（5秒間） ───
             PitchGraphView(
                 pitchHistory: viewModel.pitchHistory,
-                currentTime: viewModel.pitchHistory.last?.time ?? 0
+                currentTime: viewModel.currentTime
             )
             .frame(maxHeight: .infinity)
             .padding(.horizontal, 16)

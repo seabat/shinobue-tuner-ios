@@ -13,6 +13,7 @@
 - マイクから音声を取得し、ピッチ（Hz）をリアルタイム計測
 - 検出した音が正しい周波数からどれだけ離れているかをセント単位で表示
 - y軸: ピッチ（Hz）、x軸: 経過時間（5秒幅）の折れ線グラフをリアルタイム表示
+- 録音中は無音時でもグラフの時間軸が常に流れ、音が鳴った瞬間に折れ線が描画される
 
 ### チューニング設定
 - 基準音: **A4 = 442 Hz**（篠笛６本調子）
@@ -149,8 +150,13 @@ shinobuetuner/
 | `permissionGranted` | `@Published Bool` | マイク許可フラグ |
 
 - `init(useCase: any MonitorPitchUseCaseProtocol)` — プロトコルに依存（テスト時にモック注入可能）
-- `startMonitoring()` — UseCase.start() + Combine sink → `handleNewPitch()`
-- `handleNewPitch(_:)` — 音符変換・pitchHistory 更新（5秒ウィンドウ）
+- `startMonitoring()` — UseCase.start() + `Timer.publish(every: 0.05)` で `currentTime` を常時更新 + Combine sink → `handleNewPitch()`
+- `stopMonitoring()` — `cancellables.removeAll()` でタイマーも自動停止、`currentTime` を 0 にリセット
+- `handleNewPitch(_:)` — 音符変換・pitchHistory 更新（5秒ウィンドウ）。サンプルの時刻は `currentTime` を使用
+
+**グラフ時間軸の設計**:
+録音中は無音でも `currentTime` が 0.05秒ごとに進み、グラフの時間軸が常に流れる。
+音が鳴ると `PitchSample(time: currentTime, frequency: pitch)` としてその時刻に折れ線が描画される。
 
 ### Presentation/View
 
