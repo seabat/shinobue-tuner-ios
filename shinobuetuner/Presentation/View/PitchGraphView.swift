@@ -32,7 +32,7 @@ struct PitchGraphView: View {
         VStack(alignment: .leading, spacing: 4) {
             Text("ピッチグラフ（5秒間）")
                 .font(.caption)
-                .foregroundStyle(.gray)
+                .foregroundStyle(.white.opacity(0.7))
                 .padding(.leading, 8)
 
             Canvas { context, size in
@@ -72,7 +72,7 @@ struct PitchGraphView: View {
                     // Hz値ラベル（左側）
                     let hzText = Text(String(format: "%.0f", line.freq))
                         .font(.system(size: 9))
-                        .foregroundColor(.gray)
+                        .foregroundColor(.white.opacity(0.7))
                     context.draw(
                         hzText,
                         at: CGPoint(x: leftMargin / 2, y: y),
@@ -82,7 +82,7 @@ struct PitchGraphView: View {
                     // 音名ラベル（右側）
                     let noteText = Text(line.label)
                         .font(.system(size: 9))
-                        .foregroundColor(.gray)
+                        .foregroundColor(.white.opacity(0.7))
                     context.draw(
                         noteText,
                         at: CGPoint(x: size.width - rightMargin / 2, y: y),

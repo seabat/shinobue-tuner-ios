@@ -87,15 +87,15 @@ struct CentsMeterView: View {
 
                     // 目盛りラベル
                     HStack {
-                        Text("-50").font(.caption2).foregroundStyle(.gray)
+                        Text("-50").font(.caption2).foregroundStyle(.white.opacity(0.7))
                         Spacer()
-                        Text("-25").font(.caption2).foregroundStyle(.gray)
+                        Text("-25").font(.caption2).foregroundStyle(.white.opacity(0.7))
                         Spacer()
                         Text("0").font(.caption2).foregroundStyle(.white)
                         Spacer()
-                        Text("+25").font(.caption2).foregroundStyle(.gray)
+                        Text("+25").font(.caption2).foregroundStyle(.white.opacity(0.7))
                         Spacer()
-                        Text("+50").font(.caption2).foregroundStyle(.gray)
+                        Text("+50").font(.caption2).foregroundStyle(.white.opacity(0.7))
                     }
                     .offset(y: h * 0.6)
                 }
@@ -106,7 +106,7 @@ struct CentsMeterView: View {
         if isActive {
             Text(String(format: "%+.1f セント", cents))
                 .font(.system(size: 13, design: .monospaced))
-                .foregroundStyle(.gray)
+                .foregroundStyle(.white.opacity(0.7))
         }
     }
 }

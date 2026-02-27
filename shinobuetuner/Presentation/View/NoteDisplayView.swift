@@ -38,16 +38,16 @@ struct NoteDisplayView: View {
                 // 周波数
                 Text(String(format: "%.1f Hz", currentPitch))
                     .font(.system(size: 16, design: .monospaced))
-                    .foregroundStyle(.gray)
+                    .foregroundStyle(.white.opacity(0.7))
             } else {
                 // 無音時
                 Text("---")
                     .font(.system(size: 72, weight: .bold, design: .rounded))
-                    .foregroundStyle(.gray.opacity(0.4))
+                    .foregroundStyle(.white.opacity(0.35))
 
                 Text("音を鳴らしてください")
                     .font(.body)
-                    .foregroundStyle(.gray.opacity(0.6))
+                    .foregroundStyle(.white.opacity(0.55))
                     .padding(.top, 4)
             }
         }
