@@ -13,15 +13,14 @@ struct PitchGraphView: View {
     let pitchHistory: [PitchSample]
     let currentTime: TimeInterval
 
-    // グラフのHz範囲（篠笛の実用音域）
-    private let minHz: Float = 120
-    private let maxHz: Float = 800
+    // グラフのHz範囲（ファ/F3 ～ ファ/F5）
+    private let minHz: Float = 175.4
+    private let maxHz: Float = 701.6
 
-    // グラフに表示する主要音符の周波数ライン
+    // グラフに表示する主要音符の周波数ライン（F3 ～ F5 の範囲）
     private let noteLines: [(freq: Float, label: String)] = {
-        // C3 ～ F5 の範囲で自然音のみ表示
         let targets = [
-            (131.4, "C3"), (147.5, "D3"), (165.6, "E3"), (175.4, "F3"), (196.9, "G3"),
+            (175.4, "F3"), (196.9, "G3"),
             (221.0, "A3"), (248.1, "B3"), (262.8, "C4"), (295.0, "D4"),
             (331.1, "E4"), (350.8, "F4"), (393.8, "G4"), (442.0, "A4"),
             (496.1, "B4"), (525.6, "C5"), (590.0, "D5"), (662.3, "E5"), (701.6, "F5")
@@ -40,10 +39,12 @@ struct PitchGraphView: View {
                 // 左: Hz値ラベル、右: 音名ラベル のエリアを確保
                 let leftMargin: CGFloat = 42
                 let rightMargin: CGFloat = 38
+                // 上下端のラベル（F5/F3）が切れないよう内側に余白を取る
+                let verticalPadding: CGFloat = 8
                 let graphRect = CGRect(
-                    x: leftMargin, y: 0,
+                    x: leftMargin, y: verticalPadding,
                     width: size.width - leftMargin - rightMargin,
-                    height: size.height
+                    height: size.height - verticalPadding * 2
                 )
 
                 // 背景

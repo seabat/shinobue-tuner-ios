@@ -41,7 +41,7 @@ struct TunerMainView: View {
                 cents: viewModel.noteResult?.cents ?? 0,
                 isActive: viewModel.currentPitch > 0
             )
-            .frame(height: 72)
+            .frame(height: 90)
             .padding(.horizontal, 24)
             .padding(.vertical, 4)
 
@@ -52,7 +52,7 @@ struct TunerMainView: View {
             )
             .frame(maxHeight: .infinity)
             .padding(.horizontal, 16)
-            .padding(.bottom, 20)
+            .padding(.bottom, 32)
 
             // ─── 開始/停止ボタン + モード切替 ───
             ZStack {
@@ -77,6 +77,7 @@ struct TunerMainView: View {
                         .padding(.trailing, 20)
                 }
             }
+            .padding(.top, 8)
             .padding(.bottom, 24)
         }
         .overlay {
