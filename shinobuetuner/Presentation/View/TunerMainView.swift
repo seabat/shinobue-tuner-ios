@@ -33,8 +33,7 @@ struct TunerMainView: View {
                 noteResult: viewModel.noteResult,
                 currentPitch: viewModel.currentPitch
             )
-            .frame(height: 130)
-            .padding(.vertical, 1)
+            .frame(height: 160)
 
             // ─── チューナーメーター ───
             CentsMeterView(
