@@ -20,6 +20,8 @@ final class AudioPlayerDataSource {
     private var audioFile: AVAudioFile?
     /// pause() 時に保存する再生位置（resume() 後の基点）
     private var seekOffset: TimeInterval = 0
+    /// pause() 時の sampleTime（resume() 後の差分計算に使用）
+    private var sampleTimeAtPause: Double = 0
     private var timerCancellable: AnyCancellable?
 
     var playbackTimePublisher: AnyPublisher<TimeInterval, Never> {
@@ -48,6 +50,7 @@ final class AudioPlayerDataSource {
         let file = try AVAudioFile(forReading: url)
         audioFile = file
         seekOffset = 0
+        sampleTimeAtPause = 0
 
         let totalDuration = Double(file.length) / file.processingFormat.sampleRate
 
@@ -71,6 +74,12 @@ final class AudioPlayerDataSource {
     /// 再生を一時停止する
     func pause() {
         seekOffset = currentPlaybackTime()
+        // resume() 後の sampleTime は pause 時点から継続するため、その基点を記録する
+        if let nodeTime = playerNode.lastRenderTime,
+           let playerTime = playerNode.playerTime(forNodeTime: nodeTime),
+           playerTime.sampleTime >= 0 {
+            sampleTimeAtPause = Double(playerTime.sampleTime)
+        }
         playerNode.pause()
         isPlayingSubject.send(false)
         stopTimeTracking()
@@ -90,6 +99,7 @@ final class AudioPlayerDataSource {
         if engine.isRunning { engine.stop() }
         audioFile = nil
         seekOffset = 0
+        sampleTimeAtPause = 0
         isPlayingSubject.send(false)
         timeSubject.send(0)
 
@@ -121,6 +131,9 @@ final class AudioPlayerDataSource {
               playerTime.sampleTime >= 0 else {
             return seekOffset
         }
-        return Double(playerTime.sampleTime) / playerTime.sampleRate + seekOffset
+        // resume() 後の sampleTime は pause 時点の値から継続するため、
+        // sampleTimeAtPause を差し引いて pause 後の増分だけを seekOffset に加算する
+        let elapsed = (Double(playerTime.sampleTime) - sampleTimeAtPause) / playerTime.sampleRate
+        return max(seekOffset + elapsed, 0)
     }
 }
