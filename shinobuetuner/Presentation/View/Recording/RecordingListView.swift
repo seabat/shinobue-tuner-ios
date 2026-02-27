@@ -35,19 +35,27 @@ struct RecordingListView: View {
                 VStack(spacing: 0) {
                     List {
                         ForEach(viewModel.recordings) { recording in
+                            let isLocked = viewModel.isPlaying
+                            let isSelected = viewModel.selectedRecording?.id == recording.id
                             RecordingRowView(
                                 recording: recording,
-                                isSelected: viewModel.selectedRecording?.id == recording.id,
+                                isSelected: isSelected,
                                 isPlaying: viewModel.isPlaying
                             )
+                            // 再生中は選択済み以外のアイテムを半透明にする
+                            .opacity(isLocked && !isSelected ? 0.4 : 1.0)
                             .onTapGesture {
+                                guard !isLocked else { return }
                                 viewModel.selectAndPlay(recording)
                             }
                             .swipeActions(edge: .trailing) {
-                                Button(role: .destructive) {
-                                    viewModel.deleteRecording(recording)
-                                } label: {
-                                    Label("削除", systemImage: "trash")
+                                // 再生中はスワイプ削除を非表示にする
+                                if !isLocked {
+                                    Button(role: .destructive) {
+                                        viewModel.deleteRecording(recording)
+                                    } label: {
+                                        Label("削除", systemImage: "trash")
+                                    }
                                 }
                             }
                         }

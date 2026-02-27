@@ -18,10 +18,12 @@ final class AudioPlayerDataSource {
     private let isPlayingSubject = CurrentValueSubject<Bool, Never>(false)
 
     private var audioFile: AVAudioFile?
+    /// play() / resume() 時の開始日時（経過時間の計算基点）
+    private var playStartTime: Date? = nil
     /// pause() 時に保存する再生位置（resume() 後の基点）
     private var seekOffset: TimeInterval = 0
-    /// pause() 時の sampleTime（resume() 後の差分計算に使用）
-    private var sampleTimeAtPause: Double = 0
+    /// 再生セッションID（stop() のたびに更新し、古いコールバックを無効化する）
+    private var sessionID = UUID()
     private var timerCancellable: AnyCancellable?
 
     var playbackTimePublisher: AnyPublisher<TimeInterval, Never> {
@@ -50,9 +52,12 @@ final class AudioPlayerDataSource {
         let file = try AVAudioFile(forReading: url)
         audioFile = file
         seekOffset = 0
-        sampleTimeAtPause = 0
 
         let totalDuration = Double(file.length) / file.processingFormat.sampleRate
+
+        // 新しいセッションIDを発行（stop() 前のコールバックを無効化するため）
+        let currentSessionID = UUID()
+        sessionID = currentSessionID
 
         engine.connect(playerNode, to: engine.mainMixerNode, format: file.processingFormat)
         try engine.start()
@@ -61,12 +66,15 @@ final class AudioPlayerDataSource {
         // （デフォルトの completionHandler はバッファ書き込み完了時に呼ばれるため早すぎる）
         playerNode.scheduleFile(file, at: nil, completionCallbackType: .dataPlayedBack) { [weak self] _ in
             Task { @MainActor [weak self] in
-                self?.timeSubject.send(totalDuration)
-                self?.isPlayingSubject.send(false)
-                self?.stopTimeTracking()
+                // セッションIDが変わっていれば別ファイルに切り替わっているためスキップ
+                guard let self, self.sessionID == currentSessionID else { return }
+                self.timeSubject.send(totalDuration)
+                self.isPlayingSubject.send(false)
+                self.stopTimeTracking()
             }
         }
         playerNode.play()
+        playStartTime = Date()
         isPlayingSubject.send(true)
         startTimeTracking()
     }
@@ -74,12 +82,7 @@ final class AudioPlayerDataSource {
     /// 再生を一時停止する
     func pause() {
         seekOffset = currentPlaybackTime()
-        // resume() 後の sampleTime は pause 時点から継続するため、その基点を記録する
-        if let nodeTime = playerNode.lastRenderTime,
-           let playerTime = playerNode.playerTime(forNodeTime: nodeTime),
-           playerTime.sampleTime >= 0 {
-            sampleTimeAtPause = Double(playerTime.sampleTime)
-        }
+        playStartTime = nil
         playerNode.pause()
         isPlayingSubject.send(false)
         stopTimeTracking()
@@ -88,18 +91,21 @@ final class AudioPlayerDataSource {
     /// 一時停止した再生を再開する
     func resume() {
         playerNode.play()
+        playStartTime = Date()
         isPlayingSubject.send(true)
         startTimeTracking()
     }
 
     /// 再生を停止してリソースを解放する
     func stop() {
+        // sessionID を更新して前のコールバックを無効化する
+        sessionID = UUID()
         stopTimeTracking()
         playerNode.stop()
         if engine.isRunning { engine.stop() }
         audioFile = nil
         seekOffset = 0
-        sampleTimeAtPause = 0
+        playStartTime = nil
         isPlayingSubject.send(false)
         timeSubject.send(0)
 
@@ -124,16 +130,13 @@ final class AudioPlayerDataSource {
         timerCancellable = nil
     }
 
-    /// AVAudioPlayerNode から現在の再生位置（秒）を取得する
+    /// 現在の再生位置（秒）を返す
+    /// sampleTime は engine.stop() → start() をまたいでリセットされないため、
+    /// Date ベースの経過時間で計算する
     private func currentPlaybackTime() -> TimeInterval {
-        guard let nodeTime = playerNode.lastRenderTime,
-              let playerTime = playerNode.playerTime(forNodeTime: nodeTime),
-              playerTime.sampleTime >= 0 else {
+        guard let startTime = playStartTime else {
             return seekOffset
         }
-        // resume() 後の sampleTime は pause 時点の値から継続するため、
-        // sampleTimeAtPause を差し引いて pause 後の増分だけを seekOffset に加算する
-        let elapsed = (Double(playerTime.sampleTime) - sampleTimeAtPause) / playerTime.sampleRate
-        return max(seekOffset + elapsed, 0)
+        return seekOffset + Date().timeIntervalSince(startTime)
     }
 }

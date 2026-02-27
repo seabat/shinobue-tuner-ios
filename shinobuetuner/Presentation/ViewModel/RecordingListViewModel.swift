@@ -72,6 +72,7 @@ final class RecordingListViewModel: ObservableObject {
     /// 録音ファイルを選択して再生する
     func selectAndPlay(_ recording: RecordingFile) {
         do {
+            playbackTime = 0
             selectedRecording = recording
             try playbackUseCase.play(recording: recording)
         } catch {
