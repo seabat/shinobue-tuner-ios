@@ -62,3 +62,41 @@ struct RecordingRowView: View {
         }
     }
 }
+
+// MARK: - Preview
+
+private let previewRecording = RecordingFile(
+    id: UUID(),
+    url: URL(fileURLWithPath: "/tmp/2026-02-27_10-00-00.m4a"),
+    fileName: "2026-02-27_10-00-00.m4a",
+    createdAt: Date(),
+    duration: 93,       // 1分33秒
+    fileSize: 312_320   // 約305KB
+)
+
+#Preview("通常（非選択）") {
+    List {
+        RecordingRowView(recording: previewRecording, isSelected: false, isPlaying: false)
+    }
+    .listStyle(.plain)
+    .background(Color(red: 0.078, green: 0.078, blue: 0.118))
+    .preferredColorScheme(.dark)
+}
+
+#Preview("選択中・再生中") {
+    List {
+        RecordingRowView(recording: previewRecording, isSelected: true, isPlaying: true)
+    }
+    .listStyle(.plain)
+    .background(Color(red: 0.078, green: 0.078, blue: 0.118))
+    .preferredColorScheme(.dark)
+}
+
+#Preview("選択中・一時停止中") {
+    List {
+        RecordingRowView(recording: previewRecording, isSelected: true, isPlaying: false)
+    }
+    .listStyle(.plain)
+    .background(Color(red: 0.078, green: 0.078, blue: 0.118))
+    .preferredColorScheme(.dark)
+}

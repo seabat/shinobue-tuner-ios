@@ -125,28 +125,40 @@ struct Triangle: Shape {
 
 // MARK: - Preview
 
-#Preview {
-    VStack(spacing: 32) {
-        // チューニング完了（±0セント）
-        CentsMeterView(cents: 0, isActive: true)
-            .frame(height: 90)
+#Preview("チューニング完了（±0セント）") {
+    CentsMeterView(cents: 0, isActive: true)
+        .frame(height: 90)
+        .padding(.horizontal, 24)
+        .padding(.vertical, 16)
+        .background(Color(red: 0.078, green: 0.078, blue: 0.118))
+        .preferredColorScheme(.dark)
+}
 
-        // シャープ寄り（+25セント）
-        CentsMeterView(cents: 25, isActive: true)
-            .frame(height: 90)
+#Preview("シャープ寄り（+25セント）") {
+    CentsMeterView(cents: 25, isActive: true)
+        .frame(height: 90)
+        .padding(.horizontal, 24)
+        .padding(.vertical, 16)
+        .background(Color(red: 0.078, green: 0.078, blue: 0.118))
+        .preferredColorScheme(.dark)
+}
 
-        // フラット寄り（-30セント）
-        CentsMeterView(cents: -30, isActive: true)
-            .frame(height: 90)
+#Preview("フラット寄り（-30セント）") {
+    CentsMeterView(cents: -30, isActive: true)
+        .frame(height: 90)
+        .padding(.horizontal, 24)
+        .padding(.vertical, 16)
+        .background(Color(red: 0.078, green: 0.078, blue: 0.118))
+        .preferredColorScheme(.dark)
+}
 
-        // 無音（非アクティブ）
-        CentsMeterView(cents: 0, isActive: false)
-            .frame(height: 90)
-    }
-    .padding(.horizontal, 24)
-    .padding(.vertical, 16)
-    .background(Color(red: 0.078, green: 0.078, blue: 0.118))
-    .preferredColorScheme(.dark)
+#Preview("無音（非アクティブ）") {
+    CentsMeterView(cents: 0, isActive: false)
+        .frame(height: 90)
+        .padding(.horizontal, 24)
+        .padding(.vertical, 16)
+        .background(Color(red: 0.078, green: 0.078, blue: 0.118))
+        .preferredColorScheme(.dark)
 }
 
 // MARK: - ヘルパー拡張

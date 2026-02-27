@@ -6,6 +6,7 @@
 //
 //  録音一覧画面の下部に表示する再生コントロールバー
 
+import Combine
 import SwiftUI
 
 /// 再生コントロールバー（選択中の録音ファイルがある場合に表示）
@@ -77,4 +78,71 @@ struct PlaybackControlView: View {
         let seconds = total % 60
         return String(format: "%d:%02d", minutes, seconds)
     }
+}
+
+// MARK: - Preview
+
+private let previewRecording = RecordingFile(
+    id: UUID(),
+    url: URL(fileURLWithPath: "/tmp/2026-02-27_10-00-00.m4a"),
+    fileName: "2026-02-27_10-00-00.m4a",
+    createdAt: Date(),
+    duration: 93,
+    fileSize: 312_320
+)
+
+/// プレビュー用スタブ（録音管理）
+private final class PreviewManageUseCase: ManageRecordingsUseCaseProtocol {
+    func fetchAll() -> [RecordingFile] { [] }
+    func delete(recording: RecordingFile) throws {}
+}
+
+/// プレビュー用スタブ（再生）
+private final class PreviewPlaybackUseCase: PlaybackUseCaseProtocol {
+    var playbackTimePublisher: AnyPublisher<TimeInterval, Never> {
+        Just(0).eraseToAnyPublisher()
+    }
+    var isPlayingPublisher: AnyPublisher<Bool, Never> {
+        Just(false).eraseToAnyPublisher()
+    }
+    func play(recording: RecordingFile) throws {}
+    func pause() {}
+    func resume() {}
+    func stop() {}
+}
+
+#Preview("再生中（途中）") {
+    let vm = RecordingListViewModel(
+        manageUseCase: PreviewManageUseCase(),
+        playbackUseCase: PreviewPlaybackUseCase()
+    )
+    vm.selectedRecording = previewRecording
+    vm.isPlaying = true
+    vm.playbackTime = 34
+    return PlaybackControlView(viewModel: vm)
+        .preferredColorScheme(.dark)
+}
+
+#Preview("一時停止中") {
+    let vm = RecordingListViewModel(
+        manageUseCase: PreviewManageUseCase(),
+        playbackUseCase: PreviewPlaybackUseCase()
+    )
+    vm.selectedRecording = previewRecording
+    vm.isPlaying = false
+    vm.playbackTime = 34
+    return PlaybackControlView(viewModel: vm)
+        .preferredColorScheme(.dark)
+}
+
+#Preview("再生開始直後") {
+    let vm = RecordingListViewModel(
+        manageUseCase: PreviewManageUseCase(),
+        playbackUseCase: PreviewPlaybackUseCase()
+    )
+    vm.selectedRecording = previewRecording
+    vm.isPlaying = true
+    vm.playbackTime = 0
+    return PlaybackControlView(viewModel: vm)
+        .preferredColorScheme(.dark)
 }
