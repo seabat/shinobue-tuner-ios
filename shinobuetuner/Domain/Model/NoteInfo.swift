@@ -11,9 +11,10 @@ import Foundation
 /// 音符の情報を表す構造体
 struct NoteInfo {
     let midiNote: Int
-    let frequency: Double    // 基準周波数（Hz）
-    let westernName: String  // 西洋音名（例: "A4", "C♯4"）
-    let japaneseName: String // 日本語音名（例: "ラ", "ド♯"）
+    let frequency: Double      // 基準周波数（Hz）
+    let westernName: String    // 西洋音名（例: "A4", "B♭4"）
+    let japaneseName: String   // 日本語音名・篠笛読み方（例: "シ", "ド"）
+    let shinobueName: String?  // 篠笛の音名（例: "一", "七の甲"）。範囲外はnil
     let octave: Int
 }
 
@@ -24,16 +25,40 @@ enum NoteHelper {
     /// A4のMIDIノート番号
     static let referenceMidiNote: Int = 69
 
-    /// 半音ごとの西洋音名（C=0, C♯=1, ... B=11）
+    /// 半音ごとの西洋音名（C=0 ... B=11）。篠笛６本調子はB♭楽器のためフラット表記を使用
     static let westernNoteNames = [
-        "C", "C♯", "D", "D♯", "E", "F",
-        "F♯", "G", "G♯", "A", "A♯", "B"
+        "C", "D♭", "D", "E♭", "E", "F",
+        "G♭", "G", "A♭", "A", "B♭", "B"
     ]
 
-    /// 半音ごとの日本語音名
+    /// 半音ごとの日本語音名（篠笛６本調子の読み方。A=シ, B♭=ド, C=レ … G=ラ）
     static let japaneseNoteNames = [
-        "ド", "ド♯", "レ", "レ♯", "ミ", "ファ",
-        "ファ♯", "ソ", "ソ♯", "ラ", "ラ♯", "シ"
+        "レ", "レ♯", "ミ", "ファ", "ファ♯", "ソ",
+        "ソ♯", "ラ", "ラ♯", "シ", "ド", "ド♯"
+    ]
+
+    /// MIDIノート番号から篠笛の音名へのマッピング（六本調子）
+    /// 呂（低音域）: 一〜七、甲（高音域）: 七の甲〜五の甲
+    static let shinobueNoteNames: [Int: String] = [
+        69: "一",          // A4
+        70: "二",          // B♭4
+        71: "二（半）",    // B4
+        72: "三",          // C5
+        73: "三（半）",    // D♭5
+        74: "四",          // D5
+        75: "五",          // E♭5
+        76: "六",          // E5
+        77: "七",          // F5
+        78: "七の甲",      // G♭5
+        79: "筒音の甲",    // G5
+        80: "ツの甲",      // A♭5
+        81: "一の甲",      // A5
+        82: "二の甲",      // B♭5
+        83: "二の甲（半）", // B5
+        84: "三の甲",      // C6
+        85: "三の甲（半）", // D♭6
+        86: "四の甲",      // D6
+        87: "五の甲"       // E♭6
     ]
 
     /// MIDIノート番号から周波数を計算（442Hz基準）
@@ -67,6 +92,7 @@ enum NoteHelper {
             frequency: refFreq,
             westernName: "\(westernNoteNames[noteIndex])\(octave)",
             japaneseName: japaneseNoteNames[noteIndex],
+            shinobueName: shinobueNoteNames[midiNote],
             octave: octave
         )
 

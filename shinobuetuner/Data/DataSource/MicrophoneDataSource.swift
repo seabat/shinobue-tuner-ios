@@ -186,10 +186,10 @@ final class MicrophoneDataSource {
             }
         }
 
-        // 篠笛の有効音域: 100Hz ～ 800Hz
+        // 篠笛の有効音域: 100Hz ～ 1300Hz（甲音域の五の甲/Eb6=1250Hzをカバー）
         let binWidth = sampleRate / Float(fftSize)
         let minBin = max(1, Int(100.0 / binWidth))
-        let maxBin = min(Int(800.0 / binWidth), hpsMaxBin - 2)
+        let maxBin = min(Int(1300.0 / binWidth), hpsMaxBin - 2)
         guard minBin < maxBin else { return 0 }
 
         // HPSスペクトルのピーク（最大値）を探す

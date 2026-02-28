@@ -13,20 +13,32 @@ struct PitchGraphView: View {
     let pitchHistory: [PitchSample]
     let currentTime: TimeInterval
 
-    // グラフのHz範囲（ファ/F3 ～ ファ/F5）
-    private let minHz: Float = 175.4
-    private let maxHz: Float = 701.6
+    // グラフのHz範囲（一/A4 ～ 五の甲/Eb6）
+    private let minHz: Float = 442.0
+    private let maxHz: Float = 1260.0
 
-    // グラフに表示する主要音符の周波数ライン（F3 ～ F5 の範囲）
-    private let noteLines: [(freq: Float, label: String)] = {
-        let targets = [
-            (175.4, "F3"), (196.9, "G3"),
-            (221.0, "A3"), (248.1, "B3"), (262.8, "C4"), (295.0, "D4"),
-            (331.1, "E4"), (350.8, "F4"), (393.8, "G4"), (442.0, "A4"),
-            (496.1, "B4"), (525.6, "C5"), (590.0, "D5"), (662.3, "E5"), (701.6, "F5")
-        ]
-        return targets.map { (Float($0.0), $0.1) }
-    }()
+    // グラフに表示する篠笛六本調子の全音符ライン（一 ～ 五の甲）
+    private let noteLines: [(freq: Float, label: String)] = [
+        (442.0,  "A4"),
+        (468.3,  "Bb4"),
+        (496.1,  "B4"),
+        (525.6,  "C5"),
+        (556.9,  "Db5"),
+        (590.0,  "D5"),
+        (625.1,  "Eb5"),
+        (662.3,  "E5"),
+        (701.6,  "F5"),
+        (743.4,  "Gb5"),
+        (787.6,  "G5"),
+        (834.4,  "Ab5"),
+        (884.0,  "A5"),
+        (936.6,  "Bb5"),
+        (992.3,  "B5"),
+        (1051.3, "C6"),
+        (1113.8, "Db6"),
+        (1180.0, "D6"),
+        (1250.2, "Eb6")
+    ]
 
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {

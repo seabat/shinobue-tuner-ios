@@ -24,16 +24,21 @@ struct NoteDisplayView: View {
     var body: some View {
         VStack(spacing: 6) {
             if let result = noteResult {
-                // 日本語音名（大）
-                Text(result.note.japaneseName)
-                    .font(.system(size: 72, weight: .bold, design: .rounded))
-                    .foregroundStyle(accentColor)
-                    .animation(.easeInOut(duration: 0.15), value: result.note.japaneseName)
+                // 篠笛音名（左）・日本語音名（中央・大）・西洋音名（右）を横一列に並べる
+                HStack(alignment: .center, spacing: 8) {
+                    // 篠笛の音名（例: "一", "七の甲"）。篠笛音域外は非表示
+                    noteText(result.note.shinobueName ?? "", size: 28, weight: .semibold)
+                        .foregroundStyle(.white.opacity(0.85))
 
-                // 西洋音名
-                Text(result.note.westernName)
-                    .font(.system(size: 28, weight: .semibold))
-                    .foregroundStyle(.white.opacity(0.85))
+                    // 日本語音名（大・カラー）
+                    noteText(result.note.japaneseName, size: 72, weight: .bold, design: .rounded)
+                        .foregroundStyle(accentColor)
+                        .animation(.easeInOut(duration: 0.15), value: result.note.japaneseName)
+
+                    // 西洋音名（例: "A4", "B♭5"）
+                    noteText(result.note.westernName, size: 28, weight: .semibold)
+                        .foregroundStyle(.white.opacity(0.85))
+                }
 
                 // 周波数
                 Text(String(format: "%.1f Hz", currentPitch))
@@ -54,34 +59,73 @@ struct NoteDisplayView: View {
         .frame(maxWidth: .infinity)
         .animation(.easeInOut(duration: 0.1), value: noteResult?.note.midiNote)
     }
+
+    // MARK: - 内部処理
+
+    /// ♯/♭ を小さく上付きで表示する Text を生成する
+    /// - AttributedString を使用（iOS 26 で Text + Text が deprecated のため）
+    /// - 記号は本文の50%サイズ・25%分ベースラインを上げて表示
+    private func noteText(
+        _ text: String,
+        size: CGFloat,
+        weight: Font.Weight,
+        design: Font.Design = .default
+    ) -> Text {
+        let symbolSize = size * 0.50
+        let offset = size * 0.25
+        var attrStr = AttributedString()
+        var buffer = ""
+        for char in text {
+            if char == "♯" || char == "♭" {
+                if !buffer.isEmpty {
+                    var part = AttributedString(buffer)
+                    part.font = Font.system(size: size, weight: weight, design: design)
+                    attrStr.append(part)
+                    buffer = ""
+                }
+                var sym = AttributedString(String(char))
+                sym.font = Font.system(size: symbolSize, weight: weight)
+                sym.baselineOffset = offset
+                attrStr.append(sym)
+            } else {
+                buffer.append(char)
+            }
+        }
+        if !buffer.isEmpty {
+            var part = AttributedString(buffer)
+            part.font = Font.system(size: size, weight: weight, design: design)
+            attrStr.append(part)
+        }
+        return Text(attrStr)
+    }
 }
 
 // MARK: - Preview
 
 #Preview {
     VStack(spacing: 0) {
-        // チューニング完了（±10セント以内 → 緑）
+        // チューニング完了（±10セント以内 → 緑）: 一 = A4 = 442Hz
         NoteDisplayView(
-            noteResult: NoteHelper.closestNote(for: 295.5),
-            currentPitch: 295.5
+            noteResult: NoteHelper.closestNote(for: 442.0),
+            currentPitch: 442.0
         )
         .frame(height: 160)
 
         Divider().background(.gray.opacity(0.3))
 
-        // シャープ寄り（±25セント以内 → 黄）
+        // やや外れ（±25セント以内 → 黄）: 一 を約+23セントシャープ
         NoteDisplayView(
-            noteResult: NoteHelper.closestNote(for: 305.0),
-            currentPitch: 305.0
+            noteResult: NoteHelper.closestNote(for: 448.0),
+            currentPitch: 448.0
         )
         .frame(height: 160)
 
         Divider().background(.gray.opacity(0.3))
 
-        // 大きくズレている（±25セント超 → 赤）
+        // 大きくズレている（±25セント超 → 赤）: 一 を約+50セントシャープ
         NoteDisplayView(
-            noteResult: NoteHelper.closestNote(for: 320.0),
-            currentPitch: 320.0
+            noteResult: NoteHelper.closestNote(for: 455.0),
+            currentPitch: 455.0
         )
         .frame(height: 160)
 
