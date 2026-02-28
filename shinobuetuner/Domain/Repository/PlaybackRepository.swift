@@ -28,4 +28,7 @@ protocol PlaybackRepository {
 
     /// 再生を停止してリソースを解放する
     func stop()
+
+    /// 指定した位置（秒）にシークする
+    func seek(to time: TimeInterval)
 }

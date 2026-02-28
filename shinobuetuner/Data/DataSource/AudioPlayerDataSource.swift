@@ -90,10 +90,99 @@ final class AudioPlayerDataSource {
 
     /// 一時停止した再生を再開する
     func resume() {
+        guard let file = audioFile else { return }
+
+        if !engine.isRunning {
+            try? engine.start()
+        }
+
+        let sampleRate = file.processingFormat.sampleRate
+        let totalFrames = file.length
+        let targetFrame = AVAudioFramePosition(max(0, min(seekOffset * sampleRate, Double(totalFrames - 1))))
+        let remainingFrames = AVAudioFrameCount(totalFrames - targetFrame)
+
+        guard remainingFrames > 0 else { return }
+
+        let totalDuration = Double(totalFrames) / sampleRate
+
+        // sessionID を更新して古い completion callback を無効化する
+        let currentSessionID = UUID()
+        sessionID = currentSessionID
+
+        // seekOffset から確実に再スケジュールして再生する
+        // （pause() 後の resume や seek 後の resume のどちらにも対応）
+        playerNode.stop()
+        playerNode.scheduleSegment(
+            file,
+            startingFrame: targetFrame,
+            frameCount: remainingFrames,
+            at: nil,
+            completionCallbackType: .dataPlayedBack
+        ) { [weak self] _ in
+            Task { @MainActor [weak self] in
+                guard let self, self.sessionID == currentSessionID else { return }
+                self.timeSubject.send(totalDuration)
+                self.isPlayingSubject.send(false)
+                self.stopTimeTracking()
+            }
+        }
+
         playerNode.play()
         playStartTime = Date()
         isPlayingSubject.send(true)
         startTimeTracking()
+    }
+
+    /// 指定した位置（秒）にシークして再生を継続する
+    func seek(to time: TimeInterval) {
+        guard let file = audioFile else { return }
+
+        let sampleRate = file.processingFormat.sampleRate
+        let totalFrames = file.length
+        let targetFrame = AVAudioFramePosition(max(0, min(time * sampleRate, Double(totalFrames - 1))))
+        let remainingFrames = AVAudioFrameCount(totalFrames - targetFrame)
+
+        let wasPlaying = isPlayingSubject.value
+
+        // sessionID を先に更新して既存の completion callback を無効化する
+        let currentSessionID = UUID()
+        sessionID = currentSessionID
+
+        // スケジュール済みバッファをクリア（engine は止めない）
+        playerNode.stop()
+        stopTimeTracking()
+
+        // 新しい再生位置を保存
+        seekOffset = Double(targetFrame) / sampleRate
+        timeSubject.send(seekOffset)
+
+        guard remainingFrames > 0 else { return }
+
+        // 再生中だった場合のみ即座に再スケジュールして再生を継続する
+        // 一時停止中の場合は seekOffset のみ更新し、resume() でスケジュールと再生を行う
+        if wasPlaying {
+            let totalDuration = Double(totalFrames) / sampleRate
+
+            playerNode.scheduleSegment(
+                file,
+                startingFrame: targetFrame,
+                frameCount: remainingFrames,
+                at: nil,
+                completionCallbackType: .dataPlayedBack
+            ) { [weak self] _ in
+                Task { @MainActor [weak self] in
+                    guard let self, self.sessionID == currentSessionID else { return }
+                    self.timeSubject.send(totalDuration)
+                    self.isPlayingSubject.send(false)
+                    self.stopTimeTracking()
+                }
+            }
+
+            playerNode.play()
+            playStartTime = Date()
+            isPlayingSubject.send(true)
+            startTimeTracking()
+        }
     }
 
     /// 再生を停止してリソースを解放する

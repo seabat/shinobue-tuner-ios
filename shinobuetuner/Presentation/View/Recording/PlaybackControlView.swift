@@ -13,22 +13,32 @@ import SwiftUI
 struct PlaybackControlView: View {
     @ObservedObject var viewModel: RecordingListViewModel
 
+    /// ドラッグ操作中かどうか
+    @State private var isDragging = false
+    /// スライダーの現在位置（再生中は playbackTime に追従し、ドラッグ中はユーザー操作が優先される）
+    @State private var sliderValue: TimeInterval = 0
+
     private var duration: TimeInterval {
         viewModel.selectedRecording?.duration ?? 1
     }
 
     var body: some View {
         VStack(spacing: 10) {
-            // シークバー
-            Slider(
-                value: Binding(
-                    get: { viewModel.playbackTime },
-                    set: { _ in }  // シークは今後の拡張として保留
-                ),
-                in: 0...max(duration, 1)
-            )
+            // シークバー（ドラッグ中はユーザー操作、それ以外は playbackTime に追従）
+            Slider(value: $sliderValue, in: 0...max(duration, 1)) { editing in
+                isDragging = editing
+                if !editing {
+                    viewModel.seek(to: sliderValue)
+                }
+            }
             .tint(.cyan)
             .padding(.horizontal, 4)
+            .onChange(of: viewModel.playbackTime) { _, newTime in
+                // ドラッグ中以外は再生位置に追従してシークバーを動かす
+                if !isDragging {
+                    sliderValue = newTime
+                }
+            }
 
             HStack {
                 // 現在の再生位置
@@ -109,6 +119,7 @@ private final class PreviewPlaybackUseCase: PlaybackUseCaseProtocol {
     func pause() {}
     func resume() {}
     func stop() {}
+    func seek(to time: TimeInterval) {}
 }
 
 #Preview("再生中（途中）") {

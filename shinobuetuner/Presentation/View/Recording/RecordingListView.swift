@@ -133,6 +133,7 @@ private final class PreviewPlaybackUseCase: PlaybackUseCaseProtocol {
     func pause() {}
     func resume() {}
     func stop() {}
+    func seek(to time: TimeInterval) {}
 }
 
 #Preview("空状態") {

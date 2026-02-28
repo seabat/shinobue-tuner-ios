@@ -95,6 +95,11 @@ final class RecordingListViewModel: ObservableObject {
         selectedRecording = nil
     }
 
+    /// 指定した位置（秒）にシークする
+    func seek(to time: TimeInterval) {
+        playbackUseCase.seek(to: time)
+    }
+
     // MARK: - 内部処理
 
     /// 再生状態・再生位置のパブリッシャーを購読する

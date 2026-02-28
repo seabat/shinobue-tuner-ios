@@ -28,6 +28,9 @@ protocol PlaybackUseCaseProtocol {
 
     /// 再生を停止する
     func stop()
+
+    /// 指定した位置（秒）にシークする
+    func seek(to time: TimeInterval)
 }
 
 /// 音声再生ユースケースの具体実装
@@ -60,5 +63,9 @@ final class PlaybackUseCase: PlaybackUseCaseProtocol {
 
     func stop() {
         repository.stop()
+    }
+
+    func seek(to time: TimeInterval) {
+        repository.seek(to: time)
     }
 }

@@ -40,4 +40,8 @@ final class PlaybackRepositoryImpl: PlaybackRepository {
     func stop() {
         dataSource.stop()
     }
+
+    func seek(to time: TimeInterval) {
+        dataSource.seek(to: time)
+    }
 }
