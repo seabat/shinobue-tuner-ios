@@ -119,6 +119,8 @@ shinobuetuner/
 
 ## セットアップ
 
+### Xcode で開発する場合
+
 1. リポジトリをクローン
 
 ```bash
@@ -135,6 +137,32 @@ open shinobue-tuner-ios/shinobuetuner.xcodeproj
 
 - Xcode でターゲットデバイスを選択してビルド（⌘R）
 - マイクの使用許可を求めるダイアログが表示されるので「許可」を選択
+
+### VS Code で開発する場合
+
+#### 必要な拡張機能
+
+`.vscode/extensions.json` に推奨拡張機能が定義されています。プロジェクトを VS Code で開くと自動的にインストールを促すポップアップが表示されます。
+
+| 拡張機能 | 用途 |
+|---|---|
+| [Swift (swiftlang.swift-lang)](https://marketplace.visualstudio.com/items?itemName=swiftlang.swift-lang) | コード補完・定義ジャンプ・リファクタリング |
+| [SweetPad (sweetpad.sweetpad)](https://marketplace.visualstudio.com/items?itemName=sweetpad.sweetpad) | iOS シミュレーターでのビルド・実行・デバッグ |
+
+#### 初回セットアップ
+
+```bash
+# 依存ツールのインストール
+brew install xcode-build-server xcbeautify
+
+# SourceKit-LSP 用の設定ファイルを生成（プロジェクトルートで実行）
+xcode-build-server config -project shinobuetuner.xcodeproj -scheme shinobuetuner
+```
+
+#### ビルド & 実行
+
+- `Cmd + Shift + B` — ビルド（`Debug`）
+- `Cmd + Shift + P` → `SweetPad: Launch App` — シミュレーターで起動
 
 ---
 

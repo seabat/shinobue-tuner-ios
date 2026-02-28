@@ -283,3 +283,35 @@ INFOPLIST_KEY_NSMicrophoneUsageDescription = "マイクを使って篠笛の音�
 - 他の調子（本数）への対応（基準周波数の切り替え）
 - 再生中に篠笛のピッチ解析をリアルタイム表示（再生モードのチューナー連携）
 - 録音ファイルの共有（Share Sheet）
+
+---
+
+## VS Code 開発環境
+
+### 必要な拡張機能（`.vscode/extensions.json` に定義済み）
+
+| 拡張機能 ID | 用途 |
+|---|---|
+| `swiftlang.swift-lang` | コード補完・定義ジャンプ（SourceKit-LSP） |
+| `sweetpad.sweetpad` | iOS シミュレーターでのビルド・実行・デバッグ |
+
+### 初回セットアップ手順
+
+```bash
+# 依存ツール
+brew install xcode-build-server xcbeautify
+
+# SourceKit-LSP 用設定ファイルを生成（プロジェクトルートで実行）
+xcode-build-server config -project shinobuetuner.xcodeproj -scheme shinobuetuner
+```
+
+`buildServer.json` が生成される。これはローカル環境固有のファイルのため git 管理対象外。
+
+### VS Code の設定ファイル一覧（`.vscode/`）
+
+| ファイル | 用途 |
+|---|---|
+| `settings.json` | Swift 拡張のパス設定 |
+| `extensions.json` | 推奨拡張機能の定義 |
+| `tasks.json` | `xcodebuild` によるビルドタスク |
+| `launch.json` | SweetPad デバッグ起動設定 |

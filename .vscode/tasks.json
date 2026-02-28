@@ -1,0 +1,41 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Build Debug (Simulator)",
+      "type": "shell",
+      "command": "xcodebuild",
+      "args": [
+        "-project", "shinobuetuner.xcodeproj",
+        "-scheme", "shinobuetuner",
+        "-configuration", "Debug",
+        "-destination", "platform=iOS Simulator,name=iPhone 17",
+        "build"
+      ],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "problemMatcher": "$xcodebuild",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "Clean",
+      "type": "shell",
+      "command": "xcodebuild",
+      "args": [
+        "-project", "shinobuetuner.xcodeproj",
+        "-scheme", "shinobuetuner",
+        "clean"
+      ],
+      "group": "build",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      }
+    }
+  ]
+}

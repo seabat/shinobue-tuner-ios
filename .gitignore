@@ -63,3 +63,6 @@ fastlane/test_output
 
 # JetBrains IDE
 .idea/
+
+# xcode-build-server（ローカル環境固有の設定ファイル）
+buildServer.json

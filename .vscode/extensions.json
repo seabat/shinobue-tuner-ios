@@ -1,0 +1,8 @@
+{
+  "recommendations": [
+    // Swift 言語サポート（コード補完・定義ジャンプ・リファクタリング）
+    "swiftlang.swift-lang",
+    // iOS シミュレーターでのビルド・実行・デバッグ
+    "sweetpad.sweetpad"
+  ]
+}
