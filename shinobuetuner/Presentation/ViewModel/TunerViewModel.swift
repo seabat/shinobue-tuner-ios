@@ -31,12 +31,23 @@ final class TunerViewModel: ObservableObject {
     /// 直近に保存した録音ファイル（ContentView が一覧を更新するトリガーに使う）
     @Published var lastSavedRecording: RecordingFile? = nil
 
+    /// チューニング成功エフェクトのトリガー（false→true への変化でエフェクト発火）
+    @Published var showTuningCelebration: Bool = false
+
     // MARK: - 内部
 
     private let useCase: any MonitorPitchUseCaseProtocol
     private let recordingRepository: any RecordingRepository
     private var cancellables = Set<AnyCancellable>()
     private var sessionStartTime: Date = Date()
+
+    /// チューニング成功判定の状態機械
+    private enum InTuneState {
+        case idle
+        case accumulating(midiNote: Int, since: TimeInterval)
+        case cooling(midiNote: Int, until: TimeInterval)
+    }
+    private var inTuneState: InTuneState = .idle
 
     /// デフォルトの依存性を使って初期化（本番用）
     convenience init() {
@@ -92,6 +103,7 @@ final class TunerViewModel: ObservableObject {
         currentPitch = 0
         currentTime = 0
         noteResult = nil
+        resetInTuneState()
     }
 
     /// ピッチ監視 + 録音を開始する
@@ -123,7 +135,8 @@ final class TunerViewModel: ObservableObject {
 
         if pitch > 0 {
             // 音符情報を更新
-            noteResult = NoteHelper.closestNote(for: pitch)
+            let result = NoteHelper.closestNote(for: pitch)
+            noteResult = result
 
             // ピッチ履歴を更新（currentTime はタイマーが管理）
             let sample = PitchSample(time: currentTime, frequency: pitch)
@@ -131,8 +144,65 @@ final class TunerViewModel: ObservableObject {
 
             // 5秒より古いデータを削除
             pitchHistory.removeAll { $0.time < currentTime - 5.0 }
+
+            // チューニング成功判定
+            if let r = result {
+                updateInTuneState(midiNote: r.note.midiNote, cents: r.cents)
+            } else {
+                resetInTuneState()
+            }
         } else {
             noteResult = nil
+            resetInTuneState()
         }
+    }
+
+    /// チューニング成功判定の状態を更新する
+    private func updateInTuneState(midiNote: Int, cents: Float) {
+        let isInTune = abs(cents) <= 10.0
+
+        switch inTuneState {
+        case .idle:
+            if isInTune {
+                inTuneState = .accumulating(midiNote: midiNote, since: currentTime)
+            }
+
+        case .accumulating(let trackedNote, let since):
+            if midiNote != trackedNote {
+                // 音名変更 → 新しい音名で判定をリセット
+                inTuneState = isInTune
+                    ? .accumulating(midiNote: midiNote, since: currentTime)
+                    : .idle
+            } else if !isInTune {
+                // 同じ音名だがズレた → idle
+                inTuneState = .idle
+            } else if currentTime - since >= 1.0 {
+                // 1秒以上 in-tune → エフェクト発火
+                showTuningCelebration = true
+                inTuneState = .cooling(midiNote: midiNote, until: currentTime + 1.0)
+            }
+
+        case .cooling(let trackedNote, let until):
+            if midiNote != trackedNote {
+                // 音名変更 → 即座にリセットして新しい音名で判定開始
+                showTuningCelebration = false
+                inTuneState = isInTune
+                    ? .accumulating(midiNote: midiNote, since: currentTime)
+                    : .idle
+            } else if currentTime >= until {
+                // クールダウン終了
+                showTuningCelebration = false
+                inTuneState = isInTune
+                    ? .accumulating(midiNote: midiNote, since: currentTime)
+                    : .idle
+            }
+            // クールダウン中は何もしない
+        }
+    }
+
+    /// チューニング判定状態をリセットする
+    private func resetInTuneState() {
+        inTuneState = .idle
+        showTuningCelebration = false
     }
 }

@@ -17,8 +17,6 @@ struct TuningCelebrationView: View {
     @State private var thumbsUpVisible = false
     @State private var thumbsUpScale: CGFloat = 0
     @State private var thumbsUpOpacity: Double = 0
-    /// 連続発火を防ぐクールダウンフラグ
-    @State private var onCooldown = false
 
     private let particleColors: [Color] = [.yellow, .cyan, .green, .orange, .mint, .pink, .white]
 
@@ -47,7 +45,7 @@ struct TuningCelebrationView: View {
         }
         .allowsHitTesting(false)
         .onChange(of: isInTune) { _, newValue in
-            if newValue && !onCooldown {
+            if newValue {
                 triggerCelebration()
             }
         }
@@ -56,8 +54,6 @@ struct TuningCelebrationView: View {
     // MARK: - 内部処理
 
     private func triggerCelebration() {
-        onCooldown = true
-
         // パーティクルを生成（18方向 × 2層 = 36個）
         var configs: [ParticleConfig] = []
         for i in 0..<18 {
@@ -103,10 +99,6 @@ struct TuningCelebrationView: View {
             activeParticles = []
         }
 
-        // 2.5秒後にクールダウン解除（連続発火防止）
-        DispatchQueue.main.asyncAfter(deadline: .now() + 2.5) {
-            onCooldown = false
-        }
     }
 }
 

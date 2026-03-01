@@ -20,12 +20,6 @@ struct TunerMainView: View {
     @ObservedObject var viewModel: TunerViewModel
     @State private var selectedMode: TunerMode = .monitoring
 
-    /// ±10セント以内かつ音が出ているときに true
-    private var isInTune: Bool {
-        guard let result = viewModel.noteResult, viewModel.currentPitch > 0 else { return false }
-        return abs(result.cents) <= 10
-    }
-
     var body: some View {
         VStack(spacing: 0) {
             // ─── 音名表示エリア ───
@@ -81,7 +75,7 @@ struct TunerMainView: View {
         }
         .overlay {
             // ─── チューニング成功エフェクト ───
-            TuningCelebrationView(isInTune: isInTune)
+            TuningCelebrationView(isInTune: viewModel.showTuningCelebration)
         }
     }
 }
