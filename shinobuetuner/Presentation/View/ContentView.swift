@@ -51,6 +51,15 @@ struct ContentView: View {
                         .navigationBarTitleDisplayMode(.inline)
                 }
             }
+
+            // ─── 周波数表タブ ───
+            Tab("周波数表", systemImage: "music.note.list") {
+                NavigationStack {
+                    FrequencyTableView()
+                        .navigationTitle("六本調子 周波数表")
+                        .navigationBarTitleDisplayMode(.inline)
+                }
+            }
         }
         .task {
             // 起動時にマイク権限を確認

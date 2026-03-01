@@ -13,8 +13,8 @@ struct NoteInfo {
     let midiNote: Int
     let frequency: Double      // 基準周波数（Hz）
     let westernName: String    // 西洋音階名（例: "A4", "B♭4"）
-    let japaneseName: String   // 日本語音階名・篠笛読み方（例: "シ", "ド"）
-    let shinobueName: String?  // 篠笛の音階名（例: "一", "七の甲"）。範囲外はnil
+    let japaneseName: String   // 日本音階名・篠笛読み方（例: "シ", "ド"）
+    let fingeringName: String?  // 運指名（例: "一", "七の甲"）。範囲外はnil
     let octave: Int
 }
 
@@ -31,34 +31,37 @@ enum NoteHelper {
         "G♭", "G", "A♭", "A", "B♭", "B"
     ]
 
-    /// 半音ごとの日本語音階名（篠笛６本調子の読み方。A=シ, B♭=ド, C=レ … G=ラ）
+    /// 半音ごとの日本音階名（篠笛６本調子の読み方。A=シ, B♭=ド, C=レ … G=ラ）
     static let japaneseNoteNames = [
         "レ", "レ♯", "ミ", "ファ", "ファ♯", "ソ",
         "ソ♯", "ラ", "ラ♯", "シ", "ド", "ド♯"
     ]
 
-    /// MIDIノート番号から篠笛の音階名へのマッピング（六本調子）
-    /// 呂（低音域）: 一〜七、甲（高音域）: 七の甲〜五の甲
-    static let shinobueNoteNames: [Int: String] = [
-        69: "一",          // A4
-        70: "二",          // B♭4
-        71: "二（半）",    // B4
-        72: "三",          // C5
-        73: "三（半）",    // D♭5
-        74: "四",          // D5
-        75: "五",          // E♭5
-        76: "六",          // E5
-        77: "七",          // F5
-        78: "七の甲",      // G♭5
-        79: "筒音の甲",    // G5
-        80: "ツの甲",      // A♭5
-        81: "一の甲",      // A5
-        82: "二の甲",      // B♭5
-        83: "二の甲（半）", // B5
-        84: "三の甲",      // C6
-        85: "三の甲（半）", // D♭6
-        86: "四の甲",      // D6
-        87: "五の甲"       // E♭6
+    /// MIDIノート番号から運指名へのマッピング（六本調子）
+    /// 呂音（低音域）: 筒音・一〜七  漢数字
+    /// 甲音（高音域）: １〜５        アラビア数字
+    static let fingeringNoteNames: [Int: String] = [
+        69: "筒音",        // A4  シ（起点・基準音）
+        70: "一",          // B♭4 ド
+        71: "一（半）",    // B4  ド♯
+        72: "二",          // C5  レ
+        73: "二（半）",    // D♭5 レ♯
+        74: "三",          // D5  ミ
+        75: "四",          // E♭5 ファ
+        76: "四（半）",    // E5  ファ♯
+        77: "五",          // F5  ソ
+        78: "五（半）",    // Gb5 ソ♯
+        79: "六",          // G5  ラ
+        80: "六（半）",    // A♭5 ラ♯
+        81: "七",          // A5  シ
+        82: "１",          // B♭5 ド
+        83: "１（半）",    // B5  ド♯
+        84: "２",          // C6  レ
+        85: "２（半）",    // D♭6 レ♯
+        86: "３",          // D6  ミ
+        87: "４",          // E♭6 ファ
+        88: "４（半）",    // E6  ファ♯
+        89: "５"           // F6  ソ
     ]
 
     /// MIDIノート番号から周波数を計算（442Hz基準）
@@ -92,7 +95,7 @@ enum NoteHelper {
             frequency: refFreq,
             westernName: "\(westernNoteNames[noteIndex])\(octave)",
             japaneseName: japaneseNoteNames[noteIndex],
-            shinobueName: shinobueNoteNames[midiNote],
+            fingeringName: fingeringNoteNames[midiNote],
             octave: octave
         )
 
