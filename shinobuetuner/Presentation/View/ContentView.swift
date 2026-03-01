@@ -13,6 +13,7 @@ import Combine
 struct ContentView: View {
     @StateObject private var viewModel: TunerViewModel
     @StateObject private var recordingListViewModel: RecordingListViewModel
+    @Environment(\.scenePhase) private var scenePhase
 
     /// 本番用（デフォルト）
     init() {
@@ -58,6 +59,12 @@ struct ContentView: View {
         .onChange(of: viewModel.lastSavedRecording) { _, _ in
             // 録音保存後に一覧を自動更新
             recordingListViewModel.loadRecordings()
+        }
+        .onChange(of: scenePhase) { _, newPhase in
+            // バックグラウンド遷移時、録音中でなければ計測を停止
+            if newPhase == .background && viewModel.isRunning && !viewModel.isSavingRecording {
+                viewModel.stopMonitoring()
+            }
         }
     }
 }
