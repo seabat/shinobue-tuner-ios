@@ -48,7 +48,7 @@ struct PitchGraphView: View {
                 .padding(.leading, 8)
 
             Canvas { context, size in
-                // 左: Hz値ラベル、右: 音名ラベル のエリアを確保
+                // 左: Hz値ラベル、右: 音階名ラベル のエリアを確保
                 let leftMargin: CGFloat = 42
                 let rightMargin: CGFloat = 38
                 // 上下端のラベル（F5/F3）が切れないよう内側に余白を取る
@@ -91,7 +91,7 @@ struct PitchGraphView: View {
                         anchor: .center
                     )
 
-                    // 音名ラベル（右側）
+                    // 音階名ラベル（右側）
                     let noteText = Text(line.label)
                         .font(.system(size: 9))
                         .foregroundColor(.white.opacity(0.7))

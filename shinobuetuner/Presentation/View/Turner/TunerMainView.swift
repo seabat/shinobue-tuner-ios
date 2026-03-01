@@ -22,7 +22,7 @@ struct TunerMainView: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            // ─── 音名表示エリア ───
+            // ─── 音階名表示エリア ───
             NoteDisplayView(
                 noteResult: viewModel.noteResult,
                 currentPitch: viewModel.currentPitch

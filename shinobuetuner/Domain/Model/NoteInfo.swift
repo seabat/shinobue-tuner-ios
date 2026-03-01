@@ -12,32 +12,32 @@ import Foundation
 struct NoteInfo {
     let midiNote: Int
     let frequency: Double      // 基準周波数（Hz）
-    let westernName: String    // 西洋音名（例: "A4", "B♭4"）
-    let japaneseName: String   // 日本語音名・篠笛読み方（例: "シ", "ド"）
-    let shinobueName: String?  // 篠笛の音名（例: "一", "七の甲"）。範囲外はnil
+    let westernName: String    // 西洋音階名（例: "A4", "B♭4"）
+    let japaneseName: String   // 日本語音階名・篠笛読み方（例: "シ", "ド"）
+    let shinobueName: String?  // 篠笛の音階名（例: "一", "七の甲"）。範囲外はnil
     let octave: Int
 }
 
-/// 周波数・音名変換ヘルパー（442Hz基準の12平均律）
+/// 周波数・音階名変換ヘルパー（442Hz基準の12平均律）
 enum NoteHelper {
     /// 基準音: A4 = 442 Hz（篠笛 ６本調子）
     static let referenceFrequency: Double = 442.0
     /// A4のMIDIノート番号
     static let referenceMidiNote: Int = 69
 
-    /// 半音ごとの西洋音名（C=0 ... B=11）。篠笛６本調子はB♭楽器のためフラット表記を使用
+    /// 半音ごとの西洋音階名（C=0 ... B=11）。篠笛６本調子はB♭楽器のためフラット表記を使用
     static let westernNoteNames = [
         "C", "D♭", "D", "E♭", "E", "F",
         "G♭", "G", "A♭", "A", "B♭", "B"
     ]
 
-    /// 半音ごとの日本語音名（篠笛６本調子の読み方。A=シ, B♭=ド, C=レ … G=ラ）
+    /// 半音ごとの日本語音階名（篠笛６本調子の読み方。A=シ, B♭=ド, C=レ … G=ラ）
     static let japaneseNoteNames = [
         "レ", "レ♯", "ミ", "ファ", "ファ♯", "ソ",
         "ソ♯", "ラ", "ラ♯", "シ", "ド", "ド♯"
     ]
 
-    /// MIDIノート番号から篠笛の音名へのマッピング（六本調子）
+    /// MIDIノート番号から篠笛の音階名へのマッピング（六本調子）
     /// 呂（低音域）: 一〜七、甲（高音域）: 七の甲〜五の甲
     static let shinobueNoteNames: [Int: String] = [
         69: "一",          // A4

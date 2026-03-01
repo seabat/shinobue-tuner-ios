@@ -29,7 +29,7 @@
 ### チューニング設定
 - 基準音: **A4 = 442 Hz**（篠笛６本調子）
 - 音律: **12平均律**
-- 音名表記: 日本語（ドレミファソラシ）と西洋音名（C D E F G A B）を併記
+- 音階名表記: 日本語（ドレミファソラシ）と西洋音階名（C D E F G A B）を併記
 
 ### セント（cent）とは
 音程の微細な単位。1オクターブ = 1200セント、半音 = 100セント、**1セント = 半音の1/100**。
@@ -123,10 +123,10 @@ shinobuetuner/
 
 **NoteInfo.swift**
 - `struct NoteInfo` — 音符情報（midiNote / frequency / westernName / japaneseName / octave）
-- `enum NoteHelper` — 442Hz基準の周波数計算・音名変換ロジック
+- `enum NoteHelper` — 442Hz基準の周波数計算・音階名変換ロジック
   - `closestNote(for:)` — 計測周波数から最近傍の音符とセント偏差を返す
   - セント偏差: `cents = 1200 * log2(実測周波数 / 基準周波数)`
-  - 日本語音名テーブル: ド / ド♯ / レ / レ♯ / ミ / ファ / ファ♯ / ソ / ソ♯ / ラ / ラ♯ / シ
+  - 日本語音階名テーブル: ド / ド♯ / レ / レ♯ / ミ / ファ / ファ♯ / ソ / ソ♯ / ラ / ラ♯ / シ
 
 **PitchSample.swift**
 - `struct PitchSample` — `time: TimeInterval`（セッション開始からの経過秒）+ `frequency: Float`
@@ -220,7 +220,7 @@ shinobuetuner/
 - `ContentView.swift` — `TabView`（チューナー / 録音一覧）のルートView。`TunerViewModel` + `RecordingListViewModel` を `@StateObject` で保有。`onChange(of: lastSavedRecording)` で一覧を自動更新
 - `TunerMainView.swift` — 上部に計測/録音モード切替セグメント付きのメイン画面
 - `PermissionRequestView.swift` — マイク未許可時の権限要求画面
-- `NoteDisplayView.swift` — 音名（日本語・西洋）と周波数の大きな表示
+- `NoteDisplayView.swift` — 音階名（日本語・西洋）と周波数の大きな表示
 - `CentsMeterView.swift` — セントメーター（-50〜+50、カラーグラデーション）
 - `PitchGraphView.swift` — 5秒間のピッチ折れ線グラフ（Canvas描画、対数スケール）
 - `RecordButton.swift` — `isRecordingMode` でラベルを切り替え（計測開始/停止 or 録音開始/停止）
@@ -258,7 +258,7 @@ INFOPLIST_KEY_NSMicrophoneUsageDescription = "マイクを使って篠笛の音�
 
 ## 六本調子（シ=442Hz基準）ピッチ対応表
 
-| 篠笛の音名 | 日本語音名 | 周波数（Hz） | 西洋音名 |
+| 篠笛の音階名 | 日本語音階名 | 周波数（Hz） | 西洋音階名 |
 |-----------|--------|-------------|---------|
 | 五の甲 | ファ（高） | 1250.164 | Eb6 |
 | 四の甲 | ミ（高） | 1179.998 | D6 |

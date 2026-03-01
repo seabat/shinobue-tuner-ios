@@ -4,11 +4,11 @@
 //
 //  Created by ryouta on 2026/02/25.
 //
-//  音名（日本語・西洋）と周波数を大きく表示するビュー
+//  音階名（日本語・西洋）と周波数を大きく表示するビュー
 
 import SwiftUI
 
-/// 音名表示ビュー
+/// 音階名表示ビュー
 struct NoteDisplayView: View {
     let noteResult: (note: NoteInfo, cents: Float)?
     let currentPitch: Float
@@ -24,18 +24,18 @@ struct NoteDisplayView: View {
     var body: some View {
         VStack(spacing: 6) {
             if let result = noteResult {
-                // 篠笛音名（左）・日本語音名（中央・大）・西洋音名（右）を横一列に並べる
+                // 篠笛音階名（左）・日本語音階名（中央・大）・西洋音階名（右）を横一列に並べる
                 HStack(alignment: .center, spacing: 8) {
-                    // 篠笛の音名（例: "一", "七の甲"）。篠笛音域外は非表示
+                    // 篠笛の音階名（例: "一", "七の甲"）。篠笛音域外は非表示
                     noteText(result.note.shinobueName ?? "", size: 28, weight: .semibold)
                         .foregroundStyle(.white.opacity(0.85))
 
-                    // 日本語音名（大・カラー）
+                    // 日本語音階名（大・カラー）
                     noteText(result.note.japaneseName, size: 72, weight: .bold, design: .rounded)
                         .foregroundStyle(accentColor)
                         .animation(.easeInOut(duration: 0.15), value: result.note.japaneseName)
 
-                    // 西洋音名（例: "A4", "B♭5"）
+                    // 西洋音階名（例: "A4", "B♭5"）
                     noteText(result.note.westernName, size: 28, weight: .semibold)
                         .foregroundStyle(.white.opacity(0.85))
                 }

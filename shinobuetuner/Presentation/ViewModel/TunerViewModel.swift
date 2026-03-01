@@ -169,12 +169,12 @@ final class TunerViewModel: ObservableObject {
 
         case .accumulating(let trackedNote, let since):
             if midiNote != trackedNote {
-                // 音名変更 → 新しい音名で判定をリセット
+                // 音階名変更 → 新しい音階名で判定をリセット
                 inTuneState = isInTune
                     ? .accumulating(midiNote: midiNote, since: currentTime)
                     : .idle
             } else if !isInTune {
-                // 同じ音名だがズレた → idle
+                // 同じ音階名だがズレた → idle
                 inTuneState = .idle
             } else if currentTime - since >= 1.0 {
                 // 1秒以上 in-tune → エフェクト発火
@@ -184,7 +184,7 @@ final class TunerViewModel: ObservableObject {
 
         case .cooling(let trackedNote, let until):
             if midiNote != trackedNote {
-                // 音名変更 → 即座にリセットして新しい音名で判定開始
+                // 音階名変更 → 即座にリセットして新しい音階名で判定開始
                 showTuningCelebration = false
                 inTuneState = isInTune
                     ? .accumulating(midiNote: midiNote, since: currentTime)
