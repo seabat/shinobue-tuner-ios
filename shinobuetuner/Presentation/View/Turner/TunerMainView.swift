@@ -77,6 +77,14 @@ struct TunerMainView: View {
             // ─── チューニング成功エフェクト ───
             TuningCelebrationView(isInTune: viewModel.showTuningCelebration)
         }
+        .alert("自動停止", isPresented: $viewModel.showSilenceTimeoutAlert) {
+            Button("OK") { viewModel.showSilenceTimeoutAlert = false }
+        } message: {
+            Text(viewModel.silenceTimeoutWasRecording
+                ? "30秒間音が検出されなかったため、録音を自動的に停止しました。"
+                : "30秒間音が検出されなかったため、計測を自動的に停止しました。"
+            )
+        }
     }
 }
 

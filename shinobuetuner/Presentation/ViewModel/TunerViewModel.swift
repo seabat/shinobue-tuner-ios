@@ -33,6 +33,10 @@ final class TunerViewModel: ObservableObject {
 
     /// チューニング成功エフェクトのトリガー（false→true への変化でエフェクト発火）
     @Published var showTuningCelebration: Bool = false
+    /// 30秒間無音で自動停止したことを通知するアラートトリガー
+    @Published var showSilenceTimeoutAlert: Bool = false
+    /// 自動停止時のモード（アラートメッセージの切り替えに使用）
+    @Published var silenceTimeoutWasRecording: Bool = false
 
     // MARK: - 内部
 
@@ -40,6 +44,10 @@ final class TunerViewModel: ObservableObject {
     private let recordingRepository: any RecordingRepository
     private var cancellables = Set<AnyCancellable>()
     private var sessionStartTime: Date = Date()
+    /// 最後に音を検出した currentTime（無音タイムアウト判定に使用）
+    private var lastSoundTime: TimeInterval = 0
+    /// 無音が続いたら自動停止するまでの秒数
+    private let silenceTimeoutSeconds: TimeInterval = 30
 
     /// チューニング成功判定の状態機械
     private enum InTuneState {
@@ -75,6 +83,7 @@ final class TunerViewModel: ObservableObject {
         sessionStartTime = Date()
         pitchHistory = []
         currentTime = 0
+        lastSoundTime = 0
         isRunning = true
 
         // グラフの時間軸を動かすタイマー（0.05秒ごと）
@@ -83,6 +92,10 @@ final class TunerViewModel: ObservableObject {
             .sink { [weak self] _ in
                 guard let self else { return }
                 currentTime = Date().timeIntervalSince(sessionStartTime)
+                // 30秒間無音が続いたら自動停止
+                if currentTime - lastSoundTime >= silenceTimeoutSeconds {
+                    autoStopDueToSilence()
+                }
             }
             .store(in: &cancellables)
 
@@ -134,6 +147,9 @@ final class TunerViewModel: ObservableObject {
         currentPitch = pitch
 
         if pitch > 0 {
+            // 音を検出した時刻を更新（無音タイムアウトのリセット）
+            lastSoundTime = currentTime
+
             // 音符情報を更新
             let result = NoteHelper.closestNote(for: pitch)
             noteResult = result
@@ -198,6 +214,17 @@ final class TunerViewModel: ObservableObject {
             }
             // クールダウン中は何もしない
         }
+    }
+
+    /// 30秒間無音が続いた場合に計測/録音を自動停止する
+    private func autoStopDueToSilence() {
+        silenceTimeoutWasRecording = isSavingRecording
+        if isSavingRecording {
+            stopRecording()
+        } else {
+            stopMonitoring()
+        }
+        showSilenceTimeoutAlert = true
     }
 
     /// チューニング判定状態をリセットする
