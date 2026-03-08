@@ -61,6 +61,7 @@ struct ContentView: View {
                 }
             }
         }
+        .preferredColorScheme(.dark)
         .task {
             // 起動時にマイク権限を確認
             await viewModel.requestPermission()
