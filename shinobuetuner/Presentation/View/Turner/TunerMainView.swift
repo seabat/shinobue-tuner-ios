@@ -54,6 +54,8 @@ struct TunerMainView: View {
                 .frame(maxHeight: .infinity)
                 .padding(.horizontal, 16)
                 .padding(.bottom, 32)
+            } else {
+                Spacer()
             }
 
             // ─── 開始/停止ボタン + モード切替 ───
