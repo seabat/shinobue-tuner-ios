@@ -9,6 +9,7 @@ import SwiftUI
 /// チューニング成功判定の設定モーダル
 struct TunerSettingsView: View {
     @ObservedObject var settings: TunerSettings
+    @Environment(\.dismiss) private var dismiss
     @State private var showUnsupportedAlert = false
 
     var body: some View {
@@ -139,6 +140,12 @@ struct TunerSettingsView: View {
             }
             .navigationTitle("チューニング設定")
             .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("閉じる") { dismiss() }
+                        .foregroundStyle(.cyan)
+                }
+            }
         }
     }
 }

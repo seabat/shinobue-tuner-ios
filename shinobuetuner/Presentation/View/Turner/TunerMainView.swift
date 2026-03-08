@@ -98,9 +98,8 @@ struct TunerMainView: View {
             // ─── チューニング成功エフェクト ───
             TuningCelebrationView(isInTune: viewModel.showTuningCelebration)
         }
-        .sheet(isPresented: $isSettingsPresented) {
+        .fullScreenCover(isPresented: $isSettingsPresented) {
             TunerSettingsView(settings: viewModel.settings)
-                .presentationDetents([.medium, .large])
         }
         .alert("自動停止", isPresented: $viewModel.showSilenceTimeoutAlert) {
             Button("OK") { viewModel.showSilenceTimeoutAlert = false }
