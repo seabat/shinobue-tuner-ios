@@ -59,30 +59,10 @@ struct TunerMainView: View {
             }
 
             // ─── 開始/停止ボタン + モード切替 ───
-            ZStack {
-                // 計測/停止ボタン（中央固定）
-                RecordButton(
-                    isRunning: viewModel.isRunning,
-                    isRecordingMode: selectedMode == .recording
-                ) {
-                    switch selectedMode {
-                    case .monitoring:
-                        viewModel.isRunning ? viewModel.stopMonitoring() : viewModel.startMonitoring()
-                    case .recording:
-                        viewModel.isRunning ? viewModel.stopRecording() : viewModel.startRecording()
-                    }
-                }
-
-                // 計測/録音 モード切替（右端）
-                HStack {
-                    Spacer()
-                    ModeSwitcher(selectedMode: $selectedMode)
-                        .disabled(viewModel.isRunning)
-                        .padding(.trailing, 20)
-                }
-            }
-            .padding(.top, 8)
-            .padding(.bottom, 24)
+            ControlBarView(
+                viewModel: viewModel,
+                selectedMode: $selectedMode
+            )
         }
         .overlay(alignment: .topTrailing) {
             // ─── 設定ボタン ───
@@ -110,34 +90,6 @@ struct TunerMainView: View {
                 ? "30秒間音が検出されなかったため、録音を自動的に停止しました。"
                 : "30秒間音が検出されなかったため、計測を自動的に停止しました。"
             )
-        }
-    }
-}
-
-// MARK: - ModeSwitcher
-
-/// 計測/録音モード切替コンポーネント（ボタンの右側に配置）
-private struct ModeSwitcher: View {
-    @Binding var selectedMode: TunerMode
-
-    var body: some View {
-        VStack(spacing: 6) {
-            ForEach(TunerMode.allCases, id: \.self) { mode in
-                Button {
-                    selectedMode = mode
-                } label: {
-                    HStack(spacing: 4) {
-                        Image(systemName: mode == .monitoring ? "mic.circle.fill" : "record.circle")
-                            .font(.system(size: 12))
-                        Text(mode.rawValue)
-                            .font(.system(size: 11, weight: .medium))
-                    }
-                    .foregroundStyle(selectedMode == mode
-                        ? (mode == .monitoring ? Color.cyan : Color.orange)
-                        : Color(white: 0.4)
-                    )
-                }
-            }
         }
     }
 }
