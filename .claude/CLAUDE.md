@@ -97,16 +97,21 @@ shinobuetuner/
     │   ├── TunerViewModel.swift          # ピッチ監視 + 録音制御
     │   └── RecordingListViewModel.swift  # 録音一覧・再生の状態管理
     └── View/
-        ├── ContentView.swift             # TabView（チューナー / 録音一覧）
-        ├── TunerMainView.swift           # 計測/録音モード切替セグメント付きメイン画面
+        ├── ContentView.swift             # TabView（チューナー / 録音一覧 / 周波数表）
         ├── PermissionRequestView.swift
-        ├── NoteDisplayView.swift
-        ├── CentsMeterView.swift
-        ├── PitchGraphView.swift
-        ├── RecordButton.swift            # 計測/録音モード対応ボタン
-        ├── RecordingListView.swift       # 録音一覧画面
-        ├── RecordingRowView.swift        # 一覧の各行コンポーネント
-        └── PlaybackControlView.swift     # 再生コントロールバー
+        ├── Turner/
+        │   ├── TunerMainView.swift       # 計測/録音モード切替セグメント付きメイン画面
+        │   ├── NoteDisplayView.swift
+        │   ├── CentsMeterView.swift
+        │   ├── PitchGraphView.swift      # D5(590Hz)〜4'/Eb7(2500Hz)、対数スケール、Canvas描画
+        │   ├── RecordButton.swift        # 計測/録音モード対応ボタン
+        │   └── TuningCelebrationView.swift
+        ├── Recording/
+        │   ├── RecordingListView.swift   # 録音一覧画面
+        │   ├── RecordingRowView.swift    # 一覧の各行コンポーネント
+        │   └── PlaybackControlView.swift # 再生コントロールバー
+        └── FrequencyTable/
+            └── FrequencyTableView.swift  # 篠笛六本調子 音階周波数表（442Hz〜2500Hz）
 ```
 
 ### 依存ライブラリ
@@ -164,7 +169,7 @@ shinobuetuner/
 - **FFT**（高速フーリエ変換）: Accelerate の `vDSP_fft_zrip` / ハン窓 / FFTサイズ 4096
 - **HPS**（倍音積スペクトル法）: 倍音数3、基音を正確に検出
 - **放物線補間**: サブビン精度の周波数を算出
-- 有効音域: 100 Hz ～ 800 Hz / ノイズ判定: RMS < 0.003 で 0 を返す
+- 有効音域: 100 Hz ～ 2600 Hz（大甲音域 4'/Eb7 = 2500 Hz をカバー）/ ノイズ判定: RMS < 0.003 で 0 を返す
 - `nonisolated static func detectPitch(...)` — バックグラウンドスレッドで安全に実行
 - タップコールバック内: `Task { @MainActor [weak self] in subject.send(pitch) }` でメインスレッドに切り替え
 - マイク権限: `AVAudioApplication.requestRecordPermission()` (iOS 17+ API)
@@ -217,18 +222,22 @@ shinobuetuner/
 ### Presentation/View
 
 チューナータブ:
-- `ContentView.swift` — `TabView`（チューナー / 録音一覧）のルートView。`TunerViewModel` + `RecordingListViewModel` を `@StateObject` で保有。`onChange(of: lastSavedRecording)` で一覧を自動更新
+- `ContentView.swift` — `TabView`（チューナー / 録音一覧 / 周波数表）のルートView。`TunerViewModel` + `RecordingListViewModel` を `@StateObject` で保有。`onChange(of: lastSavedRecording)` で一覧を自動更新
 - `TunerMainView.swift` — 上部に計測/録音モード切替セグメント付きのメイン画面
 - `PermissionRequestView.swift` — マイク未許可時の権限要求画面
 - `NoteDisplayView.swift` — 音階名（日本・西洋）と周波数の大きな表示
 - `CentsMeterView.swift` — セントメーター（-50〜+50、カラーグラデーション）
-- `PitchGraphView.swift` — 5秒間のピッチ折れ線グラフ（Canvas描画、対数スケール）
+- `PitchGraphView.swift` — 5秒間のピッチ折れ線グラフ（Canvas描画、対数スケール、D5/590Hz〜4'/Eb7/2500Hz）
 - `RecordButton.swift` — `isRecordingMode` でラベルを切り替え（計測開始/停止 or 録音開始/停止）
+- `TuningCelebrationView.swift` — チューニング完了時のエフェクト表示
 
 録音一覧タブ:
 - `RecordingListView.swift` — 録音一覧（空状態表示、スワイプ削除）。下部に `PlaybackControlView`
 - `RecordingRowView.swift` — ファイル名（拡張子なし）・録音時間・サイズを表示
 - `PlaybackControlView.swift` — シークバー + 再生/一時停止 + 停止ボタン
+
+周波数表タブ:
+- `FrequencyTableView.swift` — 篠笛六本調子 全音程の周波数一覧（筒音 442Hz 〜 4'/Eb7 2500Hz、31音）
 
 UIのポイント:
 - セントメーター: ±10セントが緑、±25セントが黄、それ以上が赤
@@ -260,6 +269,16 @@ INFOPLIST_KEY_NSMicrophoneUsageDescription = "マイクを使って篠笛の音�
 
 | 運指 | 日本音階名 | 西洋音階名 | 周波数（Hz） |
 |-----------|--------|---------|-------------|
+| 4' | ファ | Eb7 | 2500.328 |
+| 3' | ミ | D7 | 2360.029 |
+| 2'（半） | レ♯ | Db7 | 2227.540 |
+| 2' | レ | C7 | 2102.519 |
+| 1'（半） | ド♯ | B6 | 1984.512 |
+| 1' | ド | Bb6 | 1873.131 |
+| ７ | シ | A6 | 1768.000 |
+| ６（半） | ラ♯ | Ab6 | 1668.770 |
+| ６ | ラ | G6 | 1575.116 |
+| ５（半） | ソ♯ | Gb6 | 1486.784 |
 | ５ | ソ | F6 | 1403.262 |
 | ４（半） | ファ♯ | E6 | 1324.504 |
 | ４ | ファ | Eb6 | 1250.164 |
