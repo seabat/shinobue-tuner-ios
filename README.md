@@ -21,11 +21,13 @@
 - マイクから音声を取得し、ピッチ（Hz）をリアルタイム計測
 - 音階名・周波数を大きく表示
 - セントメーターでチューニングのズレを視覚化（±10cent: 緑 / ±25cent: 黄 / それ以上: 赤）
+- セント値をメーターバーの上にリアルタイム表示
 - チューニング成功時のエフェクト表示
 - 5秒間のピッチ推移を折れ線グラフで表示（対数スケール・無音時も時間軸が流れる）
+- **30秒間無音が続くと自動的に停止**（計測モード・録音モード共通）
 
 ### 録音機能
-- 計測モード / 録音モードをセグメントで切り替え
+- 計測モード / 録音モードをボタンで切り替え
   - **計測モード**: ピッチ検出のみ
   - **録音モード**: ピッチ検出 ＋ m4a 録音
 - ファイル名は録音開始日時（例: `2026-02-26_21-30-00.m4a`）
@@ -35,15 +37,26 @@
 - タップで再生。再生中は下部にコントロールバーを表示
 - 再生コントロール: 再生 / 一時停止 / 停止（選択解除）/ シークバー
 - スワイプでファイルを削除
+- ファイルのリネーム・共有（Share Sheet）
 - 録音保存後、一覧を自動更新
+
+### 周波数表
+- 篠笛六本調子の全音程（筒音 442 Hz 〜 4'/Eb7 2500 Hz）の周波数一覧表を内蔵
+
+### チューニング設定
+- **調子**: ホイールピッカーで選択（現在は六本調子のみ対応）
+- **ピッチグラフ表示**: On/Off を切り替え可能
+- **セント範囲**: チューニング成功とみなす許容範囲（±1〜±50 セント）
+- **継続時間**: 成功とみなすピッチ持続時間（0.5〜5.0 秒）
+- 設定はすべて UserDefaults に保存され、次回起動時も維持される
 
 ---
 
 ## スクリーンショット
 
 <p align="center">
-  <img src="docs/turner.png" width="200" alt="チューナー画面">
-  <img src="docs/recordingi.png" width="200" alt="録音一覧画面">
+  <img src="docs/turning_success.png" width="200" alt="チューナー画面">
+  <img src="docs/recordinglist.png" width="200" alt="録音一覧画面">
 </p>
 
 ---
@@ -65,7 +78,7 @@
 - **FFT**（高速フーリエ変換）: Accelerate の `vDSP_fft_zrip` / ハン窓 / FFTサイズ 4096
 - **HPS**（倍音積スペクトル法）: 倍音数3で基音を正確に検出
 - **放物線補間**: サブビン精度の周波数を算出
-- 有効音域: **100 Hz 〜 800 Hz**
+- 有効音域: **100 Hz 〜 2600 Hz**（大甲音域 4'/Eb7 = 2500 Hz をカバー）
 - ノイズ判定: RMS < 0.003 で無音とみなす
 
 ---
@@ -90,19 +103,20 @@ Presentation ──依存──▶ Domain ◀──依存── Data
 
 ```
 shinobuetuner/
-├── ShinobuetunerApp.swift
+├── shinobuetunerApp.swift
 ├── Domain/                  # ビジネスロジック（外部依存なし）
-│   ├── Model/               # ドメインモデル
+│   ├── Model/               # NoteInfo, PitchSample, TunerSettings など
 │   ├── Repository/          # Repository プロトコル
-│   └── UseCase/             # ユースケース
+│   └── UseCase/             # MonitorPitchUseCase, ManageRecordingsUseCase など
 ├── Data/                    # AVAudioEngine / FFT などの実装詳細
-│   ├── DataSource/          # 音声入出力の低レベル処理
+│   ├── DataSource/          # MicrophoneDataSource, AudioPlayerDataSource
 │   └── Repository/          # Repository プロトコルの具体実装
 └── Presentation/            # 画面表示と状態管理
-    ├── ViewModel/           # ObservableObject
+    ├── ViewModel/           # TunerViewModel, RecordingListViewModel
     └── View/
-        ├── Turner/          # チューナー画面
-        └── Recording/       # 録音一覧・再生画面
+        ├── Turner/          # チューナー画面（TunerMainView, CentsMeterView など）
+        ├── Recording/       # 録音一覧・再生画面
+        └── FrequencyTable/  # 篠笛六本調子 音階周波数表
 ```
 
 ---
