@@ -42,6 +42,8 @@ final class TunerViewModel: ObservableObject {
 
     private let useCase: any MonitorPitchUseCaseProtocol
     private let recordingRepository: any RecordingRepository
+    /// チューニング成功判定の設定値
+    let settings: TunerSettings
     private var cancellables = Set<AnyCancellable>()
     private var sessionStartTime: Date = Date()
     /// 最後に音を検出した currentTime（無音タイムアウト判定に使用）
@@ -65,9 +67,13 @@ final class TunerViewModel: ObservableObject {
     }
 
     /// テスト時にモックを注入できる初期化
-    init(useCase: any MonitorPitchUseCaseProtocol, recordingRepository: any RecordingRepository = RecordingRepositoryImpl()) {
+    init(
+        useCase: any MonitorPitchUseCaseProtocol,
+        recordingRepository: any RecordingRepository = RecordingRepositoryImpl()
+    ) {
         self.useCase = useCase
         self.recordingRepository = recordingRepository
+        self.settings = TunerSettings()
     }
 
     // MARK: - 操作
@@ -175,7 +181,7 @@ final class TunerViewModel: ObservableObject {
 
     /// チューニング成功判定の状態を更新する
     private func updateInTuneState(midiNote: Int, cents: Float) {
-        let isInTune = abs(cents) <= 10.0
+        let isInTune = abs(cents) <= Float(settings.centThreshold)
 
         switch inTuneState {
         case .idle:
@@ -192,8 +198,8 @@ final class TunerViewModel: ObservableObject {
             } else if !isInTune {
                 // 同じ音階名だがズレた → idle
                 inTuneState = .idle
-            } else if currentTime - since >= 1.0 {
-                // 1秒以上 in-tune → エフェクト発火
+            } else if currentTime - since >= settings.durationSeconds {
+                // 設定秒数以上 in-tune → エフェクト発火
                 showTuningCelebration = true
                 inTuneState = .cooling(midiNote: midiNote, until: currentTime + 1.0)
             }

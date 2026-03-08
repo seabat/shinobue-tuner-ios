@@ -18,7 +18,14 @@ enum TunerMode: String, CaseIterable {
 /// チューナーメインビュー
 struct TunerMainView: View {
     @ObservedObject var viewModel: TunerViewModel
+    @ObservedObject private var settings: TunerSettings
     @State private var selectedMode: TunerMode = .monitoring
+    @State private var isSettingsPresented: Bool = false
+
+    init(viewModel: TunerViewModel) {
+        self._viewModel = ObservedObject(wrappedValue: viewModel)
+        self._settings = ObservedObject(wrappedValue: viewModel.settings)
+    }
 
     var body: some View {
         VStack(spacing: 0) {
@@ -39,13 +46,15 @@ struct TunerMainView: View {
             .padding(.vertical, 4)
 
             // ─── ピッチグラフ（5秒間） ───
-            PitchGraphView(
-                pitchHistory: viewModel.pitchHistory,
-                currentTime: viewModel.currentTime
-            )
-            .frame(maxHeight: .infinity)
-            .padding(.horizontal, 16)
-            .padding(.bottom, 32)
+            if settings.showPitchGraph {
+                PitchGraphView(
+                    pitchHistory: viewModel.pitchHistory,
+                    currentTime: viewModel.currentTime
+                )
+                .frame(maxHeight: .infinity)
+                .padding(.horizontal, 16)
+                .padding(.bottom, 32)
+            }
 
             // ─── 開始/停止ボタン + モード切替 ───
             ZStack {
@@ -73,9 +82,25 @@ struct TunerMainView: View {
             .padding(.top, 8)
             .padding(.bottom, 24)
         }
+        .overlay(alignment: .topTrailing) {
+            // ─── 設定ボタン ───
+            Button {
+                isSettingsPresented = true
+            } label: {
+                Image(systemName: "gearshape")
+                    .font(.title3)
+                    .foregroundStyle(.gray.opacity(0.7))
+                    .padding(12)
+            }
+            .disabled(viewModel.isRunning)
+        }
         .overlay {
             // ─── チューニング成功エフェクト ───
             TuningCelebrationView(isInTune: viewModel.showTuningCelebration)
+        }
+        .sheet(isPresented: $isSettingsPresented) {
+            TunerSettingsView(settings: viewModel.settings)
+                .presentationDetents([.medium, .large])
         }
         .alert("自動停止", isPresented: $viewModel.showSilenceTimeoutAlert) {
             Button("OK") { viewModel.showSilenceTimeoutAlert = false }
@@ -130,23 +155,31 @@ private final class PreviewUseCase: MonitorPitchUseCaseProtocol {
     func stopRecording() {}
 }
 
-#Preview("録音中（レ/D4 +8セント）") {
-    let vm = TunerViewModel(useCase: PreviewUseCase())
-    vm.currentPitch = 298.0
-    vm.isRunning = true
-    vm.noteResult = NoteHelper.closestNote(for: 298.0)
-    vm.pitchHistory = stride(from: 0.0, to: 5.0, by: 0.1).map { t in
-        let freq = 295.0 + 12.0 * sin(t * 1.5)
-        return PitchSample(time: t, frequency: Float(freq))
+private struct TunerPreviewWrapper: View {
+    @StateObject private var vm = TunerViewModel(useCase: PreviewUseCase())
+
+    var body: some View {
+        TunerMainView(viewModel: vm)
+            .background(Color(red: 0.078, green: 0.078, blue: 0.118))
+            .preferredColorScheme(.dark)
+            .task {
+                vm.currentPitch = 298.0
+                vm.isRunning = true
+                vm.noteResult = NoteHelper.closestNote(for: 298.0)
+                vm.pitchHistory = stride(from: 0.0, to: 5.0, by: 0.1).map { t in
+                    let freq = 295.0 + 12.0 * sin(t * 1.5)
+                    return PitchSample(time: t, frequency: Float(freq))
+                }
+            }
     }
-    return TunerMainView(viewModel: vm)
-        .background(Color(red: 0.078, green: 0.078, blue: 0.118))
-        .preferredColorScheme(.dark)
+}
+
+#Preview("録音中（レ/D4 +8セント）") {
+    TunerPreviewWrapper()
 }
 
 #Preview("無音・停止中") {
-    let vm = TunerViewModel(useCase: PreviewUseCase())
-    return TunerMainView(viewModel: vm)
+    TunerMainView(viewModel: TunerViewModel(useCase: PreviewUseCase()))
         .background(Color(red: 0.078, green: 0.078, blue: 0.118))
         .preferredColorScheme(.dark)
 }
