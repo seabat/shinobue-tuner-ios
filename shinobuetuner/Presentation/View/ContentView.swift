@@ -4,7 +4,7 @@
 //
 //  Created by ryouta on 2026/02/25.
 //
-//  ぞめきチューナー - ルートビュー
+//  篠笛チューナー - ルートビュー
 
 import SwiftUI
 import Combine
