@@ -56,7 +56,17 @@ struct CentsMeterView: View {
     }
 
     var body: some View {
-        VStack(spacing: 6) {
+        VStack(spacing: 2) {
+            // セント値(音程のズレを表す単位)テキスト（バー上方に控えめに表示）
+            if isActive {
+                Text(String(format: "%+.1f セント", cents))
+                    .font(.system(size: 11, design: .monospaced))
+                    .foregroundStyle(.white.opacity(0.4))
+                    .frame(maxWidth: .infinity, alignment: .center)
+            } else {
+                Spacer().frame(height: 14)
+            }
+
             GeometryReader { geo in
                 let w = geo.size.width
                 let h = geo.size.height - 24 // ラベル分を引く
@@ -102,12 +112,6 @@ struct CentsMeterView: View {
             }
         }
 
-        // セント値テキスト
-        if isActive {
-            Text(String(format: "%+.1f セント", cents))
-                .font(.system(size: 13, design: .monospaced))
-                .foregroundStyle(.white.opacity(0.7))
-        }
     }
 }
 
