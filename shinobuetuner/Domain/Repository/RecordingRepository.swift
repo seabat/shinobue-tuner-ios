@@ -16,6 +16,9 @@ protocol RecordingRepository {
     /// 指定URLの録音ファイルを削除する
     func delete(url: URL) throws
 
+    /// 録音ファイルの名前を変更する（拡張子 .m4a は維持）。新しいURLを返す
+    func rename(url: URL, newName: String) throws -> URL
+
     /// 新しい録音の保存先URLを生成して返す（ファイル名: "yyyy-MM-dd_HH-mm-ss.m4a"）
     func newRecordingURL() -> URL
 }

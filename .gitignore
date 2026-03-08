@@ -66,3 +66,6 @@ fastlane/test_output
 
 # xcode-build-server（ローカル環境固有の設定ファイル）
 buildServer.json
+
+# Claude Code（ローカル環境固有の設定ファイル）
+.claude/settings.local.json

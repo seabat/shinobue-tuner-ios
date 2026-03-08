@@ -57,6 +57,15 @@ final class RecordingRepositoryImpl: RecordingRepository {
         try fileManager.removeItem(at: url)
     }
 
+    /// 録音ファイルの名前を変更する（拡張子 .m4a は維持）
+    func rename(url: URL, newName: String) throws -> URL {
+        let newURL = url.deletingLastPathComponent()
+            .appendingPathComponent(newName)
+            .appendingPathExtension("m4a")
+        try fileManager.moveItem(at: url, to: newURL)
+        return newURL
+    }
+
     /// 新しい録音の保存先URLを生成する（ファイル名: "yyyy-MM-dd_HH-mm-ss.m4a"）
     func newRecordingURL() -> URL {
         let formatter = DateFormatter()

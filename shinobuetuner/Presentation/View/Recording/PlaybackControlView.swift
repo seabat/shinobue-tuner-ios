@@ -105,6 +105,7 @@ private let previewRecording = RecordingFile(
 private final class PreviewManageUseCase: ManageRecordingsUseCaseProtocol {
     func fetchAll() -> [RecordingFile] { [] }
     func delete(recording: RecordingFile) throws {}
+    func rename(recording: RecordingFile, newName: String) throws -> RecordingFile { recording }
 }
 
 /// プレビュー用スタブ（再生）

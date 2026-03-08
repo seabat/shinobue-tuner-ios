@@ -69,6 +69,22 @@ final class RecordingListViewModel: ObservableObject {
         }
     }
 
+    /// 録音ファイルの名前を変更する
+    func renameRecording(_ recording: RecordingFile, newName: String) {
+        let trimmed = newName.trimmingCharacters(in: .whitespaces)
+        guard !trimmed.isEmpty else { return }
+        do {
+            let renamed = try manageUseCase.rename(recording: recording, newName: trimmed)
+            // 再生中のファイルだった場合は選択中URLを更新
+            if selectedRecording?.id == recording.id {
+                selectedRecording = renamed
+            }
+            loadRecordings()
+        } catch {
+            errorMessage = "名前の変更に失敗しました: \(error.localizedDescription)"
+        }
+    }
+
     /// 録音ファイルを選択して再生する
     func selectAndPlay(_ recording: RecordingFile) {
         do {
