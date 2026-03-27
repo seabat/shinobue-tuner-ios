@@ -4,7 +4,7 @@
 //
 //  Created by ryouta on 2026/02/25.
 //
-//  ぞめきチューナー - ルートビュー
+//  篠笛チューナー - ルートビュー
 
 import SwiftUI
 import Combine
@@ -61,6 +61,7 @@ struct ContentView: View {
                 }
             }
         }
+        .preferredColorScheme(.dark)
         .task {
             // 起動時にマイク権限を確認
             await viewModel.requestPermission()

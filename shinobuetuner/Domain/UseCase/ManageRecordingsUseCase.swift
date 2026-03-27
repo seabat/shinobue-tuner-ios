@@ -15,6 +15,9 @@ protocol ManageRecordingsUseCaseProtocol {
 
     /// 録音ファイルを削除する
     func delete(recording: RecordingFile) throws
+
+    /// 録音ファイルの名前を変更する
+    func rename(recording: RecordingFile, newName: String) throws -> RecordingFile
 }
 
 /// 録音ファイル管理ユースケースの具体実装
@@ -31,5 +34,17 @@ final class ManageRecordingsUseCase: ManageRecordingsUseCaseProtocol {
 
     func delete(recording: RecordingFile) throws {
         try repository.delete(url: recording.url)
+    }
+
+    func rename(recording: RecordingFile, newName: String) throws -> RecordingFile {
+        let newURL = try repository.rename(url: recording.url, newName: newName)
+        return RecordingFile(
+            id: recording.id,
+            url: newURL,
+            fileName: newURL.lastPathComponent,
+            createdAt: recording.createdAt,
+            duration: recording.duration,
+            fileSize: recording.fileSize
+        )
     }
 }

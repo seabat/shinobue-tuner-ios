@@ -13,6 +13,16 @@ struct FrequencyTableView: View {
 
     // 六本調子（シ=442Hz基準）音階周波数表（高い音から順）
     private let rows: [FrequencyRow] = [
+        FrequencyRow("4'",       "ファ",  2500.328, "Eb7"),
+        FrequencyRow("3'",       "ミ",    2360.029, "D7"),
+        FrequencyRow("2'（半）", "レ♯",  2227.540, "Db7"),
+        FrequencyRow("2'",       "レ",    2102.519, "C7"),
+        FrequencyRow("1'（半）", "ド♯",  1984.512, "B6"),
+        FrequencyRow("1'",       "ド",    1873.131, "Bb6", isHighlighted: true),
+        FrequencyRow("７",       "シ",    1768.000, "A6"),
+        FrequencyRow("６（半）", "ラ♯",  1668.770, "Ab6"),
+        FrequencyRow("６",       "ラ",    1575.116, "G6"),
+        FrequencyRow("５（半）", "ソ♯",  1486.784, "Gb6"),
         FrequencyRow("５",       "ソ",    1403.262, "F6"),
         FrequencyRow("４（半）", "ファ♯", 1324.504, "E6"),
         FrequencyRow("４",       "ファ",  1250.164, "Eb6"),
@@ -33,7 +43,7 @@ struct FrequencyTableView: View {
         FrequencyRow("二",       "レ",     525.630, "C5"),
         FrequencyRow("一（半）", "ド♯",    496.128, "B4"),
         FrequencyRow("一",       "ド",     468.283, "Bb4"),
-        FrequencyRow("筒音",     "シ",     442.000, "A4", isReference: true),
+        FrequencyRow("筒音",     "シ",     442.000, "A4", isHighlighted: true),
     ]
 
     var body: some View {
@@ -41,55 +51,57 @@ struct FrequencyTableView: View {
             Color(red: 0.08, green: 0.08, blue: 0.12)
                 .ignoresSafeArea()
 
-            List {
-                // ─── ヘッダー行 ───
-                HStack(spacing: 0) {
-                    Text("運指").headerStyle()
-                    Text("日本").headerStyle()
-                    Text("西洋").headerStyle()
-                    Text("Hz").headerStyle(alignment: .trailing)
-                }
-                .listRowBackground(Color(red: 0.12, green: 0.12, blue: 0.18))
-                .listRowInsets(EdgeInsets(top: 6, leading: 16, bottom: 6, trailing: 16))
-
-                // ─── データ行 ───
-                ForEach(rows) { row in
+            ScrollView {
+                LazyVStack(spacing: 0) {
+                    // ─── ヘッダー行 ───
                     HStack(spacing: 0) {
-                        // 運指名
-                        Text(row.fingeringName)
-                            .font(.system(.subheadline, design: .rounded))
-                            .foregroundStyle(row.isReference ? Color.cyan : .white)
-                            .frame(maxWidth: .infinity, alignment: .leading)
-
-                        // 日本音階名
-                        Text(row.japaneseName)
-                            .font(.system(.subheadline, design: .rounded))
-                            .foregroundStyle(row.isReference ? Color.cyan : .white.opacity(0.85))
-                            .frame(maxWidth: .infinity, alignment: .leading)
-
-                        // 西洋音階名
-                        Text(row.westernName)
-                            .font(.system(.subheadline, design: .monospaced))
-                            .foregroundStyle(row.isReference ? Color.cyan : .white.opacity(0.85))
-                            .frame(maxWidth: .infinity, alignment: .leading)
-
-                        // 周波数
-                        Text(String(format: "%.3f", row.frequency))
-                            .font(.system(.subheadline, design: .monospaced))
-                            .foregroundStyle(row.isReference ? Color.cyan : .white.opacity(0.7))
-                            .frame(maxWidth: .infinity, alignment: .trailing)
+                        Text("運指").headerStyle()
+                        Text("日本").headerStyle()
+                        Text("西洋").headerStyle()
+                        Text("Hz").headerStyle(alignment: .trailing)
                     }
-                    .padding(.vertical, 2)
-                    .listRowBackground(
-                        row.isReference
-                            ? Color(red: 0.05, green: 0.15, blue: 0.2)
-                            : Color(red: 0.08, green: 0.08, blue: 0.12)
-                    )
-                    .listRowInsets(EdgeInsets(top: 6, leading: 16, bottom: 6, trailing: 16))
+                    .frame(height: 32)
+                    .padding(.horizontal, 16)
+                    .background(Color(red: 0.12, green: 0.12, blue: 0.18))
+
+                    // ─── データ行 ───
+                    ForEach(rows) { row in
+                        HStack(spacing: 0) {
+                            // 運指名
+                            Text(row.fingeringName)
+                                .font(.system(.subheadline, design: .rounded))
+                                .foregroundStyle(row.isHighlighted ? Color.cyan : .white)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+
+                            // 日本音階名
+                            Text(row.japaneseName)
+                                .font(.system(.subheadline, design: .rounded))
+                                .foregroundStyle(row.isHighlighted ? Color.cyan : .white.opacity(0.85))
+                                .frame(maxWidth: .infinity, alignment: .leading)
+
+                            // 西洋音階名
+                            Text(row.westernName)
+                                .font(.system(.subheadline, design: .monospaced))
+                                .foregroundStyle(row.isHighlighted ? Color.cyan : .white.opacity(0.85))
+                                .frame(maxWidth: .infinity, alignment: .leading)
+
+                            // 周波数
+                            Text(String(format: "%.3f", row.frequency))
+                                .font(.system(.subheadline, design: .monospaced))
+                                .foregroundStyle(row.isHighlighted ? Color.cyan : .white.opacity(0.7))
+                                .frame(maxWidth: .infinity, alignment: .trailing)
+                        }
+                        .frame(height: 30)
+                        .padding(.horizontal, 16)
+                        .background(
+                            row.isHighlighted
+                                ? Color(red: 0.05, green: 0.15, blue: 0.2)
+                                : Color(red: 0.08, green: 0.08, blue: 0.12)
+                        )
+                    }
                 }
             }
-            .listStyle(.plain)
-            .scrollContentBackground(.hidden)
+            .background(Color(red: 0.08, green: 0.08, blue: 0.12))
         }
     }
 }
@@ -102,14 +114,14 @@ private struct FrequencyRow: Identifiable {
     let japaneseName: String
     let frequency: Double
     let westernName: String
-    let isReference: Bool
+    let isHighlighted: Bool
 
-    init(_ fingeringName: String, _ japaneseName: String, _ frequency: Double, _ westernName: String, isReference: Bool = false) {
+    init(_ fingeringName: String, _ japaneseName: String, _ frequency: Double, _ westernName: String, isHighlighted: Bool = false) {
         self.fingeringName = fingeringName
         self.japaneseName = japaneseName
         self.frequency = frequency
         self.westernName = westernName
-        self.isReference = isReference
+        self.isHighlighted = isHighlighted
     }
 }
 
