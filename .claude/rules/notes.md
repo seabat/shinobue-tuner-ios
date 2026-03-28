@@ -20,6 +20,14 @@ A4 = **442 Hz**（一般的な440 Hzではなく篠笛六本調子専用）、12
 - タップコールバック → `Task { @MainActor [weak self] in subject.send(pitch) }` でメインスレッドに切り替え
 - `MicrophoneDataSource.recordingFile` は `nonisolated(unsafe) var` — タップコールバック（バックグラウンド）から直接 `AVAudioFile.write(from:)` を呼ぶ
 
+## ViewModel の設計ルール
+
+- **ViewModel をネストしない** — ViewModel のプロパティに別の ViewModel を持たせてはならない
+- **ViewModel への依存は Screen / Modal の View だけ** — サブコンポーネント（行、ボタン等）は ViewModel を直接参照しない
+- **View は原則1つの ViewModel に依存する** — 複数の ViewModel を `@ObservedObject` / `@StateObject` で同時に保持しない
+- 設定モーダルは `@StateObject private var viewModel = XxxSettingsViewModel()` で自己完結させる（呼び出し元 View から ViewModel を渡さない）
+- 設定変更を呼び出し元 ViewModel に反映する場合は `.fullScreenCover(onDismiss:)` で `viewModel.reloadSettings()` を呼ぶ
+
 ## UseCase の設計方針
 
 - Fetch/Delete/Rename 系は **`callAsFunction`** パターンを採用（インスタンスを関数として呼び出せる）
