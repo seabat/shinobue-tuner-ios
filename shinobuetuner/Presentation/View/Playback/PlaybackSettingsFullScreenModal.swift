@@ -19,6 +19,19 @@ struct PlaybackSettingsFullScreenModal: View {
 
                 Form {
                     Section {
+                        Picker("並び替え", selection: $viewModel.settings.sortOrder) {
+                            ForEach(PlaybackSortOrder.allCases, id: \.self) { order in
+                                Text(order.displayName).tag(order)
+                            }
+                        }
+                        .foregroundStyle(.white)
+                        .tint(.cyan)
+                    } header: {
+                        Text("並び替え")
+                            .foregroundStyle(.gray)
+                    }
+
+                    Section {
                         VStack(alignment: .leading, spacing: 12) {
                             HStack {
                                 Text("しきい値")
