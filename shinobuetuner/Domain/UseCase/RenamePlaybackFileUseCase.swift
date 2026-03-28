@@ -11,7 +11,7 @@ import Foundation
 /// 音声ファイルリネームユースケースのプロトコル
 protocol RenamePlaybackFileUseCaseProtocol {
     /// 指定したファイルの名前を変更し、更新後のファイルを返す
-    func rename(file: PlaybackFile, newName: String) throws -> PlaybackFile
+    func callAsFunction(file: PlaybackFile, newName: String) throws -> PlaybackFile
 }
 
 /// 音声ファイルリネームユースケースの具体実装
@@ -22,7 +22,7 @@ final class RenamePlaybackFileUseCase: RenamePlaybackFileUseCaseProtocol {
         self.repository = repository
     }
 
-    func rename(file: PlaybackFile, newName: String) throws -> PlaybackFile {
+    func callAsFunction(file: PlaybackFile, newName: String) throws -> PlaybackFile {
         let newURL = try repository.rename(url: file.url, newName: newName)
         return PlaybackFile(
             id: file.id,

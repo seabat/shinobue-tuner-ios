@@ -103,17 +103,17 @@ private let previewPlaybackFile = PlaybackFile(
 
 /// プレビュー用スタブ（一覧取得）
 private final class PreviewFetchUseCase: FetchPlaybackFilesUseCaseProtocol {
-    func fetchAll() -> [PlaybackFile] { [] }
+    func callAsFunction() -> [PlaybackFile] { [] }
 }
 
 /// プレビュー用スタブ（削除）
 private final class PreviewDeleteUseCase: DeletePlaybackFileUseCaseProtocol {
-    func delete(file: PlaybackFile) throws {}
+    func callAsFunction(file: PlaybackFile) throws {}
 }
 
 /// プレビュー用スタブ（リネーム）
 private final class PreviewRenameUseCase: RenamePlaybackFileUseCaseProtocol {
-    func rename(file: PlaybackFile, newName: String) throws -> PlaybackFile { file }
+    func callAsFunction(file: PlaybackFile, newName: String) throws -> PlaybackFile { file }
 }
 
 /// プレビュー用スタブ（再生）

@@ -13,7 +13,7 @@ shinobuetuner/
 └── Presentation/  # ViewModel / View
     └── View/
         ├── Turner/         # チューナー画面
-        ├── Recording/      # 録音一覧・再生
+        ├── Playback/       # 録音一覧・再生
         └── FrequencyTable/ # 音階周波数表
 ```
 

@@ -62,13 +62,13 @@ final class PlaybackListViewModel: ObservableObject {
 
     /// 音声ファイル一覧を読み込む
     func loadPlaybackFiles() {
-        playbackFiles = fetchUseCase.fetchAll()
+        playbackFiles = fetchUseCase()
     }
 
     /// 音声ファイルを削除する
     func deletePlaybackFile(_ playbackFile: PlaybackFile) {
         do {
-            try deleteUseCase.delete(file: playbackFile)
+            try deleteUseCase(file: playbackFile)
             if selectedPlaybackFile?.id == playbackFile.id {
                 stopPlayback()
             }
@@ -83,7 +83,7 @@ final class PlaybackListViewModel: ObservableObject {
         let trimmed = newName.trimmingCharacters(in: .whitespaces)
         guard !trimmed.isEmpty else { return }
         do {
-            let renamed = try renameUseCase.rename(file: playbackFile, newName: trimmed)
+            let renamed = try renameUseCase(file: playbackFile, newName: trimmed)
             // 再生中のファイルだった場合は選択中URLを更新
             if selectedPlaybackFile?.id == playbackFile.id {
                 selectedPlaybackFile = renamed

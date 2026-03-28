@@ -11,7 +11,7 @@ import Foundation
 /// 音声ファイル一覧取得ユースケースのプロトコル
 protocol FetchPlaybackFilesUseCaseProtocol {
     /// 保存済みファイルを新しい順に返す
-    func fetchAll() -> [PlaybackFile]
+    func callAsFunction() -> [PlaybackFile]
 }
 
 /// 音声ファイル一覧取得ユースケースの具体実装
@@ -22,7 +22,7 @@ final class FetchPlaybackFilesUseCase: FetchPlaybackFilesUseCaseProtocol {
         self.repository = repository
     }
 
-    func fetchAll() -> [PlaybackFile] {
+    func callAsFunction() -> [PlaybackFile] {
         repository.fetchAll()
     }
 }

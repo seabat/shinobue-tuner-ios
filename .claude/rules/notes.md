@@ -25,6 +25,11 @@ A4 = **442 Hz**（一般的な440 Hzではなく篠笛六本調子専用）、12
 - `TunerMainView` は `viewModel` と `viewModel.settings` の両方を `@ObservedObject` で監視する必要がある
 - `settings` の変更だけでは `viewModel` を監視しても再描画されないため、`init` で `ObservedObject(wrappedValue:)` を使って両方をラップする
 
+## UseCase の設計方針
+
+- Fetch/Delete/Rename 系は **`callAsFunction`** パターンを採用（インスタンスを関数として呼び出せる）
+- `MonitorPitchUseCase` のみ例外 — start/stop/requestPermission/startRecording/stopRecording と複数の操作を束ねる必要があるため `callAsFunction` 非採用
+
 ## グラフ時間軸の設計
 
 - 無音時でも `currentTime` が 0.05秒ごとに進み続けることで、グラフの時間軸が常に流れる

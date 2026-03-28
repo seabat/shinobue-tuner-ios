@@ -11,7 +11,7 @@ import Foundation
 /// 音声ファイル削除ユースケースのプロトコル
 protocol DeletePlaybackFileUseCaseProtocol {
     /// 指定したファイルを削除する
-    func delete(file: PlaybackFile) throws
+    func callAsFunction(file: PlaybackFile) throws
 }
 
 /// 音声ファイル削除ユースケースの具体実装
@@ -22,7 +22,7 @@ final class DeletePlaybackFileUseCase: DeletePlaybackFileUseCaseProtocol {
         self.repository = repository
     }
 
-    func delete(file: PlaybackFile) throws {
+    func callAsFunction(file: PlaybackFile) throws {
         try repository.delete(url: file.url)
     }
 }
