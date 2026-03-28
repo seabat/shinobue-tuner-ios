@@ -61,10 +61,15 @@ private final class PreviewUseCase: MonitorPitchUseCaseProtocol {
     func stopRecording() {}
 }
 
-#Preview {
+#Preview(("Light/Darkモード指定せず")) {
     let vm = TunerViewModel(useCase: PreviewUseCase())
     return PermissionRequestView(viewModel: vm)
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(Color(red: 0.078, green: 0.078, blue: 0.118))
+        // 表示領域がわかるよう背景色をつける
+        .background(Color(red: 1.0, green: 0.85, blue: 0.7))
+}
+
+#Preview(("Darkモード")) {
+    let vm = TunerViewModel(useCase: PreviewUseCase())
+    return PermissionRequestView(viewModel: vm)
         .preferredColorScheme(.dark)
 }

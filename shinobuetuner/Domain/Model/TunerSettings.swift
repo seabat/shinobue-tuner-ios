@@ -2,10 +2,9 @@
 //  TunerSettings.swift
 //  shinobuetuner
 //
-//  チューニング成功判定の設定値（UserDefaultsに永続化）
+//  チューニング成功判定の設定値
 
 import Foundation
-import Combine
 
 /// 篠笛の調子
 enum ShinobueTuning: Int, CaseIterable, Identifiable {
@@ -40,37 +39,14 @@ enum ShinobueTuning: Int, CaseIterable, Identifiable {
     var isSupported: Bool { self == .rokuHon }
 }
 
-/// チューナーの設定
-final class TunerSettings: ObservableObject {
+/// チューナーの設定値
+struct TunerSettings {
     /// チューニング成功とみなすセント閾値（デフォルト: 10セント）
-    @Published var centThreshold: Double {
-        didSet { UserDefaults.standard.set(centThreshold, forKey: "tuningCentThreshold") }
-    }
+    var centThreshold: Double = 10.0
     /// チューニング成功とみなす継続秒数（デフォルト: 1秒）
-    @Published var durationSeconds: Double {
-        didSet { UserDefaults.standard.set(durationSeconds, forKey: "tuningDurationSeconds") }
-    }
+    var durationSeconds: Double = 1.0
     /// 選択中の調子（デフォルト: 六本調子）
-    @Published var tuning: ShinobueTuning {
-        didSet { UserDefaults.standard.set(tuning.rawValue, forKey: "selectedTuning") }
-    }
+    var tuning: ShinobueTuning = .rokuHon
     /// ピッチグラフを表示するかどうか（デフォルト: true）
-    @Published var showPitchGraph: Bool {
-        didSet { UserDefaults.standard.set(showPitchGraph, forKey: "showPitchGraph") }
-    }
-
-    nonisolated init() {
-        let savedCent = UserDefaults.standard.double(forKey: "tuningCentThreshold")
-        _centThreshold = Published(initialValue: savedCent > 0 ? savedCent : 10.0)
-
-        let savedDuration = UserDefaults.standard.double(forKey: "tuningDurationSeconds")
-        _durationSeconds = Published(initialValue: savedDuration > 0 ? savedDuration : 1.0)
-
-        let savedTuning = UserDefaults.standard.integer(forKey: "selectedTuning")
-        let tuning = ShinobueTuning(rawValue: savedTuning) ?? .rokuHon
-        _tuning = Published(initialValue: tuning)
-
-        let savedShowGraph = UserDefaults.standard.object(forKey: "showPitchGraph") as? Bool ?? true
-        _showPitchGraph = Published(initialValue: savedShowGraph)
-    }
+    var showPitchGraph: Bool = true
 }

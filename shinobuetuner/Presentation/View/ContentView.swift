@@ -12,19 +12,19 @@ import Combine
 /// アプリのルートビュー（ViewModelを保有する）
 struct ContentView: View {
     @StateObject private var viewModel: TunerViewModel
-    @StateObject private var recordingListViewModel: RecordingListViewModel
+    @StateObject private var playbackFileListViewModel: PlaybackListViewModel
     @Environment(\.scenePhase) private var scenePhase
 
     /// 本番用（デフォルト）
     init() {
         _viewModel = StateObject(wrappedValue: TunerViewModel())
-        _recordingListViewModel = StateObject(wrappedValue: RecordingListViewModel())
+        _playbackFileListViewModel = StateObject(wrappedValue: PlaybackListViewModel())
     }
 
     /// プレビュー・テスト用（ViewModel を外から注入）
     init(viewModel: TunerViewModel) {
         _viewModel = StateObject(wrappedValue: viewModel)
-        _recordingListViewModel = StateObject(wrappedValue: RecordingListViewModel())
+        _playbackFileListViewModel = StateObject(wrappedValue: PlaybackListViewModel())
     }
 
     var body: some View {
@@ -36,26 +36,24 @@ struct ContentView: View {
                         .ignoresSafeArea()
 
                     if viewModel.permissionGranted {
-                        TunerMainView(viewModel: viewModel)
+                        TunerMainScreen(viewModel: viewModel)
                     } else {
                         PermissionRequestView(viewModel: viewModel)
                     }
                 }
             }
 
-            // ─── 録音一覧タブ ───
-            Tab("録音一覧", systemImage: "list.bullet.rectangle") {
+            // ─── 音声ファイルタブ ───
+            Tab("プレイリスト", systemImage: "list.bullet.rectangle") {
                 NavigationStack {
-                    RecordingListView(viewModel: recordingListViewModel)
-                        .navigationTitle("録音一覧")
-                        .navigationBarTitleDisplayMode(.inline)
+                    PlaybackListScreen(viewModel: playbackFileListViewModel)
                 }
             }
 
             // ─── 周波数表タブ ───
             Tab("周波数表", systemImage: "music.note.list") {
                 NavigationStack {
-                    FrequencyTableView()
+                    FrequencyTableScreen()
                         .navigationTitle("六本調子 周波数表")
                         .navigationBarTitleDisplayMode(.inline)
                 }
@@ -68,7 +66,7 @@ struct ContentView: View {
         }
         .onChange(of: viewModel.lastSavedRecording) { _, _ in
             // 録音保存後に一覧を自動更新
-            recordingListViewModel.loadRecordings()
+            playbackFileListViewModel.loadPlaybackFiles()
         }
         .onChange(of: scenePhase) { _, newPhase in
             // バックグラウンド遷移時、録音中でなければ計測を停止

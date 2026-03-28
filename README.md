@@ -139,17 +139,17 @@ Presentation ──依存──▶ Domain ◀──依存── Data
 shinobuetuner/
 ├── shinobuetunerApp.swift
 ├── Domain/                  # ビジネスロジック（外部依存なし）
-│   ├── Model/               # NoteInfo, PitchSample, TunerSettings など
+│   ├── Model/               # NoteInfo, PitchSample, TunerSettings, PlaybackFile など
 │   ├── Repository/          # Repository プロトコル
-│   └── UseCase/             # MonitorPitchUseCase, ManageRecordingsUseCase など
+│   └── UseCase/             # MonitorPitchUseCase, FetchPlaybackFilesUseCase など
 ├── Data/                    # AVAudioEngine / FFT などの実装詳細
 │   ├── DataSource/          # MicrophoneDataSource, AudioPlayerDataSource
 │   └── Repository/          # Repository プロトコルの具体実装
 └── Presentation/            # 画面表示と状態管理
-    ├── ViewModel/           # TunerViewModel, RecordingListViewModel
+    ├── ViewModel/           # TunerViewModel, PlaybackListViewModel
     └── View/
-        ├── Turner/          # チューナー画面（TunerMainView, CentsMeterView など）
-        ├── Recording/       # 録音一覧・再生画面
+        ├── Turner/          # チューナー画面（TunerMainScreen, CentsMeterView など）
+        ├── Playback/        # 再生一覧・再生コントロール画面
         └── FrequencyTable/  # 篠笛六本調子 音階周波数表
 ```
 
