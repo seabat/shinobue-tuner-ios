@@ -74,6 +74,10 @@ struct ContentView: View {
                 viewModel.stopMonitoring()
             }
         }
+        // 他アプリの共有シートから音声ファイルが送られてきたときにインポートする
+        .onOpenURL { url in
+            playbackFileListViewModel.importFile(from: url)
+        }
     }
 }
 

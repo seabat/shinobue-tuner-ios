@@ -37,6 +37,8 @@ final class PlaybackListViewModel: ObservableObject {
     private let renameUseCase: any RenamePlaybackFileUseCaseProtocol
     private let playbackUseCase: any PlaybackUseCaseProtocol
     private let trimUseCase: any TrimLeadingSilenceUseCaseProtocol
+    private let importUseCase: any ImportPlaybackFileUseCaseProtocol
+    private let fetchSettingsUseCase: any FetchPlaybackSettingsUseCaseProtocol
     private var cancellables = Set<AnyCancellable>()
 
     /// デフォルトの依存性を使って初期化（本番用）
@@ -49,7 +51,8 @@ final class PlaybackListViewModel: ObservableObject {
             renameUseCase: RenamePlaybackFileUseCase(repository: fileRepository),
             trimUseCase: TrimLeadingSilenceUseCase(repository: fileRepository, settingsRepository: settingsRepository),
             playbackUseCase: PlaybackUseCase(repository: PlaybackRepositoryImpl()),
-            fetchSettingsUseCase: FetchPlaybackSettingsUseCase(repository: settingsRepository)
+            fetchSettingsUseCase: FetchPlaybackSettingsUseCase(repository: settingsRepository),
+            importUseCase: ImportPlaybackFileUseCase(repository: fileRepository)
         )
     }
 
@@ -60,22 +63,43 @@ final class PlaybackListViewModel: ObservableObject {
         renameUseCase: any RenamePlaybackFileUseCaseProtocol,
         trimUseCase: any TrimLeadingSilenceUseCaseProtocol,
         playbackUseCase: any PlaybackUseCaseProtocol,
-        fetchSettingsUseCase: any FetchPlaybackSettingsUseCaseProtocol
+        fetchSettingsUseCase: any FetchPlaybackSettingsUseCaseProtocol,
+        importUseCase: any ImportPlaybackFileUseCaseProtocol
     ) {
         self.fetchUseCase = fetchUseCase
         self.deleteUseCase = deleteUseCase
         self.renameUseCase = renameUseCase
         self.trimUseCase = trimUseCase
         self.playbackUseCase = playbackUseCase
+        self.importUseCase = importUseCase
+        self.fetchSettingsUseCase = fetchSettingsUseCase
         _playbackSettings = Published(initialValue: fetchSettingsUseCase())
         subscribePlayback()
     }
 
     // MARK: - 操作
 
-    /// 音声ファイル一覧を読み込む
+    /// 設定を再読み込みしてファイル一覧を更新する（設定モーダルを閉じたときに呼ぶ）
+    func reloadSettingsAndRefresh() {
+        playbackSettings = fetchSettingsUseCase()
+        loadPlaybackFiles()
+    }
+
+    /// 音声ファイル一覧を読み込む（設定の並び替え条件を適用）
     func loadPlaybackFiles() {
-        playbackFiles = fetchUseCase()
+        let files = fetchUseCase()
+        playbackFiles = sort(files, by: playbackSettings.sortOrder)
+    }
+
+    // MARK: - 内部処理（ソート）
+
+    private func sort(_ files: [PlaybackFile], by order: PlaybackSortOrder) -> [PlaybackFile] {
+        switch order {
+        case .createdAtDescending: return files.sorted { $0.createdAt > $1.createdAt }
+        case .createdAtAscending:  return files.sorted { $0.createdAt < $1.createdAt }
+        case .fileNameDescending:  return files.sorted { $0.fileName > $1.fileName }
+        case .fileNameAscending:   return files.sorted { $0.fileName < $1.fileName }
+        }
     }
 
     /// 音声ファイルを削除する
@@ -150,6 +174,16 @@ final class PlaybackListViewModel: ObservableObject {
     /// 指定した位置（秒）にシークする
     func seek(to time: TimeInterval) {
         playbackUseCase.seek(to: time)
+    }
+
+    /// 他アプリから共有された音声ファイルをインポートしてプレイリストに追加する
+    func importFile(from url: URL) {
+        do {
+            _ = try importUseCase(from: url)
+            loadPlaybackFiles()
+        } catch {
+            errorMessage = "ファイルのインポートに失敗しました: \(error.localizedDescription)"
+        }
     }
 
     // MARK: - 内部処理

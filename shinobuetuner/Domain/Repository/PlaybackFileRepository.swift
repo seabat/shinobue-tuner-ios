@@ -24,4 +24,7 @@ protocol PlaybackFileRepository {
 
     /// 指定URLの音声ファイルから先頭の無音区間を除去し、新しいファイルを作成して返す
     func trimLeadingSilence(url: URL, threshold: Float) async throws -> URL
+
+    /// 外部から共有された音声ファイルを Documents ディレクトリにコピーして返す
+    func importFile(from url: URL) throws -> PlaybackFile
 }

@@ -123,7 +123,10 @@ struct PlaybackListScreen: View {
                     .padding(12)
             }
         }
-        .fullScreenCover(isPresented: $isSettingsPresented) {
+        // 設定モーダルを閉じたタイミングで設定値を再読み込みし、並び替えを反映する
+        .fullScreenCover(isPresented: $isSettingsPresented, onDismiss: {
+            viewModel.reloadSettingsAndRefresh()
+        }) {
             PlaybackSettingsFullScreenModal()
         }
         // 削除確認アラート
@@ -254,7 +257,8 @@ private func makePreviewVM(
         renameUseCase: PreviewRenameUseCase(),
         trimUseCase: PreviewTrimUseCase(),
         playbackUseCase: PreviewPlaybackUseCase(),
-        fetchSettingsUseCase: FetchPlaybackSettingsUseCase(repository: settingsRepository)
+        fetchSettingsUseCase: FetchPlaybackSettingsUseCase(repository: settingsRepository),
+        importUseCase: ImportPlaybackFileUseCase(repository: PlaybackFileRepositoryImpl())
     )
     vm.playbackFiles = files
     vm.selectedPlaybackFile = selected

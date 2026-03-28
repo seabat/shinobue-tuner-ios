@@ -25,8 +25,10 @@ final class PlaybackFileRepositoryImpl: PlaybackFileRepository {
             options: .skipsHiddenFiles
         ) else { return [] }
 
+        // m4a に加えて他アプリからインポートした音声フォーマットも表示する
+        let supportedExtensions: Set<String> = ["m4a", "mp3", "wav", "aiff", "aif", "caf", "flac"]
         return urls
-            .filter { $0.pathExtension == "m4a" }
+            .filter { supportedExtensions.contains($0.pathExtension.lowercased()) }
             .compactMap { url in
                 let attrs = try? fileManager.attributesOfItem(atPath: url.path)
                 let createdAt = attrs?[.creationDate] as? Date ?? Date()
@@ -56,13 +58,55 @@ final class PlaybackFileRepositoryImpl: PlaybackFileRepository {
         try fileManager.removeItem(at: url)
     }
 
-    /// 音声ファイルの名前を変更する（拡張子 .m4a は維持）
+    /// 音声ファイルの名前を変更する（元の拡張子を維持）
     func rename(url: URL, newName: String) throws -> URL {
+        let ext = url.pathExtension
         let newURL = url.deletingLastPathComponent()
             .appendingPathComponent(newName)
-            .appendingPathExtension("m4a")
+            .appendingPathExtension(ext)
         try fileManager.moveItem(at: url, to: newURL)
         return newURL
+    }
+
+    /// 外部から共有された音声ファイルを Documents ディレクトリにコピーして返す
+    /// - 同名ファイルが存在する場合は "_2", "_3" ... を末尾に付けて重複回避
+    func importFile(from url: URL) throws -> PlaybackFile {
+        // セキュリティスコープ付きリソースへのアクセスを開始する
+        let accessing = url.startAccessingSecurityScopedResource()
+        defer { if accessing { url.stopAccessingSecurityScopedResource() } }
+
+        let ext = url.pathExtension.isEmpty ? "m4a" : url.pathExtension
+        let baseName = url.deletingPathExtension().lastPathComponent
+        var destURL = documentsURL.appendingPathComponent(baseName).appendingPathExtension(ext)
+
+        // 重複ファイル名の回避
+        var counter = 2
+        while fileManager.fileExists(atPath: destURL.path) {
+            destURL = documentsURL
+                .appendingPathComponent("\(baseName)_\(counter)")
+                .appendingPathExtension(ext)
+            counter += 1
+        }
+
+        try fileManager.copyItem(at: url, to: destURL)
+
+        let attrs = try? fileManager.attributesOfItem(atPath: destURL.path)
+        let createdAt = attrs?[.creationDate] as? Date ?? Date()
+        let fileSize = (attrs?[.size] as? Int) ?? 0
+        let duration: TimeInterval
+        if let file = try? AVAudioFile(forReading: destURL) {
+            duration = Double(file.length) / file.fileFormat.sampleRate
+        } else {
+            duration = 0
+        }
+
+        return PlaybackFile(
+            url: destURL,
+            fileName: destURL.lastPathComponent,
+            createdAt: createdAt,
+            duration: duration,
+            fileSize: Int64(fileSize)
+        )
     }
 
     /// 新しい音声ファイルの保存先URLを生成する（ファイル名: "yyyy-MM-dd_HH-mm-ss.m4a"）
@@ -101,9 +145,11 @@ final class PlaybackFileRepositoryImpl: PlaybackFileRepository {
         session.timeRange = CMTimeRange(start: startTime, end: duration)
         try await session.export(to: tempURL, as: .m4a)
 
-        // 保存先: "[頭出し]元のファイル名"（非破壊）
+        // 保存先: "[頭出し]元のファイル名.m4a"（非破壊・出力フォーマットに合わせて拡張子を m4a に統一）
+        let baseName = url.deletingPathExtension().lastPathComponent
         let destURL = url.deletingLastPathComponent()
-            .appendingPathComponent("[頭出し]" + url.lastPathComponent)
+            .appendingPathComponent("[頭出し]" + baseName)
+            .appendingPathExtension("m4a")
         if fileManager.fileExists(atPath: destURL.path) {
             try fileManager.removeItem(at: destURL)
         }
