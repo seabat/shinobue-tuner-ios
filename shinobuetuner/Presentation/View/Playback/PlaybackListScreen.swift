@@ -254,7 +254,8 @@ private func makePreviewVM(
         renameUseCase: PreviewRenameUseCase(),
         trimUseCase: PreviewTrimUseCase(),
         playbackUseCase: PreviewPlaybackUseCase(),
-        fetchSettingsUseCase: FetchPlaybackSettingsUseCase(repository: settingsRepository)
+        fetchSettingsUseCase: FetchPlaybackSettingsUseCase(repository: settingsRepository),
+        importUseCase: ImportPlaybackFileUseCase(repository: PlaybackFileRepositoryImpl())
     )
     vm.playbackFiles = files
     vm.selectedPlaybackFile = selected
