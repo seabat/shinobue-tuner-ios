@@ -29,7 +29,7 @@ final class TunerViewModel: ObservableObject {
     /// 録音中かどうか（ピッチ監視とは独立）
     @Published var isSavingRecording: Bool = false
     /// 直近に保存した録音ファイル（ContentView が一覧を更新するトリガーに使う）
-    @Published var lastSavedRecording: RecordingFile? = nil
+    @Published var lastSavedRecording: PlaybackFile? = nil
 
     /// チューニング成功エフェクトのトリガー（false→true への変化でエフェクト発火）
     @Published var showTuningCelebration: Bool = false
@@ -41,7 +41,7 @@ final class TunerViewModel: ObservableObject {
     // MARK: - 内部
 
     private let useCase: any MonitorPitchUseCaseProtocol
-    private let recordingRepository: any RecordingRepository
+    private let recordingRepository: any PlaybackFileRepository
     /// チューニング成功判定の設定値
     let settings: TunerSettings
     private var cancellables = Set<AnyCancellable>()
@@ -63,13 +63,13 @@ final class TunerViewModel: ObservableObject {
     convenience init() {
         let repository = PitchRepositoryImpl()
         let useCase = MonitorPitchUseCase(repository: repository)
-        self.init(useCase: useCase, recordingRepository: RecordingRepositoryImpl())
+        self.init(useCase: useCase, recordingRepository: PlaybackFileRepositoryImpl())
     }
 
     /// テスト時にモックを注入できる初期化
     init(
         useCase: any MonitorPitchUseCaseProtocol,
-        recordingRepository: any RecordingRepository = RecordingRepositoryImpl()
+        recordingRepository: any PlaybackFileRepository = PlaybackFileRepositoryImpl()
     ) {
         self.useCase = useCase
         self.recordingRepository = recordingRepository
@@ -127,7 +127,7 @@ final class TunerViewModel: ObservableObject {
 
     /// ピッチ監視 + 録音を開始する
     func startRecording() {
-        let url = recordingRepository.newRecordingURL()
+        let url = recordingRepository.newPlaybackFileURL()
         startMonitoring()
         do {
             try useCase.startRecording(to: url)
@@ -142,7 +142,7 @@ final class TunerViewModel: ObservableObject {
         useCase.stopRecording()
         isSavingRecording = false
         stopMonitoring()
-        // ContentView が onChange で検知して録音一覧をリロードする
+        // ContentView が onChange で検知して音声ファイル一覧をリロードする
         lastSavedRecording = recordingRepository.fetchAll().first
     }
 

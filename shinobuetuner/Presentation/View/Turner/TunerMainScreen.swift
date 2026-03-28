@@ -1,5 +1,5 @@
 //
-//  TunerMainView.swift
+//  TunerMainScreen.swift
 //  shinobuetuner
 //
 //  Created by ryouta on 2026/02/25.
@@ -16,7 +16,7 @@ enum TunerMode: String, CaseIterable {
 }
 
 /// チューナーメインビュー
-struct TunerMainView: View {
+struct TunerMainScreen: View {
     @ObservedObject var viewModel: TunerViewModel
     @ObservedObject private var settings: TunerSettings
     @State private var selectedMode: TunerMode = .monitoring
@@ -112,7 +112,7 @@ private struct TunerPreviewWrapper: View {
     @StateObject private var vm = TunerViewModel(useCase: PreviewUseCase())
 
     var body: some View {
-        TunerMainView(viewModel: vm)
+        TunerMainScreen(viewModel: vm)
             .background(Color(red: 0.078, green: 0.078, blue: 0.118))
             .preferredColorScheme(.dark)
             .task {
@@ -132,7 +132,7 @@ private struct TunerPreviewWrapper: View {
 }
 
 #Preview("無音・停止中") {
-    TunerMainView(viewModel: TunerViewModel(useCase: PreviewUseCase()))
+    TunerMainScreen(viewModel: TunerViewModel(useCase: PreviewUseCase()))
         .background(Color(red: 0.078, green: 0.078, blue: 0.118))
         .preferredColorScheme(.dark)
 }

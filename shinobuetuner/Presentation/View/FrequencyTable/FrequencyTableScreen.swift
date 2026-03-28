@@ -1,5 +1,5 @@
 //
-//  FrequencyTableView.swift
+//  FrequencyTableScreen.swift
 //  shinobuetuner
 //
 //  Created by ryouta on 2026/03/01.
@@ -9,7 +9,7 @@
 import SwiftUI
 
 /// 篠笛六本調子の音階周波数表を表示するビュー
-struct FrequencyTableView: View {
+struct FrequencyTableScreen: View {
 
     // 六本調子（シ=442Hz基準）音階周波数表（高い音から順）
     private let rows: [FrequencyRow] = [
@@ -140,7 +140,7 @@ private extension Text {
 
 #Preview {
     NavigationStack {
-        FrequencyTableView()
+        FrequencyTableScreen()
             .navigationTitle("周波数表")
             .navigationBarTitleDisplayMode(.inline)
     }

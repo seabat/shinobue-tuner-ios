@@ -1,24 +1,24 @@
 //
-//  RecordingRepositoryImpl.swift
+//  PlaybackFileRepositoryImpl.swift
 //  shinobuetuner
 //
 //  Created by ryouta on 2026/02/26.
 //
-//  RecordingRepository の具体実装（Documents ディレクトリに m4a を保存）
+//  PlaybackFileRepository の具体実装（Documents ディレクトリに m4a を保存）
 
 import AVFoundation
 import Foundation
 
-/// RecordingRepository の具体実装
-final class RecordingRepositoryImpl: RecordingRepository {
+/// PlaybackFileRepository の具体実装
+final class PlaybackFileRepositoryImpl: PlaybackFileRepository {
     private let fileManager = FileManager.default
 
     private var documentsURL: URL {
         fileManager.urls(for: .documentDirectory, in: .userDomainMask)[0]
     }
 
-    /// 保存済み録音ファイルを新しい順に返す
-    func fetchAll() -> [RecordingFile] {
+    /// 保存済み音声ファイルを新しい順に返す
+    func fetchAll() -> [PlaybackFile] {
         guard let urls = try? fileManager.contentsOfDirectory(
             at: documentsURL,
             includingPropertiesForKeys: [.creationDateKey, .fileSizeKey],
@@ -40,7 +40,7 @@ final class RecordingRepositoryImpl: RecordingRepository {
                     duration = 0
                 }
 
-                return RecordingFile(
+                return PlaybackFile(
                     id: UUID(),
                     url: url,
                     fileName: url.lastPathComponent,
@@ -52,12 +52,12 @@ final class RecordingRepositoryImpl: RecordingRepository {
             .sorted { $0.createdAt > $1.createdAt }
     }
 
-    /// 指定URLの録音ファイルを削除する
+    /// 指定URLの音声ファイルを削除する
     func delete(url: URL) throws {
         try fileManager.removeItem(at: url)
     }
 
-    /// 録音ファイルの名前を変更する（拡張子 .m4a は維持）
+    /// 音声ファイルの名前を変更する（拡張子 .m4a は維持）
     func rename(url: URL, newName: String) throws -> URL {
         let newURL = url.deletingLastPathComponent()
             .appendingPathComponent(newName)
@@ -66,8 +66,8 @@ final class RecordingRepositoryImpl: RecordingRepository {
         return newURL
     }
 
-    /// 新しい録音の保存先URLを生成する（ファイル名: "yyyy-MM-dd_HH-mm-ss.m4a"）
-    func newRecordingURL() -> URL {
+    /// 新しい音声ファイルの保存先URLを生成する（ファイル名: "yyyy-MM-dd_HH-mm-ss.m4a"）
+    func newPlaybackFileURL() -> URL {
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy-MM-dd_HH-mm-ss"
         let fileName = formatter.string(from: Date()) + ".m4a"

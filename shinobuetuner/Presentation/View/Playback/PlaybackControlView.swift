@@ -4,14 +4,14 @@
 //
 //  Created by ryouta on 2026/02/26.
 //
-//  録音一覧画面の下部に表示する再生コントロールバー
+//  音声一覧画面の下部に表示する再生コントロールバー
 
 import Combine
 import SwiftUI
 
-/// 再生コントロールバー（選択中の録音ファイルがある場合に表示）
+/// 再生コントロールバー（選択中の音声ファイルがある場合に表示）
 struct PlaybackControlView: View {
-    @ObservedObject var viewModel: RecordingListViewModel
+    @ObservedObject var viewModel: PlaybackListViewModel
 
     /// ドラッグ操作中かどうか
     @State private var isDragging = false
@@ -19,7 +19,7 @@ struct PlaybackControlView: View {
     @State private var sliderValue: TimeInterval = 0
 
     private var duration: TimeInterval {
-        viewModel.selectedRecording?.duration ?? 1
+        viewModel.selectedPlaybackFile?.duration ?? 1
     }
 
     var body: some View {
@@ -92,7 +92,7 @@ struct PlaybackControlView: View {
 
 // MARK: - Preview
 
-private let previewRecording = RecordingFile(
+private let previewPlaybackFile = PlaybackFile(
     id: UUID(),
     url: URL(fileURLWithPath: "/tmp/2026-02-27_10-00-00.m4a"),
     fileName: "2026-02-27_10-00-00.m4a",
@@ -101,11 +101,19 @@ private let previewRecording = RecordingFile(
     fileSize: 312_320
 )
 
-/// プレビュー用スタブ（録音管理）
-private final class PreviewManageUseCase: ManageRecordingsUseCaseProtocol {
-    func fetchAll() -> [RecordingFile] { [] }
-    func delete(recording: RecordingFile) throws {}
-    func rename(recording: RecordingFile, newName: String) throws -> RecordingFile { recording }
+/// プレビュー用スタブ（一覧取得）
+private final class PreviewFetchUseCase: FetchPlaybackFilesUseCaseProtocol {
+    func fetchAll() -> [PlaybackFile] { [] }
+}
+
+/// プレビュー用スタブ（削除）
+private final class PreviewDeleteUseCase: DeletePlaybackFileUseCaseProtocol {
+    func delete(file: PlaybackFile) throws {}
+}
+
+/// プレビュー用スタブ（リネーム）
+private final class PreviewRenameUseCase: RenamePlaybackFileUseCaseProtocol {
+    func rename(file: PlaybackFile, newName: String) throws -> PlaybackFile { file }
 }
 
 /// プレビュー用スタブ（再生）
@@ -116,7 +124,7 @@ private final class PreviewPlaybackUseCase: PlaybackUseCaseProtocol {
     var isPlayingPublisher: AnyPublisher<Bool, Never> {
         Just(false).eraseToAnyPublisher()
     }
-    func play(recording: RecordingFile) throws {}
+    func play(file: PlaybackFile) throws {}
     func pause() {}
     func resume() {}
     func stop() {}
@@ -124,11 +132,13 @@ private final class PreviewPlaybackUseCase: PlaybackUseCaseProtocol {
 }
 
 #Preview("再生中（途中）") {
-    let vm = RecordingListViewModel(
-        manageUseCase: PreviewManageUseCase(),
+    let vm = PlaybackListViewModel(
+        fetchUseCase: PreviewFetchUseCase(),
+        deleteUseCase: PreviewDeleteUseCase(),
+        renameUseCase: PreviewRenameUseCase(),
         playbackUseCase: PreviewPlaybackUseCase()
     )
-    vm.selectedRecording = previewRecording
+    vm.selectedPlaybackFile = previewPlaybackFile
     vm.isPlaying = true
     vm.playbackTime = 34
     return PlaybackControlView(viewModel: vm)
@@ -136,11 +146,13 @@ private final class PreviewPlaybackUseCase: PlaybackUseCaseProtocol {
 }
 
 #Preview("一時停止中") {
-    let vm = RecordingListViewModel(
-        manageUseCase: PreviewManageUseCase(),
+    let vm = PlaybackListViewModel(
+        fetchUseCase: PreviewFetchUseCase(),
+        deleteUseCase: PreviewDeleteUseCase(),
+        renameUseCase: PreviewRenameUseCase(),
         playbackUseCase: PreviewPlaybackUseCase()
     )
-    vm.selectedRecording = previewRecording
+    vm.selectedPlaybackFile = previewPlaybackFile
     vm.isPlaying = false
     vm.playbackTime = 34
     return PlaybackControlView(viewModel: vm)
@@ -148,11 +160,13 @@ private final class PreviewPlaybackUseCase: PlaybackUseCaseProtocol {
 }
 
 #Preview("再生開始直後") {
-    let vm = RecordingListViewModel(
-        manageUseCase: PreviewManageUseCase(),
+    let vm = PlaybackListViewModel(
+        fetchUseCase: PreviewFetchUseCase(),
+        deleteUseCase: PreviewDeleteUseCase(),
+        renameUseCase: PreviewRenameUseCase(),
         playbackUseCase: PreviewPlaybackUseCase()
     )
-    vm.selectedRecording = previewRecording
+    vm.selectedPlaybackFile = previewPlaybackFile
     vm.isPlaying = true
     vm.playbackTime = 0
     return PlaybackControlView(viewModel: vm)
