@@ -21,4 +21,7 @@ protocol PlaybackFileRepository {
 
     /// 新しい音声の保存先URLを生成して返す（ファイル名: "yyyy-MM-dd_HH-mm-ss.m4a"）
     func newPlaybackFileURL() -> URL
+
+    /// 指定URLの音声ファイルから先頭の無音区間を除去し、新しいファイルを作成して返す
+    func trimLeadingSilence(url: URL, threshold: Float) async throws -> URL
 }

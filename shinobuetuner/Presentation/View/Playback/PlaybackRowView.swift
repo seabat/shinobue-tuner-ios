@@ -66,7 +66,6 @@ struct PlaybackRowView: View {
 // MARK: - Preview
 
 private let previewPlaybackFile = PlaybackFile(
-    id: UUID(),
     url: URL(fileURLWithPath: "/tmp/2026-02-27_10-00-00.m4a"),
     fileName: "2026-02-27_10-00-00.m4a",
     createdAt: Date(),

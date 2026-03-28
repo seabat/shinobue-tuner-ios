@@ -25,7 +25,6 @@ final class RenamePlaybackFileUseCase: RenamePlaybackFileUseCaseProtocol {
     func callAsFunction(file: PlaybackFile, newName: String) throws -> PlaybackFile {
         let newURL = try repository.rename(url: file.url, newName: newName)
         return PlaybackFile(
-            id: file.id,
             url: newURL,
             fileName: newURL.lastPathComponent,
             createdAt: file.createdAt,

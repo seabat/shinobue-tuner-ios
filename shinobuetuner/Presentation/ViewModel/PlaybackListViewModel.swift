@@ -24,23 +24,32 @@ final class PlaybackListViewModel: ObservableObject {
     @Published var playbackTime: TimeInterval = 0
     /// エラーメッセージ
     @Published var errorMessage: String? = nil
+    /// 頭出し処理中かどうか
+    @Published var isTrimming: Bool = false
 
     // MARK: - 内部
+
+    /// 音声ファイルの設定値（読み取り専用・保存は PlaybackSettingsViewModel が担う）
+    @Published var playbackSettings: PlaybackSettings
 
     private let fetchUseCase: any FetchPlaybackFilesUseCaseProtocol
     private let deleteUseCase: any DeletePlaybackFileUseCaseProtocol
     private let renameUseCase: any RenamePlaybackFileUseCaseProtocol
     private let playbackUseCase: any PlaybackUseCaseProtocol
+    private let trimUseCase: any TrimLeadingSilenceUseCaseProtocol
     private var cancellables = Set<AnyCancellable>()
 
     /// デフォルトの依存性を使って初期化（本番用）
     convenience init() {
-        let repository = PlaybackFileRepositoryImpl()
+        let fileRepository = PlaybackFileRepositoryImpl()
+        let settingsRepository = PlaybackSettingsRepositoryImpl()
         self.init(
-            fetchUseCase: FetchPlaybackFilesUseCase(repository: repository),
-            deleteUseCase: DeletePlaybackFileUseCase(repository: repository),
-            renameUseCase: RenamePlaybackFileUseCase(repository: repository),
-            playbackUseCase: PlaybackUseCase(repository: PlaybackRepositoryImpl())
+            fetchUseCase: FetchPlaybackFilesUseCase(repository: fileRepository),
+            deleteUseCase: DeletePlaybackFileUseCase(repository: fileRepository),
+            renameUseCase: RenamePlaybackFileUseCase(repository: fileRepository),
+            trimUseCase: TrimLeadingSilenceUseCase(repository: fileRepository, settingsRepository: settingsRepository),
+            playbackUseCase: PlaybackUseCase(repository: PlaybackRepositoryImpl()),
+            fetchSettingsUseCase: FetchPlaybackSettingsUseCase(repository: settingsRepository)
         )
     }
 
@@ -49,12 +58,16 @@ final class PlaybackListViewModel: ObservableObject {
         fetchUseCase: any FetchPlaybackFilesUseCaseProtocol,
         deleteUseCase: any DeletePlaybackFileUseCaseProtocol,
         renameUseCase: any RenamePlaybackFileUseCaseProtocol,
-        playbackUseCase: any PlaybackUseCaseProtocol
+        trimUseCase: any TrimLeadingSilenceUseCaseProtocol,
+        playbackUseCase: any PlaybackUseCaseProtocol,
+        fetchSettingsUseCase: any FetchPlaybackSettingsUseCaseProtocol
     ) {
         self.fetchUseCase = fetchUseCase
         self.deleteUseCase = deleteUseCase
         self.renameUseCase = renameUseCase
+        self.trimUseCase = trimUseCase
         self.playbackUseCase = playbackUseCase
+        _playbackSettings = Published(initialValue: fetchSettingsUseCase())
         subscribePlayback()
     }
 
@@ -118,6 +131,20 @@ final class PlaybackListViewModel: ObservableObject {
     func stopPlayback() {
         playbackUseCase.stop()
         selectedPlaybackFile = nil
+    }
+
+    /// 音声ファイルの先頭の無音区間を除去する
+    func trimLeadingSilence(_ playbackFile: PlaybackFile) {
+        isTrimming = true
+        Task {
+            defer { isTrimming = false }
+            do {
+                try await trimUseCase(file: playbackFile)
+                loadPlaybackFiles()
+            } catch {
+                errorMessage = "頭出しに失敗しました: \(error.localizedDescription)"
+            }
+        }
     }
 
     /// 指定した位置（秒）にシークする

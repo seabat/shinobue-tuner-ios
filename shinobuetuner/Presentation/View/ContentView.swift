@@ -44,11 +44,9 @@ struct ContentView: View {
             }
 
             // ─── 音声ファイルタブ ───
-            Tab("音声ファイル", systemImage: "list.bullet.rectangle") {
+            Tab("プレイリスト", systemImage: "list.bullet.rectangle") {
                 NavigationStack {
                     PlaybackListScreen(viewModel: playbackFileListViewModel)
-                        .navigationTitle("音声ファイル")
-                        .navigationBarTitleDisplayMode(.inline)
                 }
             }
 

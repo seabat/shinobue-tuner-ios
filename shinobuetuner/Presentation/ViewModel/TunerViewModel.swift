@@ -38,12 +38,14 @@ final class TunerViewModel: ObservableObject {
     /// 自動停止時のモード（アラートメッセージの切り替えに使用）
     @Published var silenceTimeoutWasRecording: Bool = false
 
+    /// チューナー設定値（設定モーダルを閉じたタイミングで reloadSettings() により更新）
+    @Published var tunerSettings: TunerSettings
+
     // MARK: - 内部
 
     private let useCase: any MonitorPitchUseCaseProtocol
-    private let recordingRepository: any PlaybackFileRepository
-    /// チューニング成功判定の設定値
-    let settings: TunerSettings
+    private let playbackFileRepository: any PlaybackFileRepository
+    private let fetchSettingsUseCase: any FetchTunerSettingsUseCaseProtocol
     private var cancellables = Set<AnyCancellable>()
     private var sessionStartTime: Date = Date()
     /// 最後に音を検出した currentTime（無音タイムアウト判定に使用）
@@ -61,19 +63,34 @@ final class TunerViewModel: ObservableObject {
 
     /// デフォルトの依存性を使って初期化（本番用）
     convenience init() {
-        let repository = PitchRepositoryImpl()
-        let useCase = MonitorPitchUseCase(repository: repository)
-        self.init(useCase: useCase, recordingRepository: PlaybackFileRepositoryImpl())
+        let settingsRepository = TunerSettingsRepositoryImpl()
+        self.init(
+            useCase: MonitorPitchUseCase(repository: PitchRepositoryImpl()),
+            playbackFileRepository: PlaybackFileRepositoryImpl(),
+            fetchSettingsUseCase: FetchTunerSettingsUseCase(repository: settingsRepository)
+        )
     }
 
-    /// テスト時にモックを注入できる初期化
+    /// テスト・Preview 用にモック UseCase だけを差し替えられる便利イニシャライザ
+    convenience init(useCase: any MonitorPitchUseCaseProtocol) {
+        let settingsRepository = TunerSettingsRepositoryImpl()
+        self.init(
+            useCase: useCase,
+            playbackFileRepository: PlaybackFileRepositoryImpl(),
+            fetchSettingsUseCase: FetchTunerSettingsUseCase(repository: settingsRepository)
+        )
+    }
+
+    /// 全依存性を注入できる指定イニシャライザ（完全なモック差し替えが必要なテスト用）
     init(
         useCase: any MonitorPitchUseCaseProtocol,
-        recordingRepository: any PlaybackFileRepository = PlaybackFileRepositoryImpl()
+        playbackFileRepository: any PlaybackFileRepository,
+        fetchSettingsUseCase: any FetchTunerSettingsUseCaseProtocol
     ) {
         self.useCase = useCase
-        self.recordingRepository = recordingRepository
-        self.settings = TunerSettings()
+        self.playbackFileRepository = playbackFileRepository
+        self.fetchSettingsUseCase = fetchSettingsUseCase
+        self.tunerSettings = fetchSettingsUseCase()
     }
 
     // MARK: - 操作
@@ -82,6 +99,11 @@ final class TunerViewModel: ObservableObject {
     func requestPermission() async {
         let granted = await useCase.requestPermission()
         permissionGranted = granted
+    }
+
+    /// 設定モーダルを閉じた後に設定値を再読み込みする
+    func reloadSettings() {
+        tunerSettings = fetchSettingsUseCase()
     }
 
     /// ピッチ監視を開始する
@@ -127,7 +149,7 @@ final class TunerViewModel: ObservableObject {
 
     /// ピッチ監視 + 録音を開始する
     func startRecording() {
-        let url = recordingRepository.newPlaybackFileURL()
+        let url = playbackFileRepository.newPlaybackFileURL()
         startMonitoring()
         do {
             try useCase.startRecording(to: url)
@@ -143,7 +165,7 @@ final class TunerViewModel: ObservableObject {
         isSavingRecording = false
         stopMonitoring()
         // ContentView が onChange で検知して音声ファイル一覧をリロードする
-        lastSavedRecording = recordingRepository.fetchAll().first
+        lastSavedRecording = playbackFileRepository.fetchAll().first
     }
 
     // MARK: - 内部処理
@@ -181,7 +203,7 @@ final class TunerViewModel: ObservableObject {
 
     /// チューニング成功判定の状態を更新する
     private func updateInTuneState(midiNote: Int, cents: Float) {
-        let isInTune = abs(cents) <= Float(settings.centThreshold)
+        let isInTune = abs(cents) <= Float(tunerSettings.centThreshold)
 
         switch inTuneState {
         case .idle:
@@ -198,7 +220,7 @@ final class TunerViewModel: ObservableObject {
             } else if !isInTune {
                 // 同じ音階名だがズレた → idle
                 inTuneState = .idle
-            } else if currentTime - since >= settings.durationSeconds {
+            } else if currentTime - since >= tunerSettings.durationSeconds {
                 // 設定秒数以上 in-tune → エフェクト発火
                 showTuningCelebration = true
                 inTuneState = .cooling(midiNote: midiNote, until: currentTime + 1.0)

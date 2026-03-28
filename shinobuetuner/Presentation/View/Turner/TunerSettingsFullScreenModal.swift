@@ -1,14 +1,14 @@
 //
-//  TunerSettingsView.swift
+//  TunerSettingsFullScreenModal.swift
 //  shinobuetuner
 //
 //  チューニング成功判定の設定画面
 
 import SwiftUI
 
-/// チューニング成功判定の設定モーダル
-struct TunerSettingsView: View {
-    @ObservedObject var settings: TunerSettings
+/// チューニング成功判定の設定モーダル（自己完結型：内部で ViewModel を保持）
+struct TunerSettingsFullScreenModal: View {
+    @StateObject private var viewModel = TunerSettingsViewModel()
     @Environment(\.dismiss) private var dismiss
     @State private var showUnsupportedAlert = false
 
@@ -20,16 +20,16 @@ struct TunerSettingsView: View {
 
                 Form {
                     Section {
-                        Picker("調子", selection: $settings.tuning) {
+                        Picker("調子", selection: $viewModel.settings.tuning) {
                             ForEach(ShinobueTuning.allCases) { tuning in
                                 Text(tuning.displayName).tag(tuning)
                             }
                         }
                         .pickerStyle(.wheel)
-                        .onChange(of: settings.tuning) { _, newValue in
+                        .onChange(of: viewModel.settings.tuning) { _, newValue in
                             if !newValue.isSupported {
                                 showUnsupportedAlert = true
-                                settings.tuning = .rokuHon
+                                viewModel.settings.tuning = .rokuHon
                             }
                         }
                     } header: {
@@ -46,7 +46,7 @@ struct TunerSettingsView: View {
                     }
 
                     Section {
-                        Toggle(isOn: $settings.showPitchGraph) {
+                        Toggle(isOn: $viewModel.settings.showPitchGraph) {
                             Text("ピッチグラフを表示")
                                 .foregroundStyle(.white)
                         }
@@ -62,12 +62,12 @@ struct TunerSettingsView: View {
                                 Text("セント範囲")
                                     .foregroundStyle(.white)
                                 Spacer()
-                                Text("±\(Int(settings.centThreshold)) セント")
+                                Text("±\(Int(viewModel.settings.centThreshold)) セント")
                                     .foregroundStyle(.cyan)
                                     .fontWeight(.semibold)
                             }
                             Slider(
-                                value: $settings.centThreshold,
+                                value: $viewModel.settings.centThreshold,
                                 in: 1...50,
                                 step: 1
                             )
@@ -87,7 +87,7 @@ struct TunerSettingsView: View {
                         Text("成功とみなすセント範囲")
                             .foregroundStyle(.gray)
                     } footer: {
-                        Text("ピッチが基準音から ±\(Int(settings.centThreshold)) セント以内を「チューニング成功」とみなします。")
+                        Text("ピッチが基準音から ±\(Int(viewModel.settings.centThreshold)) セント以内を「チューニング成功」とみなします。")
                             .foregroundStyle(.gray.opacity(0.7))
                     }
 
@@ -97,12 +97,12 @@ struct TunerSettingsView: View {
                                 Text("継続時間")
                                     .foregroundStyle(.white)
                                 Spacer()
-                                Text(String(format: "%.1f 秒", settings.durationSeconds))
+                                Text(String(format: "%.1f 秒", viewModel.settings.durationSeconds))
                                     .foregroundStyle(.cyan)
                                     .fontWeight(.semibold)
                             }
                             Slider(
-                                value: $settings.durationSeconds,
+                                value: $viewModel.settings.durationSeconds,
                                 in: 0.5...5.0,
                                 step: 0.5
                             )
@@ -122,16 +122,13 @@ struct TunerSettingsView: View {
                         Text("成功とみなす継続時間")
                             .foregroundStyle(.gray)
                     } footer: {
-                        Text("セント範囲内のピッチが \(String(format: "%.1f", settings.durationSeconds)) 秒間続いた場合に「チューニング成功」とみなします。")
+                        Text("セント範囲内のピッチが \(String(format: "%.1f", viewModel.settings.durationSeconds)) 秒間続いた場合に「チューニング成功」とみなします。")
                             .foregroundStyle(.gray.opacity(0.7))
                     }
 
                     Section {
                         Button("デフォルトに戻す") {
-                            settings.centThreshold = 10.0
-                            settings.durationSeconds = 1.0
-                            settings.tuning = .rokuHon
-                            settings.showPitchGraph = true
+                            viewModel.settings = TunerSettings()
                         }
                         .foregroundStyle(.orange)
                     }
@@ -153,6 +150,6 @@ struct TunerSettingsView: View {
 // MARK: - Preview
 
 #Preview {
-    TunerSettingsView(settings: TunerSettings())
+    TunerSettingsFullScreenModal()
         .preferredColorScheme(.dark)
 }

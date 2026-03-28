@@ -18,14 +18,8 @@ enum TunerMode: String, CaseIterable {
 /// チューナーメインビュー
 struct TunerMainScreen: View {
     @ObservedObject var viewModel: TunerViewModel
-    @ObservedObject private var settings: TunerSettings
     @State private var selectedMode: TunerMode = .monitoring
     @State private var isSettingsPresented: Bool = false
-
-    init(viewModel: TunerViewModel) {
-        self._viewModel = ObservedObject(wrappedValue: viewModel)
-        self._settings = ObservedObject(wrappedValue: viewModel.settings)
-    }
 
     var body: some View {
         VStack(spacing: 0) {
@@ -46,7 +40,7 @@ struct TunerMainScreen: View {
             .padding(.vertical, 4)
 
             // ─── ピッチグラフ（5秒間） ───
-            if settings.showPitchGraph {
+            if viewModel.tunerSettings.showPitchGraph {
                 PitchGraphView(
                     pitchHistory: viewModel.pitchHistory,
                     currentTime: viewModel.currentTime
@@ -80,8 +74,11 @@ struct TunerMainScreen: View {
             // ─── チューニング成功エフェクト ───
             TuningCelebrationView(isInTune: viewModel.showTuningCelebration)
         }
-        .fullScreenCover(isPresented: $isSettingsPresented) {
-            TunerSettingsView(settings: viewModel.settings)
+        // 設定モーダルを閉じたタイミングで TunerViewModel の設定値を再読み込みする
+        .fullScreenCover(isPresented: $isSettingsPresented, onDismiss: {
+            viewModel.reloadSettings()
+        }) {
+            TunerSettingsFullScreenModal()
         }
         .alert("自動停止", isPresented: $viewModel.showSilenceTimeoutAlert) {
             Button("OK") { viewModel.showSilenceTimeoutAlert = false }

@@ -93,7 +93,6 @@ struct PlaybackControlView: View {
 // MARK: - Preview
 
 private let previewPlaybackFile = PlaybackFile(
-    id: UUID(),
     url: URL(fileURLWithPath: "/tmp/2026-02-27_10-00-00.m4a"),
     fileName: "2026-02-27_10-00-00.m4a",
     createdAt: Date(),
@@ -116,6 +115,11 @@ private final class PreviewRenameUseCase: RenamePlaybackFileUseCaseProtocol {
     func callAsFunction(file: PlaybackFile, newName: String) throws -> PlaybackFile { file }
 }
 
+/// プレビュー用スタブ（頭出し）
+private final class PreviewTrimUseCase: TrimLeadingSilenceUseCaseProtocol {
+    func callAsFunction(file: PlaybackFile) async throws {}
+}
+
 /// プレビュー用スタブ（再生）
 private final class PreviewPlaybackUseCase: PlaybackUseCaseProtocol {
     var playbackTimePublisher: AnyPublisher<TimeInterval, Never> {
@@ -131,44 +135,49 @@ private final class PreviewPlaybackUseCase: PlaybackUseCaseProtocol {
     func seek(to time: TimeInterval) {}
 }
 
-#Preview("再生中（途中）") {
+@MainActor
+private func makePreviewVM(
+    selected: PlaybackFile? = nil,
+    playing: Bool = false,
+    time: TimeInterval = 0
+) -> PlaybackListViewModel {
     let vm = PlaybackListViewModel(
         fetchUseCase: PreviewFetchUseCase(),
         deleteUseCase: PreviewDeleteUseCase(),
         renameUseCase: PreviewRenameUseCase(),
-        playbackUseCase: PreviewPlaybackUseCase()
+        trimUseCase: PreviewTrimUseCase(),
+        playbackUseCase: PreviewPlaybackUseCase(),
+        fetchSettingsUseCase: FetchPlaybackSettingsUseCase(repository: PlaybackSettingsRepositoryImpl())
     )
-    vm.selectedPlaybackFile = previewPlaybackFile
-    vm.isPlaying = true
-    vm.playbackTime = 34
-    return PlaybackControlView(viewModel: vm)
-        .preferredColorScheme(.dark)
+    vm.selectedPlaybackFile = selected
+    vm.isPlaying = playing
+    vm.playbackTime = time
+    return vm
+}
+
+#Preview("再生中（途中）") {
+    PlaybackControlView(viewModel: makePreviewVM(
+        selected: previewPlaybackFile,
+        playing: true,
+        time: 34
+    ))
+    .preferredColorScheme(.dark)
 }
 
 #Preview("一時停止中") {
-    let vm = PlaybackListViewModel(
-        fetchUseCase: PreviewFetchUseCase(),
-        deleteUseCase: PreviewDeleteUseCase(),
-        renameUseCase: PreviewRenameUseCase(),
-        playbackUseCase: PreviewPlaybackUseCase()
-    )
-    vm.selectedPlaybackFile = previewPlaybackFile
-    vm.isPlaying = false
-    vm.playbackTime = 34
-    return PlaybackControlView(viewModel: vm)
-        .preferredColorScheme(.dark)
+    PlaybackControlView(viewModel: makePreviewVM(
+        selected: previewPlaybackFile,
+        playing: false,
+        time: 34
+    ))
+    .preferredColorScheme(.dark)
 }
 
 #Preview("再生開始直後") {
-    let vm = PlaybackListViewModel(
-        fetchUseCase: PreviewFetchUseCase(),
-        deleteUseCase: PreviewDeleteUseCase(),
-        renameUseCase: PreviewRenameUseCase(),
-        playbackUseCase: PreviewPlaybackUseCase()
-    )
-    vm.selectedPlaybackFile = previewPlaybackFile
-    vm.isPlaying = true
-    vm.playbackTime = 0
-    return PlaybackControlView(viewModel: vm)
-        .preferredColorScheme(.dark)
+    PlaybackControlView(viewModel: makePreviewVM(
+        selected: previewPlaybackFile,
+        playing: true,
+        time: 0
+    ))
+    .preferredColorScheme(.dark)
 }
