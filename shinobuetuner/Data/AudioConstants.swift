@@ -12,4 +12,7 @@ enum AudioConstants {
     /// - MicrophoneDataSource: vDSP_rmsqv で計算した RMS と比較
     /// - PlaybackFileRepositoryImpl: サンプルの絶対値（ピーク）と比較
     static let noiseThreshold: Float = 0.003
+
+    /// アンサンブル安定性判定に使うリングバッファのフレーム数
+    static let ensembleBufferSize: Int = 30
 }

@@ -21,6 +21,10 @@ final class PitchRepositoryImpl: PitchRepository {
         dataSource.publisher
     }
 
+    var spectrumPublisher: AnyPublisher<(pitch: Float, magnitudes: [Float], binWidth: Float), Never> {
+        dataSource.spectrumPublisher
+    }
+
     func startMonitoring() {
         dataSource.startCapture()
     }

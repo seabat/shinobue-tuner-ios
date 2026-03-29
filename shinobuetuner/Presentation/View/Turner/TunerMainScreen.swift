@@ -9,17 +9,12 @@
 import SwiftUI
 import Combine
 
-/// チューナーメインビューのモード
-enum TunerMode: String, CaseIterable {
-    case monitoring = "計測"
-    case recording  = "録音"
-}
-
 /// チューナーメインビュー
 struct TunerMainScreen: View {
     @ObservedObject var viewModel: TunerViewModel
-    @State private var selectedMode: TunerMode = .monitoring
+    @State private var selectedMode: TunerMode = .soloMonitoring
     @State private var isSettingsPresented: Bool = false
+    @State private var showEnsembleCountdown: Bool = false
 
     var body: some View {
         VStack(spacing: 0) {
@@ -55,7 +50,8 @@ struct TunerMainScreen: View {
             // ─── 開始/停止ボタン + モード切替 ───
             ControlBarView(
                 viewModel: viewModel,
-                selectedMode: $selectedMode
+                selectedMode: $selectedMode,
+                showEnsembleCountdown: $showEnsembleCountdown
             )
         }
         .overlay(alignment: .topTrailing) {
@@ -73,6 +69,16 @@ struct TunerMainScreen: View {
         .overlay {
             // ─── チューニング成功エフェクト ───
             TuningCelebrationView(isInTune: viewModel.showTuningCelebration)
+        }
+        // selectedMode の変化を viewModel.tunerMode に反映する
+        .onChange(of: selectedMode) { _, newMode in
+            viewModel.tunerMode = newMode
+        }
+        // アンサンブルカウントダウンモーダル
+        .fullScreenCover(isPresented: $showEnsembleCountdown) {
+            EnsembleCountdownFullScreenModal {
+                viewModel.startMonitoring()
+            }
         }
         // 設定モーダルを閉じたタイミングで TunerViewModel の設定値を再読み込みする
         .fullScreenCover(isPresented: $isSettingsPresented, onDismiss: {
@@ -96,6 +102,9 @@ struct TunerMainScreen: View {
 /// プレビュー専用のダミーUseCase（何もしないスタブ）
 private final class PreviewUseCase: MonitorPitchUseCaseProtocol {
     var pitchPublisher: AnyPublisher<Float, Never> {
+        Empty().eraseToAnyPublisher()
+    }
+    var spectrumPublisher: AnyPublisher<(pitch: Float, magnitudes: [Float], binWidth: Float), Never> {
         Empty().eraseToAnyPublisher()
     }
     func start() {}

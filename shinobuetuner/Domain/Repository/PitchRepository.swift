@@ -14,6 +14,9 @@ protocol PitchRepository {
     /// 検出したピッチ（Hz）をemitするパブリッシャー（0は無音）
     var pitchPublisher: AnyPublisher<Float, Never> { get }
 
+    /// ピッチとスペクトル情報をセットでemitするパブリッシャー（アンサンブルモニタリング用）
+    var spectrumPublisher: AnyPublisher<(pitch: Float, magnitudes: [Float], binWidth: Float), Never> { get }
+
     /// マイクの監視を開始する
     func startMonitoring()
 
