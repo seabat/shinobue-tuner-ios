@@ -17,8 +17,8 @@ protocol PlaybackUseCaseProtocol {
     /// 再生中かどうかをemitするパブリッシャー
     var isPlayingPublisher: AnyPublisher<Bool, Never> { get }
 
-    /// 録音ファイルを再生する
-    func play(recording: RecordingFile) throws
+    /// 音声ファイルを再生する
+    func play(file: PlaybackFile) throws
 
     /// 再生を一時停止する
     func pause()
@@ -49,8 +49,8 @@ final class PlaybackUseCase: PlaybackUseCaseProtocol {
         repository.isPlayingPublisher
     }
 
-    func play(recording: RecordingFile) throws {
-        try repository.play(url: recording.url)
+    func play(file: PlaybackFile) throws {
+        try repository.play(url: file.url)
     }
 
     func pause() {

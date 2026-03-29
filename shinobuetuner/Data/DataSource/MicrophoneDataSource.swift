@@ -141,7 +141,7 @@ final class MicrophoneDataSource {
         // RMSでノイズレベルチェック（無音は0を返す）
         var rms: Float = 0
         vDSP_rmsqv(signal, 1, &rms, vDSP_Length(copyCount))
-        guard rms > 0.003 else { return 0 }
+        guard rms > AudioConstants.noiseThreshold else { return 0 }
 
         // ハン窓を適用してスペクトル漏れを軽減
         var window = [Float](repeating: 0, count: fftSize)

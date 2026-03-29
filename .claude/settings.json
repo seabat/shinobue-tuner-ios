@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(xcodebuild -project /Users/ryouta/Dev/iOS/shinobue-tuner-ios/shinobuetuner.xcodeproj -scheme shinobuetuner -sdk iphonesimulator build)",
+      "Bash(git reset:*)"
+    ]
+  }
+}
