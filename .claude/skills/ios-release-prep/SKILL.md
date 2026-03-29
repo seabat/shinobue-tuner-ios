@@ -22,7 +22,7 @@ allowed-tools: Bash, Read, Write, Grep
 以下を実行して main ブランチの `MARKETING_VERSION` と `CURRENT_PROJECT_VERSION` を取得する：
 
 ```bash
-git show main:shinobuetuner.xcodeproj/project.pbxproj | grep -E 'MARKETING_VERSION|CURRENT_PROJECT_VERSION'
+git show refs/heads/main:shinobuetuner.xcodeproj/project.pbxproj | grep -E 'MARKETING_VERSION|CURRENT_PROJECT_VERSION'
 ```
 
 ### 1-3. ユーザーに確認
@@ -46,8 +46,8 @@ main ブランチ  : MARKETING_VERSION = X.X.X, CURRENT_PROJECT_VERSION = N
 # 最新のリリースタグを取得
 gh release list --limit 1
 
-# 前回タグ以降のマージコミットを取得
-git log <前回タグ>..HEAD --oneline --merges
+# 前回タグ以降のマージコミットを取得（タグ名と同名ブランチが存在する場合は refs/tags/ を明示）
+git log refs/tags/<前回タグ>..HEAD --oneline --merges
 ```
 
 各マージコミットから `gh pr view <PR番号>` でタイトルと URL を取得する。
@@ -63,6 +63,8 @@ git log <前回タグ>..HEAD --oneline --merges
 - 技術的な内容は平易な言葉に言い換える
 - PR タイトルや URL は含めない
 - 箇条書きで簡潔に（例: 「・○○機能を追加」「・○○の不具合を修正」）
+- 1項目は20〜30字以内を目安にする
+- 詳細な説明は不要。機能名と「追加」「改善」「修正」などの動詞だけで十分
 
 ### 3-2. ユーザーに内容を確認・修正してもらう
 
