@@ -15,7 +15,7 @@ struct TunerSettingsFullScreenModal: View {
     var body: some View {
         NavigationStack {
             ZStack {
-                Color(red: 0.08, green: 0.08, blue: 0.12)
+                Color("AppBackground")
                     .ignoresSafeArea()
 
                 Form {
@@ -34,10 +34,10 @@ struct TunerSettingsFullScreenModal: View {
                         }
                     } header: {
                         Text("調子")
-                            .foregroundStyle(.gray)
+                            .foregroundStyle(Color("AssistantText"))
                     } footer: {
                         Text("現在は六本調子のみ対応しています。")
-                            .foregroundStyle(.gray.opacity(0.7))
+                            .foregroundStyle(Color("AssistantText").opacity(0.7))
                     }
                     .alert("未対応の調子", isPresented: $showUnsupportedAlert) {
                         Button("OK") { }
@@ -50,10 +50,10 @@ struct TunerSettingsFullScreenModal: View {
                             Text("ピッチグラフを表示")
                                 .foregroundStyle(.white)
                         }
-                        .tint(.cyan)
+                        .tint(Color.accentColor)
                     } header: {
                         Text("表示設定")
-                            .foregroundStyle(.gray)
+                            .foregroundStyle(Color("AssistantText"))
                     }
 
                     Section {
@@ -63,7 +63,7 @@ struct TunerSettingsFullScreenModal: View {
                                     .foregroundStyle(.white)
                                 Spacer()
                                 Text("±\(Int(viewModel.settings.centThreshold)) セント")
-                                    .foregroundStyle(.cyan)
+                                    .foregroundStyle(Color.accentColor)
                                     .fontWeight(.semibold)
                             }
                             Slider(
@@ -71,24 +71,24 @@ struct TunerSettingsFullScreenModal: View {
                                 in: 1...50,
                                 step: 1
                             )
-                            .tint(.cyan)
+                            .tint(Color.accentColor)
                             HStack {
                                 Text("±1")
                                     .font(.caption2)
-                                    .foregroundStyle(.gray)
+                                    .foregroundStyle(Color("AssistantText"))
                                 Spacer()
                                 Text("±50")
                                     .font(.caption2)
-                                    .foregroundStyle(.gray)
+                                    .foregroundStyle(Color("AssistantText"))
                             }
                         }
                         .padding(.vertical, 4)
                     } header: {
                         Text("成功とみなすセント範囲")
-                            .foregroundStyle(.gray)
+                            .foregroundStyle(Color("AssistantText"))
                     } footer: {
                         Text("ピッチが基準音から ±\(Int(viewModel.settings.centThreshold)) セント以内を「チューニング成功」とみなします。推奨: ソロ ±10セント / アンサンブル ±15セント")
-                            .foregroundStyle(.gray.opacity(0.7))
+                            .foregroundStyle(Color("AssistantText").opacity(0.7))
                     }
 
                     Section {
@@ -98,7 +98,7 @@ struct TunerSettingsFullScreenModal: View {
                                     .foregroundStyle(.white)
                                 Spacer()
                                 Text(String(format: "%.1f 秒", viewModel.settings.durationSeconds))
-                                    .foregroundStyle(.cyan)
+                                    .foregroundStyle(Color.accentColor)
                                     .fontWeight(.semibold)
                             }
                             Slider(
@@ -106,24 +106,24 @@ struct TunerSettingsFullScreenModal: View {
                                 in: 0.5...5.0,
                                 step: 0.5
                             )
-                            .tint(.cyan)
+                            .tint(Color.accentColor)
                             HStack {
                                 Text("0.5秒")
                                     .font(.caption2)
-                                    .foregroundStyle(.gray)
+                                    .foregroundStyle(Color("AssistantText"))
                                 Spacer()
                                 Text("5.0秒")
                                     .font(.caption2)
-                                    .foregroundStyle(.gray)
+                                    .foregroundStyle(Color("AssistantText"))
                             }
                         }
                         .padding(.vertical, 4)
                     } header: {
                         Text("成功とみなす継続時間")
-                            .foregroundStyle(.gray)
+                            .foregroundStyle(Color("AssistantText"))
                     } footer: {
                         Text("セント範囲内のピッチが \(String(format: "%.1f", viewModel.settings.durationSeconds)) 秒間続いた場合に「チューニング成功」とみなします。推奨: ソロ 1.0秒 / アンサンブル 0.5秒")
-                            .foregroundStyle(.gray.opacity(0.7))
+                            .foregroundStyle(Color("AssistantText").opacity(0.7))
                     }
 
                     Section {
@@ -145,11 +145,11 @@ struct TunerSettingsFullScreenModal: View {
                             HStack {
                                 Text("1.0")
                                     .font(.caption2)
-                                    .foregroundStyle(.gray)
+                                    .foregroundStyle(Color("AssistantText"))
                                 Spacer()
                                 Text("20.0")
                                     .font(.caption2)
-                                    .foregroundStyle(.gray)
+                                    .foregroundStyle(Color("AssistantText"))
                             }
                         }
                         .padding(.vertical, 4)
@@ -172,20 +172,20 @@ struct TunerSettingsFullScreenModal: View {
                             HStack {
                                 Text("1.0")
                                     .font(.caption2)
-                                    .foregroundStyle(.gray)
+                                    .foregroundStyle(Color("AssistantText"))
                                 Spacer()
                                 Text("30.0")
                                     .font(.caption2)
-                                    .foregroundStyle(.gray)
+                                    .foregroundStyle(Color("AssistantText"))
                             }
                         }
                         .padding(.vertical, 4)
                     } header: {
                         Text("アンサンブル 調整オプション（非推奨）")
-                            .foregroundStyle(.gray)
+                            .foregroundStyle(Color("AssistantText"))
                     } footer: {
                         Text("実機テスト中の値です。変更すると判定が正常に動作しない場合があります。最適値が決まり次第この設定は削除されます。")
-                            .foregroundStyle(.gray.opacity(0.7))
+                            .foregroundStyle(Color("AssistantText").opacity(0.7))
                     }
 
                     Section {
@@ -202,7 +202,7 @@ struct TunerSettingsFullScreenModal: View {
             .toolbar {
                 ToolbarItem(placement: .confirmationAction) {
                     Button("閉じる") { dismiss() }
-                        .foregroundStyle(.cyan)
+                        .foregroundStyle(Color.accentColor)
                 }
             }
         }

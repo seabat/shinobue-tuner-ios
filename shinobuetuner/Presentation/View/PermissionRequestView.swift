@@ -26,7 +26,7 @@ struct PermissionRequestView: View {
 
                 Text("篠笛の音をリアルタイムで計測するため、\nマイクへのアクセスを許可してください。")
                     .font(.body)
-                    .foregroundStyle(.gray)
+                    .foregroundStyle(Color("AssistantText"))
                     .multilineTextAlignment(.center)
             }
 

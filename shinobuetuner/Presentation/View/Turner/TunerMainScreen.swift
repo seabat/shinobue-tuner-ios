@@ -15,6 +15,8 @@ struct TunerMainScreen: View {
     @State private var selectedMode: TunerMode = .soloMonitoring
     @State private var isSettingsPresented: Bool = false
     @State private var showEnsembleCountdown: Bool = false
+    /// 計測が一度でも開始されたかどうか（ヘルプ表示の制御に使用）
+    @State private var hasStartedMonitoring: Bool = false
 
     var body: some View {
         VStack(spacing: 0) {
@@ -34,8 +36,8 @@ struct TunerMainScreen: View {
             .padding(.horizontal, 24)
             .padding(.vertical, 4)
 
-            // ─── ピッチグラフ（5秒間） ───
-            if viewModel.tunerSettings.showPitchGraph {
+            // ─── ピッチグラフ or ヘルプ ───
+            if viewModel.tunerSettings.showPitchGraph && hasStartedMonitoring {
                 PitchGraphView(
                     pitchHistory: viewModel.pitchHistory,
                     currentTime: viewModel.currentTime
@@ -44,7 +46,10 @@ struct TunerMainScreen: View {
                 .padding(.horizontal, 16)
                 .padding(.bottom, 32)
             } else {
-                Spacer()
+                TunerHelpView()
+                    .frame(maxHeight: .infinity)
+                    .padding(.horizontal, 16)
+                    .padding(.bottom, 8)
             }
 
             // ─── 開始/停止ボタン + モード切替 ───
@@ -61,7 +66,7 @@ struct TunerMainScreen: View {
             } label: {
                 Image(systemName: "gearshape")
                     .font(.title3)
-                    .foregroundStyle(.gray.opacity(0.7))
+                    .foregroundStyle(Color("InactiveMode").opacity(0.7))
                     .padding(12)
             }
             .disabled(viewModel.isRunning)
@@ -73,6 +78,14 @@ struct TunerMainScreen: View {
         // selectedMode の変化を viewModel.tunerMode に反映する
         .onChange(of: selectedMode) { _, newMode in
             viewModel.tunerMode = newMode
+        }
+        // 計測開始でヘルプを非表示にする
+        .onChange(of: viewModel.isRunning) { _, isRunning in
+            if isRunning { hasStartedMonitoring = true }
+        }
+        // タブ表示のたびにヘルプをリセット
+        .onAppear {
+            hasStartedMonitoring = false
         }
         // アンサンブルカウントダウンモーダル
         .fullScreenCover(isPresented: $showEnsembleCountdown) {
@@ -119,7 +132,7 @@ private struct TunerPreviewWrapper: View {
 
     var body: some View {
         TunerMainScreen(viewModel: vm)
-            .background(Color(red: 0.078, green: 0.078, blue: 0.118))
+            .background(Color("AppBackground"))
             .preferredColorScheme(.dark)
             .task {
                 vm.currentPitch = 298.0
@@ -139,6 +152,6 @@ private struct TunerPreviewWrapper: View {
 
 #Preview("無音・停止中") {
     TunerMainScreen(viewModel: TunerViewModel(useCase: PreviewUseCase()))
-        .background(Color(red: 0.078, green: 0.078, blue: 0.118))
+        .background(Color("AppBackground"))
         .preferredColorScheme(.dark)
 }

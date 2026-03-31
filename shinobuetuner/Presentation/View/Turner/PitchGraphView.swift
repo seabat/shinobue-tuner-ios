@@ -182,7 +182,7 @@ struct PitchGraphView: View {
     return PitchGraphView(pitchHistory: history, currentTime: 5.0)
         .frame(height: 240)
         .padding(16)
-        .background(Color(red: 0.078, green: 0.078, blue: 0.118))
+        .background(Color("AppBackground"))
         .preferredColorScheme(.dark)
 }
 
@@ -190,6 +190,6 @@ struct PitchGraphView: View {
     PitchGraphView(pitchHistory: [], currentTime: 0)
         .frame(height: 240)
         .padding(16)
-        .background(Color(red: 0.078, green: 0.078, blue: 0.118))
+        .background(Color("AppBackground"))
         .preferredColorScheme(.dark)
 }

@@ -24,7 +24,7 @@ struct PlaybackListScreen: View {
 
     var body: some View {
         ZStack {
-            Color(red: 0.08, green: 0.08, blue: 0.12)
+            Color("AppBackground")
                 .ignoresSafeArea()
 
             VStack(spacing: 0) {
@@ -41,13 +41,13 @@ struct PlaybackListScreen: View {
                     VStack(spacing: 16) {
                         Image(systemName: "waveform.slash")
                             .font(.system(size: 48))
-                            .foregroundStyle(.gray.opacity(0.4))
+                            .foregroundStyle(Color("AssistantText").opacity(0.4))
                         Text("音声ファイルがありません")
                             .font(.body)
-                            .foregroundStyle(.gray)
+                            .foregroundStyle(Color("AssistantText"))
                         Text("チューナー画面で録音してください")
                             .font(.caption)
-                            .foregroundStyle(.gray.opacity(0.6))
+                            .foregroundStyle(Color("AssistantText").opacity(0.6))
                     }
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                 } else {
@@ -119,7 +119,7 @@ struct PlaybackListScreen: View {
             } label: {
                 Image(systemName: "gearshape")
                     .font(.title3)
-                    .foregroundStyle(.gray.opacity(0.7))
+                    .foregroundStyle(Color("InactiveMode").opacity(0.7))
                     .padding(12)
             }
         }

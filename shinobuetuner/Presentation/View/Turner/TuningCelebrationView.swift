@@ -150,7 +150,7 @@ private struct FireworkParticle: View {
 
         var body: some View {
             ZStack {
-                Color(red: 0.078, green: 0.078, blue: 0.118)
+                Color("AppBackground")
                     .ignoresSafeArea()
                 TuningCelebrationView(isInTune: inTune)
                 Button("発火テスト") { inTune.toggle() }

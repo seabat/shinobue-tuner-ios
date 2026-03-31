@@ -32,7 +32,7 @@ struct ContentView: View {
             // ─── チューナータブ ───
             Tab("チューナー", systemImage: "tuningfork") {
                 ZStack {
-                    Color(red: 0.08, green: 0.08, blue: 0.12)
+                    Color("AppBackground")
                         .ignoresSafeArea()
 
                     if viewModel.permissionGranted {
