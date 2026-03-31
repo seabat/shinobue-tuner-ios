@@ -49,4 +49,11 @@ struct TunerSettings {
     var tuning: ShinobueTuning = .rokuHon
     /// ピッチグラフを表示するかどうか（デフォルト: true）
     var showPitchGraph: Bool = true
+
+    /// アンサンブル用高難度オプション（非推奨・実機テスト中）
+    /// スペクトル幅の閾値（ビン数）：値が小さいほど判定が厳しい
+    var ensembleSpectralWidthThreshold: Float = 5.0
+    /// アンサンブル用高難度オプション（非推奨・実機テスト中）
+    /// 安定性スコアの閾値（セント標準偏差）：値が小さいほど判定が厳しい
+    var ensembleStabilityScoreThreshold: Float = 10.0
 }

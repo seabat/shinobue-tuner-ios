@@ -87,7 +87,7 @@ struct TunerSettingsFullScreenModal: View {
                         Text("成功とみなすセント範囲")
                             .foregroundStyle(.gray)
                     } footer: {
-                        Text("ピッチが基準音から ±\(Int(viewModel.settings.centThreshold)) セント以内を「チューニング成功」とみなします。")
+                        Text("ピッチが基準音から ±\(Int(viewModel.settings.centThreshold)) セント以内を「チューニング成功」とみなします。推奨: ソロ ±10セント / アンサンブル ±15セント")
                             .foregroundStyle(.gray.opacity(0.7))
                     }
 
@@ -122,7 +122,69 @@ struct TunerSettingsFullScreenModal: View {
                         Text("成功とみなす継続時間")
                             .foregroundStyle(.gray)
                     } footer: {
-                        Text("セント範囲内のピッチが \(String(format: "%.1f", viewModel.settings.durationSeconds)) 秒間続いた場合に「チューニング成功」とみなします。")
+                        Text("セント範囲内のピッチが \(String(format: "%.1f", viewModel.settings.durationSeconds)) 秒間続いた場合に「チューニング成功」とみなします。推奨: ソロ 1.0秒 / アンサンブル 0.5秒")
+                            .foregroundStyle(.gray.opacity(0.7))
+                    }
+
+                    Section {
+                        VStack(alignment: .leading, spacing: 12) {
+                            HStack {
+                                Text("スペクトル幅の閾値")
+                                    .foregroundStyle(.white)
+                                Spacer()
+                                Text(String(format: "%.1f ビン", viewModel.settings.ensembleSpectralWidthThreshold))
+                                    .foregroundStyle(.green)
+                                    .fontWeight(.semibold)
+                            }
+                            Slider(
+                                value: $viewModel.settings.ensembleSpectralWidthThreshold,
+                                in: 1.0...20.0,
+                                step: 0.5
+                            )
+                            .tint(.green)
+                            HStack {
+                                Text("1.0")
+                                    .font(.caption2)
+                                    .foregroundStyle(.gray)
+                                Spacer()
+                                Text("20.0")
+                                    .font(.caption2)
+                                    .foregroundStyle(.gray)
+                            }
+                        }
+                        .padding(.vertical, 4)
+
+                        VStack(alignment: .leading, spacing: 12) {
+                            HStack {
+                                Text("安定性スコアの閾値")
+                                    .foregroundStyle(.white)
+                                Spacer()
+                                Text(String(format: "%.0f セント", viewModel.settings.ensembleStabilityScoreThreshold))
+                                    .foregroundStyle(.green)
+                                    .fontWeight(.semibold)
+                            }
+                            Slider(
+                                value: $viewModel.settings.ensembleStabilityScoreThreshold,
+                                in: 1.0...30.0,
+                                step: 1.0
+                            )
+                            .tint(.green)
+                            HStack {
+                                Text("1.0")
+                                    .font(.caption2)
+                                    .foregroundStyle(.gray)
+                                Spacer()
+                                Text("30.0")
+                                    .font(.caption2)
+                                    .foregroundStyle(.gray)
+                            }
+                        }
+                        .padding(.vertical, 4)
+                    } header: {
+                        Text("アンサンブル 調整オプション（非推奨）")
+                            .foregroundStyle(.gray)
+                    } footer: {
+                        Text("実機テスト中の値です。変更すると判定が正常に動作しない場合があります。最適値が決まり次第この設定は削除されます。")
                             .foregroundStyle(.gray.opacity(0.7))
                     }
 

@@ -87,6 +87,9 @@ private final class PreviewUseCase: MonitorPitchUseCaseProtocol {
     var pitchPublisher: AnyPublisher<Float, Never> {
         Empty().eraseToAnyPublisher()
     }
+    var spectrumPublisher: AnyPublisher<(pitch: Float, magnitudes: [Float], binWidth: Float), Never> {
+        Empty().eraseToAnyPublisher()
+    }
     func start() {}
     func stop() {}
     func requestPermission() async -> Bool { true }

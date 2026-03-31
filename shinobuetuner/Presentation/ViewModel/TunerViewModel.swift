@@ -9,6 +9,13 @@
 import Foundation
 import Combine
 
+/// チューナーのモード
+enum TunerMode: String, CaseIterable {
+    case soloMonitoring     = "計測(単)"
+    case ensembleMonitoring = "計測(複)"
+    case recording          = "録音"
+}
+
 /// チューナー画面の状態を管理するViewModel
 @MainActor
 final class TunerViewModel: ObservableObject {
@@ -41,17 +48,23 @@ final class TunerViewModel: ObservableObject {
     /// チューナー設定値（設定モーダルを閉じたタイミングで reloadSettings() により更新）
     @Published var tunerSettings: TunerSettings
 
+    /// 現在のチューナーモード（View から設定される）
+    @Published var tunerMode: TunerMode = .soloMonitoring
+
     // MARK: - 内部
 
     private let useCase: any MonitorPitchUseCaseProtocol
     private let playbackFileRepository: any PlaybackFileRepository
-    private let fetchSettingsUseCase: any FetchTunerSettingsUseCaseProtocol
+    private let fetchTunerSettingsUseCase: any FetchTunerSettingsUseCaseProtocol
     private var cancellables = Set<AnyCancellable>()
     private var sessionStartTime: Date = Date()
     /// 最後に音を検出した currentTime（無音タイムアウト判定に使用）
     private var lastSoundTime: TimeInterval = 0
     /// 無音が続いたら自動停止するまでの秒数
     private let silenceTimeoutSeconds: TimeInterval = 30
+
+    /// EnsembleTuningDetector のインスタンス（アンサンブルモニタリング時のみ存在）
+    private var ensembleDetector: EnsembleTuningDetector? = nil
 
     /// チューニング成功判定の状態機械
     private enum InTuneState {
@@ -67,7 +80,7 @@ final class TunerViewModel: ObservableObject {
         self.init(
             useCase: MonitorPitchUseCase(repository: PitchRepositoryImpl()),
             playbackFileRepository: PlaybackFileRepositoryImpl(),
-            fetchSettingsUseCase: FetchTunerSettingsUseCase(repository: settingsRepository)
+            fetchTunerSettingsUseCase: FetchTunerSettingsUseCase(repository: settingsRepository)
         )
     }
 
@@ -77,7 +90,7 @@ final class TunerViewModel: ObservableObject {
         self.init(
             useCase: useCase,
             playbackFileRepository: PlaybackFileRepositoryImpl(),
-            fetchSettingsUseCase: FetchTunerSettingsUseCase(repository: settingsRepository)
+            fetchTunerSettingsUseCase: FetchTunerSettingsUseCase(repository: settingsRepository)
         )
     }
 
@@ -85,12 +98,12 @@ final class TunerViewModel: ObservableObject {
     init(
         useCase: any MonitorPitchUseCaseProtocol,
         playbackFileRepository: any PlaybackFileRepository,
-        fetchSettingsUseCase: any FetchTunerSettingsUseCaseProtocol
+        fetchTunerSettingsUseCase: any FetchTunerSettingsUseCaseProtocol
     ) {
         self.useCase = useCase
         self.playbackFileRepository = playbackFileRepository
-        self.fetchSettingsUseCase = fetchSettingsUseCase
-        self.tunerSettings = fetchSettingsUseCase()
+        self.fetchTunerSettingsUseCase = fetchTunerSettingsUseCase
+        self.tunerSettings = fetchTunerSettingsUseCase()
     }
 
     // MARK: - 操作
@@ -103,7 +116,7 @@ final class TunerViewModel: ObservableObject {
 
     /// 設定モーダルを閉じた後に設定値を再読み込みする
     func reloadSettings() {
-        tunerSettings = fetchSettingsUseCase()
+        tunerSettings = fetchTunerSettingsUseCase()
     }
 
     /// ピッチ監視を開始する
@@ -133,12 +146,30 @@ final class TunerViewModel: ObservableObject {
             }
             .store(in: &cancellables)
 
+        // エンジンを先に起動して inputFormat.sampleRate を確定させる
         useCase.start()
+
+        // アンサンブルモニタリング時は EnsembleTuningDetector を起動する
+        // （useCase.start() 後にアクセスすることで binWidth が正しく計算される）
+        if tunerMode == .ensembleMonitoring {
+            let detector = EnsembleTuningDetector()
+            detector.start(
+                spectrumPublisher: useCase.spectrumPublisher,
+                settings: fetchTunerSettingsUseCase()
+            )
+            detector.publisher
+                .sink { [weak self] state in
+                    self?.handleEnsembleState(state)
+                }
+                .store(in: &cancellables)
+            ensembleDetector = detector
+        }
     }
 
     /// ピッチ監視を停止する
     func stopMonitoring() {
         useCase.stop()
+        ensembleDetector = nil
         cancellables.removeAll()
         isRunning = false
         currentPitch = 0
@@ -189,22 +220,31 @@ final class TunerViewModel: ObservableObject {
             // 5秒より古いデータを削除
             pitchHistory.removeAll { $0.time < currentTime - 5.0 }
 
-            // チューニング成功判定
-            if let r = result {
-                updateInTuneState(midiNote: r.note.midiNote, cents: r.cents)
-            } else {
-                resetInTuneState()
+            // チューニング成功判定（ソロモニタリング時のみ）
+            if tunerMode == .soloMonitoring {
+                if let r = result {
+                    let isInTune = abs(r.cents) <= Float(tunerSettings.centThreshold)
+                    updateInTuneState(midiNote: r.note.midiNote, isInTune: isInTune)
+                } else {
+                    resetInTuneState()
+                }
             }
         } else {
             noteResult = nil
-            resetInTuneState()
+            // チューニング成功判定（ソロモニタリング時のみ）
+            if tunerMode == .soloMonitoring {
+                resetInTuneState()
+            }
         }
     }
 
-    /// チューニング成功判定の状態を更新する
-    private func updateInTuneState(midiNote: Int, cents: Float) {
-        let isInTune = abs(cents) <= Float(tunerSettings.centThreshold)
+    /// アンサンブルチューニング判定結果を受け取って状態を更新する
+    private func handleEnsembleState(_ state: EnsembleTuningState) {
+        updateInTuneState(midiNote: 0, isInTune: state.isInTune)
+    }
 
+    /// チューニング成功判定の状態を更新する
+    private func updateInTuneState(midiNote: Int, isInTune: Bool) {
         switch inTuneState {
         case .idle:
             if isInTune {

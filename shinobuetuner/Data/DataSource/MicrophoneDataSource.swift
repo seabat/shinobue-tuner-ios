@@ -13,12 +13,21 @@ import Accelerate
 
 /// マイク音声からリアルタイムにピッチを検出するデータソース
 final class MicrophoneDataSource {
-    /// 検出したピッチ（Hz）をemitするSubject（0は無音）
-    private let subject = PassthroughSubject<Float, Never>()
+    /// 検出したピッチとHPSスペクトルをセットでemitするSubject（pitch=0は無音）
+    private let subject = PassthroughSubject<(pitch: Float, magnitudes: [Float]), Never>()
 
-    /// 外部公開用パブリッシャー
+    /// 外部公開用パブリッシャー（後方互換：ピッチのみ）
     var publisher: AnyPublisher<Float, Never> {
-        subject.eraseToAnyPublisher()
+        subject.map { $0.pitch }.eraseToAnyPublisher()
+    }
+
+    /// スペクトル情報付きパブリッシャー（アンサンブルモニタリング用）
+    var spectrumPublisher: AnyPublisher<(pitch: Float, magnitudes: [Float], binWidth: Float), Never> {
+        let inputFormat = engine.inputNode.inputFormat(forBus: 0)
+        let binWidth = Float(inputFormat.sampleRate) / Float(4096)
+        return subject
+            .map { (pitch: $0.pitch, magnitudes: $0.magnitudes, binWidth: binWidth) }
+            .eraseToAnyPublisher()
     }
 
     private let engine = AVAudioEngine()
@@ -68,7 +77,7 @@ final class MicrophoneDataSource {
             }
 
             // ピッチ検出（バックグラウンドスレッドで実行可能）
-            let pitch = MicrophoneDataSource.detectPitch(
+            let result = MicrophoneDataSource.detectPitchWithSpectrum(
                 buffer: buffer,
                 sampleRate: sampleRate,
                 fftSize: fftSize
@@ -76,7 +85,7 @@ final class MicrophoneDataSource {
 
             // subject.send をメインスレッドで呼び出す
             Task { @MainActor [weak self] in
-                self?.subject.send(pitch)
+                self?.subject.send((pitch: result.pitch, magnitudes: result.magnitudes))
             }
         }
 
@@ -116,6 +125,99 @@ final class MicrophoneDataSource {
     }
 
     // MARK: - ピッチ検出（静的メソッド・スレッドセーフ）
+
+    /// FFT + HPSアルゴリズムによるピッチ検出（スペクトル情報付き）
+    /// - Parameters:
+    ///   - buffer: 音声バッファ
+    ///   - sampleRate: サンプルレート（Hz）
+    ///   - fftSize: FFTサイズ（2の累乗）
+    /// - Returns: (pitch: 検出周波数Hz, magnitudes: HPSスペクトル)、無音時は pitch=0
+    nonisolated static func detectPitchWithSpectrum(
+        buffer: AVAudioPCMBuffer,
+        sampleRate: Float,
+        fftSize: Int
+    ) -> (pitch: Float, magnitudes: [Float]) {
+        guard let channelData = buffer.floatChannelData?[0] else { return (0, []) }
+        let frameLength = Int(buffer.frameLength)
+        guard frameLength > 0 else { return (0, []) }
+
+        let halfSize = fftSize / 2
+        let log2n = vDSP_Length(log2f(Float(fftSize)))
+
+        var signal = [Float](repeating: 0, count: fftSize)
+        let copyCount = min(frameLength, fftSize)
+        for i in 0..<copyCount {
+            signal[i] = channelData[i]
+        }
+
+        var rms: Float = 0
+        vDSP_rmsqv(signal, 1, &rms, vDSP_Length(copyCount))
+        guard rms > AudioConstants.noiseThreshold else { return (0, []) }
+
+        var window = [Float](repeating: 0, count: fftSize)
+        vDSP_hann_window(&window, vDSP_Length(fftSize), Int32(vDSP_HANN_NORM))
+        vDSP_vmul(signal, 1, window, 1, &signal, 1, vDSP_Length(fftSize))
+
+        guard let fftSetup = vDSP_create_fftsetup(log2n, FFTRadix(kFFTRadix2)) else { return (0, []) }
+        defer { vDSP_destroy_fftsetup(fftSetup) }
+
+        var realParts = [Float](repeating: 0, count: halfSize)
+        var imagParts = [Float](repeating: 0, count: halfSize)
+        var magnitudes = [Float](repeating: 0, count: halfSize)
+
+        signal.withUnsafeBytes { rawPtr in
+            let complexPtr = rawPtr.baseAddress!.assumingMemoryBound(to: DSPComplex.self)
+            realParts.withUnsafeMutableBufferPointer { realBuf in
+                imagParts.withUnsafeMutableBufferPointer { imagBuf in
+                    var split = DSPSplitComplex(
+                        realp: realBuf.baseAddress!,
+                        imagp: imagBuf.baseAddress!
+                    )
+                    vDSP_ctoz(complexPtr, 2, &split, 1, vDSP_Length(halfSize))
+                    vDSP_fft_zrip(fftSetup, &split, 1, log2n, FFTDirection(FFT_FORWARD))
+                    vDSP_zvmags(&split, 1, &magnitudes, 1, vDSP_Length(halfSize))
+                }
+            }
+        }
+
+        var hpsSpectrum = magnitudes
+        let numHarmonics = 3
+        let hpsMaxBin = halfSize / numHarmonics
+        for harmonic in 2...numHarmonics {
+            for i in 0..<hpsMaxBin {
+                hpsSpectrum[i] *= magnitudes[i * harmonic]
+            }
+        }
+
+        let binWidth = sampleRate / Float(fftSize)
+        let minBin = max(1, Int(100.0 / binWidth))
+        let maxBin = min(Int(2600.0 / binWidth), hpsMaxBin - 2)
+        guard minBin < maxBin else { return (0, hpsSpectrum) }
+
+        var maxMag: Float = 0
+        var peakBin = minBin
+        for i in minBin...maxBin {
+            if hpsSpectrum[i] > maxMag {
+                maxMag = hpsSpectrum[i]
+                peakBin = i
+            }
+        }
+
+        var avgMag: Float = 0
+        vDSP_meanv(hpsSpectrum, 1, &avgMag, vDSP_Length(hpsMaxBin))
+        guard maxMag > avgMag * 8 else { return (0, hpsSpectrum) }
+
+        guard peakBin > 0 && peakBin < hpsMaxBin - 1 else {
+            return (Float(peakBin) * binWidth, hpsSpectrum)
+        }
+        let alpha = hpsSpectrum[peakBin - 1]
+        let beta  = hpsSpectrum[peakBin]
+        let gamma = hpsSpectrum[peakBin + 1]
+        let denominator = alpha - 2 * beta + gamma
+        let offset: Float = abs(denominator) > 1e-6 ? 0.5 * (alpha - gamma) / denominator : 0
+
+        return ((Float(peakBin) + offset) * binWidth, hpsSpectrum)
+    }
 
     /// FFT + HPSアルゴリズムによるピッチ検出
     /// - Parameters:

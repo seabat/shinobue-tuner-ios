@@ -14,6 +14,9 @@ protocol MonitorPitchUseCaseProtocol {
     /// 検出したピッチ（Hz）をemitするパブリッシャー（0は無音）
     var pitchPublisher: AnyPublisher<Float, Never> { get }
 
+    /// ピッチとスペクトル情報をセットでemitするパブリッシャー（アンサンブルモニタリング用）
+    var spectrumPublisher: AnyPublisher<(pitch: Float, magnitudes: [Float], binWidth: Float), Never> { get }
+
     /// ピッチ監視を開始する
     func start()
 
@@ -41,6 +44,10 @@ final class MonitorPitchUseCase: MonitorPitchUseCaseProtocol {
 
     var pitchPublisher: AnyPublisher<Float, Never> {
         repository.pitchPublisher
+    }
+
+    var spectrumPublisher: AnyPublisher<(pitch: Float, magnitudes: [Float], binWidth: Float), Never> {
+        repository.spectrumPublisher
     }
 
     func start() {
