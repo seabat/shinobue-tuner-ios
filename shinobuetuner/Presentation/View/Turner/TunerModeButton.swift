@@ -1,15 +1,15 @@
 //
-//  RecordButton.swift
+//  TunerModeButton.swift
 //  shinobuetuner
 //
 //  Created by ryouta on 2026/02/25.
 //
-//  録音開始/停止ボタン
+//  計測/録音 開始・停止ボタン
 
 import SwiftUI
 
 /// 計測/録音 開始・停止ボタン
-struct RecordButton: View {
+struct TunerModeButton: View {
     let isRunning: Bool
     /// ボタンのアクセントカラー（soloMonitoring: .cyan / ensembleMonitoring: .green / recording: .orange）
     let accentColor: Color
@@ -50,17 +50,17 @@ struct RecordButton: View {
 #Preview {
     VStack(spacing: 24) {
         // ソロ計測モード・停止中
-        RecordButton(isRunning: false, accentColor: Color.accentColor, startIcon: "mic.circle.fill") {}
+        TunerModeButton(isRunning: false, accentColor: Color.accentColor, startIcon: "mic.circle.fill") {}
         // ソロ計測モード・計測中
-        RecordButton(isRunning: true, accentColor: Color.accentColor, startIcon: "mic.circle.fill") {}
+        TunerModeButton(isRunning: true, accentColor: Color.accentColor, startIcon: "mic.circle.fill") {}
         // アンサンブル計測モード・停止中
-        RecordButton(isRunning: false, accentColor: .green, startIcon: "person.2.circle.fill") {}
+        TunerModeButton(isRunning: false, accentColor: .green, startIcon: "person.2.circle.fill") {}
         // アンサンブル計測モード・計測中
-        RecordButton(isRunning: true, accentColor: .green, startIcon: "person.2.circle.fill") {}
+        TunerModeButton(isRunning: true, accentColor: .green, startIcon: "person.2.circle.fill") {}
         // 録音モード・停止中
-        RecordButton(isRunning: false, accentColor: .orange, startIcon: "record.circle") {}
+        TunerModeButton(isRunning: false, accentColor: .orange, startIcon: "record.circle") {}
         // 録音モード・録音中
-        RecordButton(isRunning: true, accentColor: .orange, startIcon: "record.circle") {}
+        TunerModeButton(isRunning: true, accentColor: .orange, startIcon: "record.circle") {}
     }
     .padding(40)
     .background(Color("AppBackground"))

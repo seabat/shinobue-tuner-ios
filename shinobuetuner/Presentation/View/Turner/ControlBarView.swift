@@ -17,7 +17,7 @@ struct ControlBarView: View {
     var body: some View {
         ZStack {
             // 計測/停止ボタン（中央固定）
-            RecordButton(
+            TunerModeButton(
                 isRunning: viewModel.isRunning,
                 accentColor: modeColor(for: selectedMode),
                 startIcon: icon(for: selectedMode)
