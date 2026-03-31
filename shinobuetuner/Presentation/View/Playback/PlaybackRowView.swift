@@ -19,7 +19,7 @@ struct PlaybackRowView: View {
             // 再生状態インジケーター
             Image(systemName: isSelected && isPlaying ? "waveform" : "play.circle")
                 .font(.title3)
-                .foregroundStyle(isSelected ? .cyan : .gray.opacity(0.5))
+                .foregroundStyle(isSelected ? Color.accentColor : Color("InactiveMode").opacity(0.5))
                 .frame(width: 28)
 
             VStack(alignment: .leading, spacing: 4) {
@@ -35,7 +35,7 @@ struct PlaybackRowView: View {
                     Label(formattedSize, systemImage: "doc")
                 }
                 .font(.caption)
-                .foregroundStyle(.gray)
+                .foregroundStyle(Color("AssistantText"))
             }
         }
         .padding(.vertical, 4)
@@ -78,7 +78,7 @@ private let previewPlaybackFile = PlaybackFile(
         PlaybackRowView(playbackFile: previewPlaybackFile, isSelected: false, isPlaying: false)
     }
     .listStyle(.plain)
-    .background(Color(red: 0.078, green: 0.078, blue: 0.118))
+    .background(Color("AppBackground"))
     .preferredColorScheme(.dark)
 }
 
@@ -87,7 +87,7 @@ private let previewPlaybackFile = PlaybackFile(
         PlaybackRowView(playbackFile: previewPlaybackFile, isSelected: true, isPlaying: true)
     }
     .listStyle(.plain)
-    .background(Color(red: 0.078, green: 0.078, blue: 0.118))
+    .background(Color("AppBackground"))
     .preferredColorScheme(.dark)
 }
 
@@ -96,6 +96,6 @@ private let previewPlaybackFile = PlaybackFile(
         PlaybackRowView(playbackFile: previewPlaybackFile, isSelected: true, isPlaying: false)
     }
     .listStyle(.plain)
-    .background(Color(red: 0.078, green: 0.078, blue: 0.118))
+    .background(Color("AppBackground"))
     .preferredColorScheme(.dark)
 }

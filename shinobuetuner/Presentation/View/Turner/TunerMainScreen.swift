@@ -61,7 +61,7 @@ struct TunerMainScreen: View {
             } label: {
                 Image(systemName: "gearshape")
                     .font(.title3)
-                    .foregroundStyle(.gray.opacity(0.7))
+                    .foregroundStyle(Color("InactiveMode").opacity(0.7))
                     .padding(12)
             }
             .disabled(viewModel.isRunning)
@@ -119,7 +119,7 @@ private struct TunerPreviewWrapper: View {
 
     var body: some View {
         TunerMainScreen(viewModel: vm)
-            .background(Color(red: 0.078, green: 0.078, blue: 0.118))
+            .background(Color("AppBackground"))
             .preferredColorScheme(.dark)
             .task {
                 vm.currentPitch = 298.0
@@ -139,6 +139,6 @@ private struct TunerPreviewWrapper: View {
 
 #Preview("無音・停止中") {
     TunerMainScreen(viewModel: TunerViewModel(useCase: PreviewUseCase()))
-        .background(Color(red: 0.078, green: 0.078, blue: 0.118))
+        .background(Color("AppBackground"))
         .preferredColorScheme(.dark)
 }

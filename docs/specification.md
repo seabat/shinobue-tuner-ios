@@ -16,6 +16,31 @@
 | 子（プレイリストタブ） | `PlaybackListScreen` （プレイリスト機能） | `PlaybackSettingsFullScreenModal`（プレイリスト設定フルモーダル） |
 | 子（周波数表タブ） | `FrequencyTableScreen` （周波数表） | なし |
 
+### カラー定義
+
+#### カラーアセット（`Assets.xcassets`）
+
+| アセット名 | 参照色 | 用途 |
+|---|---|---|
+| `AppBackground` | `(R:0.078, G:0.078, B:0.118)` 濃紺 | アプリ共通の画面背景色 |
+| `LaunchBackground` | `(R:0.078, G:0.078, B:0.118)` 濃紺 | ローンチ画面の背景色（`AppBackground` と同値） |
+| `AccentColor` | `systemCyanColor` シアン | アプリ全体のアクセントカラー（Toggle・Slider・テキスト強調など） |
+| `SoloMonitoring` | `systemCyanColor` シアン | 計測(単)モードのアクセント色（ボタン・モード切替） |
+| `EnsembleMonitoring` | `systemGreenColor` 緑 | 計測(複)モードのアクセント色（ボタン・モード切替） |
+| `Recording` | `systemOrangeColor` オレンジ | 録音モードのアクセント色（ボタン・モード切替） |
+| `InactiveMode` | `systemGrayColor` グレー | 非選択・無効状態のUI要素（非選択アイコン、無音時の音符色、非アクティブインジケーター、設定ボタン） |
+| `AssistantText` | `systemGrayColor` グレー | 補助テキスト・説明文・ラベル（セクションヘッダー、フッター、時間表示、空状態、日付キャプション） |
+| `PreviewBackground` | `(R:1.0, G:0.88, B:0.9)` うすいピンク | Xcode プレビュー専用の背景色（本番画面には使用しない） |
+
+#### セマンティックカラー（コード内で直接使用）
+
+| 色 | 用途 |
+|---|---|
+| `.green` | 音階名のアクセント色・セントメーター（セント絶対値 ≤ 10） |
+| `.yellow` | 音階名のアクセント色・セントメーター（10 < セント絶対値 ≤ 25） |
+| `.red` | 音階名のアクセント色・セントメーター（セント絶対値 > 25）、録音中ボタン色 |
+| `.blue` | プレイリスト行スワイプの「名前変更」ボタン |
+
 ---
 
 ## 機能仕様

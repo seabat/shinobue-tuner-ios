@@ -50,9 +50,9 @@ struct RecordButton: View {
 #Preview {
     VStack(spacing: 24) {
         // ソロ計測モード・停止中
-        RecordButton(isRunning: false, accentColor: .cyan, startIcon: "mic.circle.fill") {}
+        RecordButton(isRunning: false, accentColor: Color.accentColor, startIcon: "mic.circle.fill") {}
         // ソロ計測モード・計測中
-        RecordButton(isRunning: true, accentColor: .cyan, startIcon: "mic.circle.fill") {}
+        RecordButton(isRunning: true, accentColor: Color.accentColor, startIcon: "mic.circle.fill") {}
         // アンサンブル計測モード・停止中
         RecordButton(isRunning: false, accentColor: .green, startIcon: "person.2.circle.fill") {}
         // アンサンブル計測モード・計測中
@@ -63,6 +63,6 @@ struct RecordButton: View {
         RecordButton(isRunning: true, accentColor: .orange, startIcon: "record.circle") {}
     }
     .padding(40)
-    .background(Color(red: 0.078, green: 0.078, blue: 0.118))
+    .background(Color("AppBackground"))
     .preferredColorScheme(.dark)
 }

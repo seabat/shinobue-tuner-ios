@@ -19,7 +19,7 @@ struct ControlBarView: View {
             // 計測/停止ボタン（中央固定）
             RecordButton(
                 isRunning: viewModel.isRunning,
-                accentColor: accentColor(for: selectedMode),
+                accentColor: modeColor(for: selectedMode),
                 startIcon: icon(for: selectedMode)
             ) {
                 switch selectedMode {
@@ -48,11 +48,11 @@ struct ControlBarView: View {
         .padding(.bottom, 24)
     }
 
-    private func accentColor(for mode: TunerMode) -> Color {
+    private func modeColor(for mode: TunerMode) -> Color {
         switch mode {
-        case .soloMonitoring:     return .cyan
-        case .ensembleMonitoring: return .green
-        case .recording:          return .orange
+        case .soloMonitoring:     return Color("SoloMonitoring")
+        case .ensembleMonitoring: return Color("EnsembleMonitoring")
+        case .recording:          return Color("Recording")
         }
     }
 
@@ -84,7 +84,7 @@ private struct ModeSwitcher: View {
                             .font(.system(size: 11, weight: .medium))
                     }
                     .foregroundStyle(selectedMode == mode
-                        ? activeColor(for: mode)
+                        ? modeColor(for: mode)
                         : Color(white: 0.4)
                     )
                 }
@@ -100,11 +100,11 @@ private struct ModeSwitcher: View {
         }
     }
 
-    private func activeColor(for mode: TunerMode) -> Color {
+    private func modeColor(for mode: TunerMode) -> Color {
         switch mode {
-        case .soloMonitoring:     return .cyan
-        case .ensembleMonitoring: return .green
-        case .recording:          return .orange
+        case .soloMonitoring:     return Color("SoloMonitoring")
+        case .ensembleMonitoring: return Color("EnsembleMonitoring")
+        case .recording:          return Color("Recording")
         }
     }
 }
@@ -123,14 +123,41 @@ private final class PreviewUseCase: MonitorPitchUseCaseProtocol {
     func stopRecording() {}
 }
 
-#Preview("計測モード・停止中") {
+#Preview("ソロ計測モード・停止中") {
     ZStack {
-        Color(red: 0.078, green: 0.078, blue: 0.118).ignoresSafeArea()
+        Color("PreviewBackground").ignoresSafeArea()
         ControlBarView(
             viewModel: TunerViewModel(useCase: PreviewUseCase()),
             selectedMode: .constant(.soloMonitoring),
             showEnsembleCountdown: .constant(false)
         )
+        .background(Color("AppBackground"))
+    }
+    .preferredColorScheme(.light)
+}
+
+#Preview("アンサンブル計測モード・停止中") {
+    ZStack {
+        Color("PreviewBackground").ignoresSafeArea()
+        ControlBarView(
+            viewModel: TunerViewModel(useCase: PreviewUseCase()),
+            selectedMode: .constant(.ensembleMonitoring),
+            showEnsembleCountdown: .constant(false)
+        )
+        .background(Color("AppBackground"))
+    }
+    .preferredColorScheme(.dark)
+}
+
+#Preview("録音モード・停止中") {
+    ZStack {
+        Color("PreviewBackground").ignoresSafeArea()
+        ControlBarView(
+            viewModel: TunerViewModel(useCase: PreviewUseCase()),
+            selectedMode: .constant(.recording),
+            showEnsembleCountdown: .constant(false)
+        )
+        .background(Color("AppBackground"))
     }
     .preferredColorScheme(.dark)
 }
@@ -147,8 +174,9 @@ private final class PreviewUseCase: MonitorPitchUseCaseProtocol {
 
         var body: some View {
             ZStack {
-                Color(red: 0.078, green: 0.078, blue: 0.118).ignoresSafeArea()
+                Color("PreviewBackground").ignoresSafeArea() // うすいピンク色
                 ControlBarView(viewModel: vm, selectedMode: $mode, showEnsembleCountdown: $showCountdown)
+                    .background(Color("AppBackground"))
             }
             .preferredColorScheme(.dark)
         }
