@@ -14,7 +14,7 @@ struct NoteDisplayView: View {
     let currentPitch: Float
 
     private var accentColor: Color {
-        guard let cents = noteResult?.cents else { return .gray }
+        guard let cents = noteResult?.cents else { return Color("InactiveMode") }
         let absCents = abs(cents)
         if absCents <= 10 { return .green }
         if absCents <= 25 { return .yellow }
@@ -111,7 +111,7 @@ struct NoteDisplayView: View {
         )
         .frame(height: 160)
 
-        Divider().background(.gray.opacity(0.3))
+        Divider().background(Color("AssistantText").opacity(0.3))
 
         // やや外れ（±25セント以内 → 黄）: 一 を約+23セントシャープ
         NoteDisplayView(
@@ -120,7 +120,7 @@ struct NoteDisplayView: View {
         )
         .frame(height: 160)
 
-        Divider().background(.gray.opacity(0.3))
+        Divider().background(Color("AssistantText").opacity(0.3))
 
         // 大きくズレている（±25セント超 → 赤）: 一 を約+50セントシャープ
         NoteDisplayView(
@@ -129,12 +129,12 @@ struct NoteDisplayView: View {
         )
         .frame(height: 160)
 
-        Divider().background(.gray.opacity(0.3))
+        Divider().background(Color("AssistantText").opacity(0.3))
 
         // 無音
         NoteDisplayView(noteResult: nil, currentPitch: 0)
             .frame(height: 160)
     }
-    .background(Color(red: 0.078, green: 0.078, blue: 0.118))
+    .background(Color("AppBackground"))
     .preferredColorScheme(.dark)
 }

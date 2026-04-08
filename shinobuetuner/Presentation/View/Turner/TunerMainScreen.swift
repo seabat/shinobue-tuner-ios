@@ -9,17 +9,14 @@
 import SwiftUI
 import Combine
 
-/// チューナーメインビューのモード
-enum TunerMode: String, CaseIterable {
-    case monitoring = "計測"
-    case recording  = "録音"
-}
-
 /// チューナーメインビュー
 struct TunerMainScreen: View {
     @ObservedObject var viewModel: TunerViewModel
-    @State private var selectedMode: TunerMode = .monitoring
+    @State private var selectedMode: TunerMode = .soloMonitoring
     @State private var isSettingsPresented: Bool = false
+    @State private var showEnsembleCountdown: Bool = false
+    /// 計測が一度でも開始されたかどうか（ヘルプ表示の制御に使用）
+    @State private var hasStartedMonitoring: Bool = false
 
     var body: some View {
         VStack(spacing: 0) {
@@ -39,8 +36,8 @@ struct TunerMainScreen: View {
             .padding(.horizontal, 24)
             .padding(.vertical, 4)
 
-            // ─── ピッチグラフ（5秒間） ───
-            if viewModel.tunerSettings.showPitchGraph {
+            // ─── ピッチグラフ or ヘルプ ───
+            if viewModel.tunerSettings.showPitchGraph && hasStartedMonitoring {
                 PitchGraphView(
                     pitchHistory: viewModel.pitchHistory,
                     currentTime: viewModel.currentTime
@@ -49,13 +46,17 @@ struct TunerMainScreen: View {
                 .padding(.horizontal, 16)
                 .padding(.bottom, 32)
             } else {
-                Spacer()
+                TunerHelpView()
+                    .frame(maxHeight: .infinity)
+                    .padding(.horizontal, 16)
+                    .padding(.bottom, 8)
             }
 
             // ─── 開始/停止ボタン + モード切替 ───
             ControlBarView(
                 viewModel: viewModel,
-                selectedMode: $selectedMode
+                selectedMode: $selectedMode,
+                showEnsembleCountdown: $showEnsembleCountdown
             )
         }
         .overlay(alignment: .topTrailing) {
@@ -65,7 +66,7 @@ struct TunerMainScreen: View {
             } label: {
                 Image(systemName: "gearshape")
                     .font(.title3)
-                    .foregroundStyle(.gray.opacity(0.7))
+                    .foregroundStyle(Color("InactiveMode").opacity(0.7))
                     .padding(12)
             }
             .disabled(viewModel.isRunning)
@@ -73,6 +74,24 @@ struct TunerMainScreen: View {
         .overlay {
             // ─── チューニング成功エフェクト ───
             TuningCelebrationView(isInTune: viewModel.showTuningCelebration)
+        }
+        // selectedMode の変化を viewModel.tunerMode に反映する
+        .onChange(of: selectedMode) { _, newMode in
+            viewModel.tunerMode = newMode
+        }
+        // 計測開始でヘルプを非表示にする
+        .onChange(of: viewModel.isRunning) { _, isRunning in
+            if isRunning { hasStartedMonitoring = true }
+        }
+        // タブ表示のたびにヘルプをリセット
+        .onAppear {
+            hasStartedMonitoring = false
+        }
+        // アンサンブルカウントダウンモーダル
+        .fullScreenCover(isPresented: $showEnsembleCountdown) {
+            EnsembleCountdownFullScreenModal {
+                viewModel.startMonitoring()
+            }
         }
         // 設定モーダルを閉じたタイミングで TunerViewModel の設定値を再読み込みする
         .fullScreenCover(isPresented: $isSettingsPresented, onDismiss: {
@@ -98,6 +117,9 @@ private final class PreviewUseCase: MonitorPitchUseCaseProtocol {
     var pitchPublisher: AnyPublisher<Float, Never> {
         Empty().eraseToAnyPublisher()
     }
+    var spectrumPublisher: AnyPublisher<(pitch: Float, magnitudes: [Float], binWidth: Float), Never> {
+        Empty().eraseToAnyPublisher()
+    }
     func start() {}
     func stop() {}
     func requestPermission() async -> Bool { true }
@@ -110,7 +132,7 @@ private struct TunerPreviewWrapper: View {
 
     var body: some View {
         TunerMainScreen(viewModel: vm)
-            .background(Color(red: 0.078, green: 0.078, blue: 0.118))
+            .background(Color("AppBackground"))
             .preferredColorScheme(.dark)
             .task {
                 vm.currentPitch = 298.0
@@ -130,6 +152,6 @@ private struct TunerPreviewWrapper: View {
 
 #Preview("無音・停止中") {
     TunerMainScreen(viewModel: TunerViewModel(useCase: PreviewUseCase()))
-        .background(Color(red: 0.078, green: 0.078, blue: 0.118))
+        .background(Color("AppBackground"))
         .preferredColorScheme(.dark)
 }

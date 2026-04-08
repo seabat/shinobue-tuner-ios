@@ -31,7 +31,7 @@ struct PlaybackControlView: View {
                     viewModel.seek(to: sliderValue)
                 }
             }
-            .tint(.cyan)
+            .tint(Color.accentColor)
             .padding(.horizontal, 4)
             .onChange(of: viewModel.playbackTime) { _, newTime in
                 // ドラッグ中以外は再生位置に追従してシークバーを動かす
@@ -44,7 +44,7 @@ struct PlaybackControlView: View {
                 // 現在の再生位置
                 Text(formattedTime(viewModel.playbackTime))
                     .font(.caption.monospacedDigit())
-                    .foregroundStyle(.gray)
+                    .foregroundStyle(Color("AssistantText"))
                     .frame(width: 44, alignment: .leading)
 
                 Spacer()
@@ -55,7 +55,7 @@ struct PlaybackControlView: View {
                 } label: {
                     Image(systemName: "xmark.circle.fill")
                         .font(.title2)
-                        .foregroundStyle(.gray)
+                        .foregroundStyle(Color("InactiveMode"))
                 }
 
                 // 再生/一時停止ボタン
@@ -72,7 +72,7 @@ struct PlaybackControlView: View {
                 // 総再生時間
                 Text(formattedTime(duration))
                     .font(.caption.monospacedDigit())
-                    .foregroundStyle(.gray)
+                    .foregroundStyle(Color("AssistantText"))
                     .frame(width: 44, alignment: .trailing)
             }
             .padding(.horizontal, 8)

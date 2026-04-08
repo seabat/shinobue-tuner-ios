@@ -26,7 +26,7 @@ struct PermissionRequestView: View {
 
                 Text("篠笛の音をリアルタイムで計測するため、\nマイクへのアクセスを許可してください。")
                     .font(.body)
-                    .foregroundStyle(.gray)
+                    .foregroundStyle(Color("AssistantText"))
                     .multilineTextAlignment(.center)
             }
 
@@ -52,6 +52,9 @@ struct PermissionRequestView: View {
 
 private final class PreviewUseCase: MonitorPitchUseCaseProtocol {
     var pitchPublisher: AnyPublisher<Float, Never> {
+        Empty().eraseToAnyPublisher()
+    }
+    var spectrumPublisher: AnyPublisher<(pitch: Float, magnitudes: [Float], binWidth: Float), Never> {
         Empty().eraseToAnyPublisher()
     }
     func start() {}

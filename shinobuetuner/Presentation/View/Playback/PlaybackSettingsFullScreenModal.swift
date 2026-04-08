@@ -25,10 +25,10 @@ struct PlaybackSettingsFullScreenModal: View {
                             }
                         }
                         .foregroundStyle(.white)
-                        .tint(.cyan)
+                        .tint(Color.accentColor)
                     } header: {
                         Text("並び替え")
-                            .foregroundStyle(.gray)
+                            .foregroundStyle(Color("AssistantText"))
                     }
 
                     Section {
@@ -38,7 +38,7 @@ struct PlaybackSettingsFullScreenModal: View {
                                     .foregroundStyle(.white)
                                 Spacer()
                                 Text(String(format: "%.3f", viewModel.settings.trimNoisePeakThreshold))
-                                    .foregroundStyle(.cyan)
+                                    .foregroundStyle(Color.accentColor)
                                     .fontWeight(.semibold)
                                     .monospacedDigit()
                             }
@@ -47,26 +47,26 @@ struct PlaybackSettingsFullScreenModal: View {
                                 in: 0.001...0.020,
                                 step: 0.001
                             )
-                            .tint(.cyan)
+                            .tint(Color.accentColor)
                             HStack {
                                 Text("0.001\n(敏感)")
                                     .font(.caption2)
-                                    .foregroundStyle(.gray)
+                                    .foregroundStyle(Color("AssistantText"))
                                     .multilineTextAlignment(.center)
                                 Spacer()
                                 Text("0.020\n(鈍感)")
                                     .font(.caption2)
-                                    .foregroundStyle(.gray)
+                                    .foregroundStyle(Color("AssistantText"))
                                     .multilineTextAlignment(.center)
                             }
                         }
                         .padding(.vertical, 4)
                     } header: {
                         Text("頭出し")
-                            .foregroundStyle(.gray)
+                            .foregroundStyle(Color("AssistantText"))
                     } footer: {
                         Text("値が小さいほど微かな音も「有音」と判定します。デフォルト: 0.003")
-                            .foregroundStyle(.gray.opacity(0.7))
+                            .foregroundStyle(Color("AssistantText").opacity(0.7))
                     }
 
                     Section {
@@ -83,7 +83,7 @@ struct PlaybackSettingsFullScreenModal: View {
             .toolbar {
                 ToolbarItem(placement: .confirmationAction) {
                     Button("閉じる") { dismiss() }
-                        .foregroundStyle(.cyan)
+                        .foregroundStyle(Color.accentColor)
                 }
             }
         }

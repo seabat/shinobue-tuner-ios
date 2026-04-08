@@ -88,7 +88,7 @@ struct CentsMeterView: View {
                             .fill(.black.opacity(0.5))
                             .frame(width: 22, height: 16)
                         Triangle()
-                            .fill(isActive ? .white : .gray.opacity(0.3))
+                            .fill(isActive ? .white : Color("InactiveMode").opacity(0.3))
                             .frame(width: 18, height: 13)
                     }
                     .shadow(color: .black.opacity(0.6), radius: 3, x: 0, y: 1)
@@ -134,7 +134,7 @@ struct Triangle: Shape {
         .frame(height: 90)
         .padding(.horizontal, 24)
         .padding(.vertical, 16)
-        .background(Color(red: 0.078, green: 0.078, blue: 0.118))
+        .background(Color("AppBackground"))
         .preferredColorScheme(.dark)
 }
 
@@ -143,7 +143,7 @@ struct Triangle: Shape {
         .frame(height: 90)
         .padding(.horizontal, 24)
         .padding(.vertical, 16)
-        .background(Color(red: 0.078, green: 0.078, blue: 0.118))
+        .background(Color("AppBackground"))
         .preferredColorScheme(.dark)
 }
 
@@ -152,7 +152,7 @@ struct Triangle: Shape {
         .frame(height: 90)
         .padding(.horizontal, 24)
         .padding(.vertical, 16)
-        .background(Color(red: 0.078, green: 0.078, blue: 0.118))
+        .background(Color("AppBackground"))
         .preferredColorScheme(.dark)
 }
 
@@ -161,7 +161,7 @@ struct Triangle: Shape {
         .frame(height: 90)
         .padding(.horizontal, 24)
         .padding(.vertical, 16)
-        .background(Color(red: 0.078, green: 0.078, blue: 0.118))
+        .background(Color("AppBackground"))
         .preferredColorScheme(.dark)
 }
 

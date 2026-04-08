@@ -32,7 +32,7 @@ struct ContentView: View {
             // ─── チューナータブ ───
             Tab("チューナー", systemImage: "tuningfork") {
                 ZStack {
-                    Color(red: 0.08, green: 0.08, blue: 0.12)
+                    Color("AppBackground")
                         .ignoresSafeArea()
 
                     if viewModel.permissionGranted {
@@ -85,6 +85,9 @@ struct ContentView: View {
 
 private final class PreviewUseCase: MonitorPitchUseCaseProtocol {
     var pitchPublisher: AnyPublisher<Float, Never> {
+        Empty().eraseToAnyPublisher()
+    }
+    var spectrumPublisher: AnyPublisher<(pitch: Float, magnitudes: [Float], binWidth: Float), Never> {
         Empty().eraseToAnyPublisher()
     }
     func start() {}
