@@ -1,0 +1,872 @@
+{
+  "sourceLanguage" : "ja",
+  "strings" : {
+    "asset.tunerHelp.soloMode" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "SoloModeHelpEN" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "SoloModeHelp" } }
+      }
+    },
+    "asset.tunerHelp.ensembleMode" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "EnsembleModeHelpEN" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "EnsembleModeHelp" } }
+      }
+    },
+    "asset.tunerHelp.recordMode" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "RecordModeHelpEN" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "RecordModeHelp" } }
+      }
+    },
+    "url.tuningExplainer" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "https://www.saitomusic.com/blog/answering-common-hon-choshi-questions" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "https://note.com/fuefukitake4/n/n4f7440595e80" } }
+      }
+    },
+    "レ" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Re" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "レ" } }
+      }
+    },
+    "レ♯" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Re♯" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "レ♯" } }
+      }
+    },
+    "ミ" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Mi" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "ミ" } }
+      }
+    },
+    "ファ" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Fa" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "ファ" } }
+      }
+    },
+    "ファ♯" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Fa♯" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "ファ♯" } }
+      }
+    },
+    "ソ" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Sol" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "ソ" } }
+      }
+    },
+    "ソ♯" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Sol♯" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "ソ♯" } }
+      }
+    },
+    "ラ" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "La" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "ラ" } }
+      }
+    },
+    "ラ♯" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "La♯" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "ラ♯" } }
+      }
+    },
+    "シ" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Ti" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "シ" } }
+      }
+    },
+    "ド" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Do" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "ド" } }
+      }
+    },
+    "ド♯" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Do♯" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "ド♯" } }
+      }
+    },
+
+    "筒音" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Open" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "筒音" } }
+      }
+    },
+    "一" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "1" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "一" } }
+      }
+    },
+    "一（半）" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "1½" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "一（半）" } }
+      }
+    },
+    "二" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "2" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "二" } }
+      }
+    },
+    "二（半）" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "2½" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "二（半）" } }
+      }
+    },
+    "三" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "3" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "三" } }
+      }
+    },
+    "四" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "4" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "四" } }
+      }
+    },
+    "四（半）" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "4½" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "四（半）" } }
+      }
+    },
+    "五" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "5" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "五" } }
+      }
+    },
+    "五（半）" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "5½" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "五（半）" } }
+      }
+    },
+    "六" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "6" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "六" } }
+      }
+    },
+    "六（半）" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "6½" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "六（半）" } }
+      }
+    },
+    "七" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "7" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "七" } }
+      }
+    },
+    "１" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "K1" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "１" } }
+      }
+    },
+    "１（半）" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "K1½" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "１（半）" } }
+      }
+    },
+    "２" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "K2" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "２" } }
+      }
+    },
+    "２（半）" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "K2½" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "２（半）" } }
+      }
+    },
+    "３" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "K3" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "３" } }
+      }
+    },
+    "４" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "K4" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "４" } }
+      }
+    },
+    "４（半）" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "K4½" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "４（半）" } }
+      }
+    },
+    "５" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "K5" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "５" } }
+      }
+    },
+    "５（半）" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "K5½" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "５（半）" } }
+      }
+    },
+    "６" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "K6" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "６" } }
+      }
+    },
+    "６（半）" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "K6½" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "６（半）" } }
+      }
+    },
+    "７" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "K7" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "７" } }
+      }
+    },
+    "1'" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "K1'" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "1'" } }
+      }
+    },
+    "1'（半）" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "K1'½" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "1'（半）" } }
+      }
+    },
+    "2'" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "K2'" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "2'" } }
+      }
+    },
+    "2'（半）" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "K2'½" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "2'（半）" } }
+      }
+    },
+    "3'" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "K3'" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "3'" } }
+      }
+    },
+    "4'" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "K4'" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "4'" } }
+      }
+    },
+
+    "作成日時（新しい順）" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Date Created (Newest First)" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "作成日時（新しい順）" } }
+      }
+    },
+    "作成日時（古い順）" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Date Created (Oldest First)" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "作成日時（古い順）" } }
+      }
+    },
+    "ファイル名（Z → A）" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "File Name (Z → A)" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "ファイル名（Z → A）" } }
+      }
+    },
+    "ファイル名（A → Z）" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "File Name (A → Z)" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "ファイル名（A → Z）" } }
+      }
+    },
+
+    "tuning.displayName.format" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "No. %d" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "%d本調子" } }
+      }
+    },
+
+    "計測(単)" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Solo" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "計測(単)" } }
+      }
+    },
+    "計測(複)" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Ensemble" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "計測(複)" } }
+      }
+    },
+    "録音" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Recording" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "録音" } }
+      }
+    },
+
+    "playback.error.delete.format" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Failed to delete: %@" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "削除に失敗しました: %@" } }
+      }
+    },
+    "playback.error.rename.format" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Failed to rename: %@" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "名前の変更に失敗しました: %@" } }
+      }
+    },
+    "playback.error.play.format" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Failed to play: %@" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "再生に失敗しました: %@" } }
+      }
+    },
+    "playback.error.trim.format" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Failed to trim silence: %@" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "頭出しに失敗しました: %@" } }
+      }
+    },
+    "playback.error.import.format" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Failed to import file: %@" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "ファイルのインポートに失敗しました: %@" } }
+      }
+    },
+
+    "チューナー" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Tuner" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "チューナー" } }
+      }
+    },
+    "プレイリスト" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Playlist" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "プレイリスト" } }
+      }
+    },
+    "周波数表" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Frequency Table" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "周波数表" } }
+      }
+    },
+    "六本調子 周波数表" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "No. 6 Frequency Table" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "六本調子 周波数表" } }
+      }
+    },
+
+    "ピッチグラフ（5秒間）" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Pitch Graph (5 sec)" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "ピッチグラフ（5秒間）" } }
+      }
+    },
+
+    "マイクのアクセスが必要です" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Microphone Access Required" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "マイクのアクセスが必要です" } }
+      }
+    },
+    "篠笛の音をリアルタイムで計測するため、\nマイクへのアクセスを許可してください。" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Please allow microphone access\nto measure the shinobue's pitch in real time." } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "篠笛の音をリアルタイムで計測するため、\nマイクへのアクセスを許可してください。" } }
+      }
+    },
+    "マイクの使用を許可" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Allow Microphone Access" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "マイクの使用を許可" } }
+      }
+    },
+
+    "いいね！" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Nice!" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "いいね！" } }
+      }
+    },
+
+    "自動停止" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Auto-Stop" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "自動停止" } }
+      }
+    },
+    "30秒間音が検出されなかったため、録音を自動的に停止しました。" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "No sound was detected for 30 seconds, so recording was stopped automatically." } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "30秒間音が検出されなかったため、録音を自動的に停止しました。" } }
+      }
+    },
+    "30秒間音が検出されなかったため、計測を自動的に停止しました。" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "No sound was detected for 30 seconds, so measurement was stopped automatically." } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "30秒間音が検出されなかったため、計測を自動的に停止しました。" } }
+      }
+    },
+
+    "録音開始" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Start Recording" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "録音開始" } }
+      }
+    },
+    "計測開始" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Start Measuring" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "計測開始" } }
+      }
+    },
+    "録音停止" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Stop Recording" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "録音停止" } }
+      }
+    },
+    "計測停止" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Stop Measuring" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "計測停止" } }
+      }
+    },
+
+    "音を鳴らしてください" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Play a note" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "音を鳴らしてください" } }
+      }
+    },
+
+    "はい！" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Go!" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "はい！" } }
+      }
+    },
+    "決めた音をみんなで一緒に吹いてください。\n音が揃ったら成功です！" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Everyone play the agreed note together.\nYou succeed once the pitches align!" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "決めた音をみんなで一緒に吹いてください。\n音が揃ったら成功です！" } }
+      }
+    },
+
+    "使い方" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "How to Use" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "使い方" } }
+      }
+    },
+    "計測(単) — ソロチューニング" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Solo Mode — Solo Tuning" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "計測(単) — ソロチューニング" } }
+      }
+    },
+    "「計測(単)」モードを選択し、計測開始ボタンを押してください。篠笛を吹くと、音名とセントが表示されます。メーターが中央（0セント）に近づくようにチューニングしてください。" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Select \"Solo\" mode and tap Start Measuring. Play the shinobue, and the note name and cents will be displayed. Tune until the meter is centered (0 cents)." } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "「計測(単)」モードを選択し、計測開始ボタンを押してください。篠笛を吹くと、音名とセントが表示されます。メーターが中央（0セント）に近づくようにチューニングしてください。" } }
+      }
+    },
+    "計測(複) — アンサンブルチューニング" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Ensemble Mode — Ensemble Tuning" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "計測(複) — アンサンブルチューニング" } }
+      }
+    },
+    "「計測(複)」モードを選択し、計測開始ボタンを押してください。カウントダウン後に計測が始まります。複数人が同じ音を吹いたとき、ピッチのまとまりを検出して合奏チューニングを判定します。" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Select \"Ensemble\" mode and tap Start Measuring. Measurement begins after a countdown. When multiple players play the same note, the app detects pitch alignment and judges ensemble tuning." } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "「計測(複)」モードを選択し、計測開始ボタンを押してください。カウントダウン後に計測が始まります。複数人が同じ音を吹いたとき、ピッチのまとまりを検出して合奏チューニングを判定します。" } }
+      }
+    },
+    "この機能は改善中です。判定結果はご参考までにお使いください。" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "This feature is still being improved. Please treat the results as a reference only." } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "この機能は改善中です。判定結果はご参考までにお使いください。" } }
+      }
+    },
+    "「録音」モードを選択し、録音開始ボタンを押してください。演奏を m4a ファイルとして保存します。録音が完了するとプレイリストに自動追加されます。" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Select \"Recording\" mode and tap Start Recording. Your performance is saved as an m4a file. Completed recordings are automatically added to the playlist." } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "「録音」モードを選択し、録音開始ボタンを押してください。演奏を m4a ファイルとして保存します。録音が完了するとプレイリストに自動追加されます。" } }
+      }
+    },
+
+    "呂音＝一〜七　甲音＝１〜７　大甲音＝1'〜4'　（半）＝半開孔" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "1–7 = low register · K1–K7 = high register · K1'–K4' = highest register · ½ = half-hole" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "呂音＝一〜七　甲音＝１〜７　大甲音＝1'〜4'　（半）＝半開孔" } }
+      }
+    },
+    "運指" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Fingering" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "運指" } }
+      }
+    },
+    "日本" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Solfège" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "日本" } }
+      }
+    },
+    "西洋" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Western" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "西洋" } }
+      }
+    },
+
+    "並び替え" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Sort Order" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "並び替え" } }
+      }
+    },
+    "しきい値" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Threshold" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "しきい値" } }
+      }
+    },
+    "0.001\n(敏感)" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "0.001\n(Sensitive)" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "0.001\n(敏感)" } }
+      }
+    },
+    "0.020\n(鈍感)" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "0.020\n(Insensitive)" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "0.020\n(鈍感)" } }
+      }
+    },
+    "頭出し" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Trim Leading Silence" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "頭出し" } }
+      }
+    },
+    "値が小さいほど微かな音も「有音」と判定します。デフォルト: 0.003" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Lower values make the detector treat even faint sounds as \"sound present.\" Default: 0.003" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "値が小さいほど微かな音も「有音」と判定します。デフォルト: 0.003" } }
+      }
+    },
+    "デフォルトに戻す" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Reset to Default" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "デフォルトに戻す" } }
+      }
+    },
+    "音声ファイル設定" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Audio File Settings" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "音声ファイル設定" } }
+      }
+    },
+    "閉じる" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Close" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "閉じる" } }
+      }
+    },
+
+    "音声ファイルがありません" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "No Audio Files" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "音声ファイルがありません" } }
+      }
+    },
+    "チューナー画面で録音してください" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Record from the Tuner screen" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "チューナー画面で録音してください" } }
+      }
+    },
+    "削除" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Delete" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "削除" } }
+      }
+    },
+    "名前変更" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Rename" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "名前変更" } }
+      }
+    },
+    "共有" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Share" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "共有" } }
+      }
+    },
+    "削除の確認" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Confirm Deletion" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "削除の確認" } }
+      }
+    },
+    "キャンセル" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Cancel" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "キャンセル" } }
+      }
+    },
+    "playback.delete.confirm.format" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Delete \"%@\"?\nThis action cannot be undone." } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "「%@」を削除しますか？\nこの操作は元に戻せません。" } }
+      }
+    },
+    "名前を変更" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Rename" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "名前を変更" } }
+      }
+    },
+    "ファイル名" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "File Name" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "ファイル名" } }
+      }
+    },
+    "変更" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Rename" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "変更" } }
+      }
+    },
+    "拡張子（.m4a）は自動で付加されます" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "The .m4a extension is added automatically" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "拡張子（.m4a）は自動で付加されます" } }
+      }
+    },
+    "エラー" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Error" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "エラー" } }
+      }
+    },
+
+    "調子" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Key" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "調子" } }
+      }
+    },
+    "現在は六本調子のみ対応しています。" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Currently only No. 6 is supported." } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "現在は六本調子のみ対応しています。" } }
+      }
+    },
+    "未対応の調子" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Unsupported Key" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "未対応の調子" } }
+      }
+    },
+    "この調子は近日対応予定です。" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "This key will be supported soon." } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "この調子は近日対応予定です。" } }
+      }
+    },
+    "ピッチグラフを表示" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Show Pitch Graph" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "ピッチグラフを表示" } }
+      }
+    },
+    "表示設定" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Display Settings" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "表示設定" } }
+      }
+    },
+    "セント範囲" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Cent Range" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "セント範囲" } }
+      }
+    },
+    "tuner.settings.centRange.value.format" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "±%d cents" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "±%d セント" } }
+      }
+    },
+    "成功とみなすセント範囲" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Cent Range for Success" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "成功とみなすセント範囲" } }
+      }
+    },
+    "tuner.settings.centRange.description.format" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "A pitch within ±%d cents of the reference note counts as a successful tuning. Recommended: ±10 cents for solo / ±15 cents for ensemble." } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "ピッチが基準音から ±%d セント以内を「チューニング成功」とみなします。推奨: ソロ ±10セント / アンサンブル ±15セント" } }
+      }
+    },
+    "継続時間" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Duration" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "継続時間" } }
+      }
+    },
+    "tuner.settings.duration.value.format" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "%.1f sec" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "%.1f 秒" } }
+      }
+    },
+    "0.5秒" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "0.5 sec" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "0.5秒" } }
+      }
+    },
+    "5.0秒" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "5.0 sec" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "5.0秒" } }
+      }
+    },
+    "成功とみなす継続時間" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Duration for Success" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "成功とみなす継続時間" } }
+      }
+    },
+    "tuner.settings.duration.description.format" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "A pitch within the cent range sustained for %@ seconds counts as a successful tuning. Recommended: 1.0 sec for solo / 0.5 sec for ensemble." } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "セント範囲内のピッチが %@ 秒間続いた場合に「チューニング成功」とみなします。推奨: ソロ 1.0秒 / アンサンブル 0.5秒" } }
+      }
+    },
+    "スペクトル幅の閾値" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Spectral Width Threshold" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "スペクトル幅の閾値" } }
+      }
+    },
+    "tuner.settings.ensemble.spectralWidth.value.format" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "%.1f bins" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "%.1f ビン" } }
+      }
+    },
+    "安定性スコアの閾値" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Stability Score Threshold" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "安定性スコアの閾値" } }
+      }
+    },
+    "tuner.settings.ensemble.stabilityScore.value.format" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "%.0f cents" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "%.0f セント" } }
+      }
+    },
+    "アンサンブル 調整オプション（非推奨）" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Ensemble Tuning Options (Not Recommended)" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "アンサンブル 調整オプション（非推奨）" } }
+      }
+    },
+    "実機テスト中の値です。変更すると判定が正常に動作しない場合があります。最適値が決まり次第この設定は削除されます。" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "These values are still being tested on real devices. Changing them may cause detection to behave incorrectly. This setting will be removed once the optimal values are determined." } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "実機テスト中の値です。変更すると判定が正常に動作しない場合があります。最適値が決まり次第この設定は削除されます。" } }
+      }
+    },
+    "チューニング設定" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Tuning Settings" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "チューニング設定" } }
+      }
+    },
+
+    "cents.meter.value.format" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "%+.1f cents" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "%+.1f セント" } }
+      }
+    },
+
+    "[頭出し]" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "[Trimmed]" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "[頭出し]" } }
+      }
+    },
+    "エクスポートセッションの作成に失敗しました" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Failed to create the export session" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "エクスポートセッションの作成に失敗しました" } }
+      }
+    }
+  },
+  "version" : "1.0"
+}

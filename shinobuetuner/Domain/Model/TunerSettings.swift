@@ -24,7 +24,10 @@ enum ShinobueTuning: Int, CaseIterable, Identifiable {
 
     var id: Int { rawValue }
 
-    var displayName: String { "\(rawValue)本調子" }
+    var displayName: String {
+        let format = String(localized: "tuning.displayName.format", defaultValue: "%d本調子")
+        return String(format: format, rawValue)
+    }
 
     /// 筒音（シ）の基準周波数（Hz）。六本調子 = 442Hz
     /// ※ 他の調子は未対応（将来実装予定）

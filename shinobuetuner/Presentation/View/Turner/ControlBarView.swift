@@ -15,12 +15,15 @@ struct ControlBarView: View {
     @Binding var showEnsembleCountdown: Bool
 
     var body: some View {
-        ZStack {
-            // 計測/停止ボタン（中央固定）
+        // 計測/停止ボタンとモード切替を同じ行に並べる（ZStackでの重ね配置だと
+        // ローカライズでラベル文字数が増えた際にモード切替と衝突するため、
+        // HStack + maxWidth: .infinity でボタン側に余白を吸収させる）
+        HStack(spacing: 12) {
             TunerModeButton(
                 isRunning: viewModel.isRunning,
                 accentColor: modeColor(for: selectedMode),
-                startIcon: icon(for: selectedMode)
+                startIcon: icon(for: selectedMode),
+                isRecording: selectedMode == .recording
             ) {
                 switch selectedMode {
                 case .soloMonitoring:
@@ -36,14 +39,11 @@ struct ControlBarView: View {
                 }
             }
 
-            // モード切替（右端）
-            HStack {
-                Spacer()
-                ModeSwitcher(selectedMode: $selectedMode)
-                    .disabled(viewModel.isRunning)
-                    .padding(.trailing, 20)
-            }
+            ModeSwitcher(selectedMode: $selectedMode)
+                .disabled(viewModel.isRunning)
         }
+        .padding(.leading, 20)
+        .padding(.trailing, 20)
         .padding(.top, 8)
         .padding(.bottom, 24)
     }
@@ -80,7 +80,7 @@ private struct ModeSwitcher: View {
                     HStack(spacing: 4) {
                         Image(systemName: icon(for: mode))
                             .font(.system(size: 12))
-                        Text(mode.rawValue)
+                        Text(mode.displayName)
                             .font(.system(size: 11, weight: .medium))
                     }
                     .foregroundStyle(selectedMode == mode

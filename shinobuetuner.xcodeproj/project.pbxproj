@@ -187,9 +187,10 @@
 				};
 			};
 			buildConfigurationList = 11FD78182F4F1CB500B48424 /* Build configuration list for PBXProject "shinobuetuner" */;
-			developmentRegion = en;
+			developmentRegion = ja;
 			hasScannedForEncodings = 0;
 			knownRegions = (
+				ja,
 				en,
 				Base,
 			);
