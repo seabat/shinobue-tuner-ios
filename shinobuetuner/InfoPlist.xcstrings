@@ -18,6 +18,18 @@
         }
       }
     },
+    "CFBundleName" : {
+      "comment" : "Bundle name",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "shinobuetuner"
+          }
+        }
+      }
+    },
     "CFBundleTypeName" : {
       "extractionState" : "manual",
       "localizations" : {
