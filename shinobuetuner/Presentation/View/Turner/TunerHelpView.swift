@@ -17,21 +17,21 @@ struct TunerHelpView: View {
 
             TabView {
                 HelpPage(
-                    imageName: String(localized: "asset.tunerHelp.soloMode", defaultValue: "SoloModeHelp"),
+                    imageName: "SoloModeHelp",
                     modeColor: Color("SoloMonitoring"),
                     title: "計測(単) — ソロチューニング",
                     description: "「計測(単)」モードを選択し、計測開始ボタンを押してください。篠笛を吹くと、音名とセントが表示されます。メーターが中央（0セント）に近づくようにチューニングしてください。",
                     alphaNotice: nil
                 )
                 HelpPage(
-                    imageName: String(localized: "asset.tunerHelp.ensembleMode", defaultValue: "EnsembleModeHelp"),
+                    imageName: "EnsembleModeHelp",
                     modeColor: Color("EnsembleMonitoring"),
                     title: "計測(複) — アンサンブルチューニング",
                     description: "「計測(複)」モードを選択し、計測開始ボタンを押してください。カウントダウン後に計測が始まります。複数人が同じ音を吹いたとき、ピッチのまとまりを検出して合奏チューニングを判定します。",
                     alphaNotice: "この機能は改善中です。判定結果はご参考までにお使いください。"
                 )
                 HelpPage(
-                    imageName: String(localized: "asset.tunerHelp.recordMode", defaultValue: "RecordModeHelp"),
+                    imageName: "RecordModeHelp",
                     modeColor: Color("Recording"),
                     title: "録音",
                     description: "「録音」モードを選択し、録音開始ボタンを押してください。演奏を m4a ファイルとして保存します。録音が完了するとプレイリストに自動追加されます。",
@@ -53,9 +53,9 @@ struct TunerHelpView: View {
 private struct HelpPage: View {
     let imageName: String
     let modeColor: Color
-    let title: LocalizedStringResource
-    let description: LocalizedStringResource
-    let alphaNotice: LocalizedStringResource?
+    let title: String
+    let description: String
+    let alphaNotice: String?
 
     var body: some View {
         VStack(spacing: 12) {

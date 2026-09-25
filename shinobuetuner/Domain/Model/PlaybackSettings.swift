@@ -15,10 +15,10 @@ enum PlaybackSortOrder: String, CaseIterable {
 
     var displayName: String {
         switch self {
-        case .createdAtDescending: return String(localized: "作成日時（新しい順）")
-        case .createdAtAscending:  return String(localized: "作成日時（古い順）")
-        case .fileNameDescending:  return String(localized: "ファイル名（Z → A）")
-        case .fileNameAscending:   return String(localized: "ファイル名（A → Z）")
+        case .createdAtDescending: return "作成日時（新しい順）"
+        case .createdAtAscending:  return "作成日時（古い順）"
+        case .fileNameDescending:  return "ファイル名（Z → A）"
+        case .fileNameAscending:   return "ファイル名（A → Z）"
         }
     }
 }

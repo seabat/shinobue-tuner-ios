@@ -51,67 +51,57 @@ struct FrequencyTableScreen: View {
             Color(red: 0.08, green: 0.08, blue: 0.12)
                 .ignoresSafeArea()
 
-            VStack(spacing: 0) {
-                // ─── 運指表記の凡例 ───
-                Text("呂音＝一〜七　甲音＝１〜７　大甲音＝1'〜4'　（半）＝半開孔")
-                    .font(.caption2)
-                    .foregroundStyle(.white.opacity(0.5))
-                    .frame(maxWidth: .infinity, alignment: .leading)
+            ScrollView {
+                LazyVStack(spacing: 0) {
+                    // ─── ヘッダー行 ───
+                    HStack(spacing: 0) {
+                        Text("運指").headerStyle()
+                        Text("日本").headerStyle()
+                        Text("西洋").headerStyle()
+                        Text("Hz").headerStyle(alignment: .trailing)
+                    }
+                    .frame(height: 32)
                     .padding(.horizontal, 16)
-                    .padding(.vertical, 6)
+                    .background(Color(red: 0.12, green: 0.12, blue: 0.18))
 
-                ScrollView {
-                    LazyVStack(spacing: 0) {
-                        // ─── ヘッダー行 ───
+                    // ─── データ行 ───
+                    ForEach(rows) { row in
                         HStack(spacing: 0) {
-                            Text("運指").headerStyle()
-                            Text("日本").headerStyle()
-                            Text("西洋").headerStyle()
-                            Text("Hz").headerStyle(alignment: .trailing)
+                            // 運指名
+                            Text(row.fingeringName)
+                                .font(.system(.subheadline, design: .rounded))
+                                .foregroundStyle(row.isHighlighted ? Color.cyan : .white)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+
+                            // 日本音階名
+                            Text(row.japaneseName)
+                                .font(.system(.subheadline, design: .rounded))
+                                .foregroundStyle(row.isHighlighted ? Color.cyan : .white.opacity(0.85))
+                                .frame(maxWidth: .infinity, alignment: .leading)
+
+                            // 西洋音階名
+                            Text(row.westernName)
+                                .font(.system(.subheadline, design: .monospaced))
+                                .foregroundStyle(row.isHighlighted ? Color.cyan : .white.opacity(0.85))
+                                .frame(maxWidth: .infinity, alignment: .leading)
+
+                            // 周波数
+                            Text(String(format: "%.3f", row.frequency))
+                                .font(.system(.subheadline, design: .monospaced))
+                                .foregroundStyle(row.isHighlighted ? Color.cyan : .white.opacity(0.7))
+                                .frame(maxWidth: .infinity, alignment: .trailing)
                         }
-                        .frame(height: 32)
+                        .frame(height: 30)
                         .padding(.horizontal, 16)
-                        .background(Color(red: 0.12, green: 0.12, blue: 0.18))
-
-                        // ─── データ行 ───
-                        ForEach(rows) { row in
-                            HStack(spacing: 0) {
-                                // 運指名
-                                Text(row.fingeringName)
-                                    .font(.system(.subheadline, design: .rounded))
-                                    .foregroundStyle(row.isHighlighted ? Color.cyan : .white)
-                                    .frame(maxWidth: .infinity, alignment: .leading)
-
-                                // 日本音階名
-                                Text(row.japaneseName)
-                                    .font(.system(.subheadline, design: .rounded))
-                                    .foregroundStyle(row.isHighlighted ? Color.cyan : .white.opacity(0.85))
-                                    .frame(maxWidth: .infinity, alignment: .leading)
-
-                                // 西洋音階名
-                                Text(row.westernName)
-                                    .font(.system(.subheadline, design: .monospaced))
-                                    .foregroundStyle(row.isHighlighted ? Color.cyan : .white.opacity(0.85))
-                                    .frame(maxWidth: .infinity, alignment: .leading)
-
-                                // 周波数
-                                Text(String(format: "%.3f", row.frequency))
-                                    .font(.system(.subheadline, design: .monospaced))
-                                    .foregroundStyle(row.isHighlighted ? Color.cyan : .white.opacity(0.7))
-                                    .frame(maxWidth: .infinity, alignment: .trailing)
-                            }
-                            .frame(height: 30)
-                            .padding(.horizontal, 16)
-                            .background(
-                                row.isHighlighted
-                                    ? Color(red: 0.05, green: 0.15, blue: 0.2)
-                                    : Color(red: 0.08, green: 0.08, blue: 0.12)
-                            )
-                        }
+                        .background(
+                            row.isHighlighted
+                                ? Color(red: 0.05, green: 0.15, blue: 0.2)
+                                : Color(red: 0.08, green: 0.08, blue: 0.12)
+                        )
                     }
                 }
-                .background(Color(red: 0.08, green: 0.08, blue: 0.12))
             }
+            .background(Color(red: 0.08, green: 0.08, blue: 0.12))
         }
     }
 }
@@ -120,13 +110,13 @@ struct FrequencyTableScreen: View {
 
 private struct FrequencyRow: Identifiable {
     let id = UUID()
-    let fingeringName: LocalizedStringResource
-    let japaneseName: LocalizedStringResource
+    let fingeringName: String
+    let japaneseName: String
     let frequency: Double
     let westernName: String
     let isHighlighted: Bool
 
-    init(_ fingeringName: LocalizedStringResource, _ japaneseName: LocalizedStringResource, _ frequency: Double, _ westernName: String, isHighlighted: Bool = false) {
+    init(_ fingeringName: String, _ japaneseName: String, _ frequency: Double, _ westernName: String, isHighlighted: Bool = false) {
         self.fingeringName = fingeringName
         self.japaneseName = japaneseName
         self.frequency = frequency

@@ -14,7 +14,7 @@ struct EnsembleCountdownFullScreenModal: View {
     @Environment(\.dismiss) private var dismiss
 
     private struct CountStep {
-        let label: LocalizedStringResource
+        let label: String
         let color: Color
         let fontSize: CGFloat
     }

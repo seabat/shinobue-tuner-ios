@@ -14,14 +14,6 @@ enum TunerMode: String, CaseIterable {
     case soloMonitoring     = "計測(単)"
     case ensembleMonitoring = "計測(複)"
     case recording          = "録音"
-
-    var displayName: LocalizedStringResource {
-        switch self {
-        case .soloMonitoring:     return "計測(単)"
-        case .ensembleMonitoring: return "計測(複)"
-        case .recording:          return "録音"
-        }
-    }
 }
 
 /// チューナー画面の状態を管理するViewModel

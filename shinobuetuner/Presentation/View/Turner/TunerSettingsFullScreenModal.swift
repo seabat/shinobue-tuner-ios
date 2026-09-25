@@ -33,14 +33,8 @@ struct TunerSettingsFullScreenModal: View {
                             }
                         }
                     } header: {
-                        Link(destination: tuningExplainerURL) {
-                            HStack(spacing: 4) {
-                                Text("調子")
-                                Image(systemName: "info.circle")
-                                    .font(.caption2)
-                            }
-                        }
-                        .foregroundStyle(Color("AssistantText"))
+                        Text("調子")
+                            .foregroundStyle(Color("AssistantText"))
                     } footer: {
                         Text("現在は六本調子のみ対応しています。")
                             .foregroundStyle(Color("AssistantText").opacity(0.7))
@@ -68,7 +62,7 @@ struct TunerSettingsFullScreenModal: View {
                                 Text("セント範囲")
                                     .foregroundStyle(.white)
                                 Spacer()
-                                Text(String(format: String(localized: "tuner.settings.centRange.value.format", defaultValue: "±%d セント"), Int(viewModel.settings.centThreshold)))
+                                Text("±\(Int(viewModel.settings.centThreshold)) セント")
                                     .foregroundStyle(Color.accentColor)
                                     .fontWeight(.semibold)
                             }
@@ -93,7 +87,7 @@ struct TunerSettingsFullScreenModal: View {
                         Text("成功とみなすセント範囲")
                             .foregroundStyle(Color("AssistantText"))
                     } footer: {
-                        Text(String(format: String(localized: "tuner.settings.centRange.description.format", defaultValue: "ピッチが基準音から ±%d セント以内を「チューニング成功」とみなします。推奨: ソロ ±10セント / アンサンブル ±15セント"), Int(viewModel.settings.centThreshold)))
+                        Text("ピッチが基準音から ±\(Int(viewModel.settings.centThreshold)) セント以内を「チューニング成功」とみなします。推奨: ソロ ±10セント / アンサンブル ±15セント")
                             .foregroundStyle(Color("AssistantText").opacity(0.7))
                     }
 
@@ -103,7 +97,7 @@ struct TunerSettingsFullScreenModal: View {
                                 Text("継続時間")
                                     .foregroundStyle(.white)
                                 Spacer()
-                                Text(String(format: String(localized: "tuner.settings.duration.value.format", defaultValue: "%.1f 秒"), viewModel.settings.durationSeconds))
+                                Text(String(format: "%.1f 秒", viewModel.settings.durationSeconds))
                                     .foregroundStyle(Color.accentColor)
                                     .fontWeight(.semibold)
                             }
@@ -128,7 +122,7 @@ struct TunerSettingsFullScreenModal: View {
                         Text("成功とみなす継続時間")
                             .foregroundStyle(Color("AssistantText"))
                     } footer: {
-                        Text(String(format: String(localized: "tuner.settings.duration.description.format", defaultValue: "セント範囲内のピッチが %@ 秒間続いた場合に「チューニング成功」とみなします。推奨: ソロ 1.0秒 / アンサンブル 0.5秒"), String(format: "%.1f", viewModel.settings.durationSeconds)))
+                        Text("セント範囲内のピッチが \(String(format: "%.1f", viewModel.settings.durationSeconds)) 秒間続いた場合に「チューニング成功」とみなします。推奨: ソロ 1.0秒 / アンサンブル 0.5秒")
                             .foregroundStyle(Color("AssistantText").opacity(0.7))
                     }
 
@@ -138,7 +132,7 @@ struct TunerSettingsFullScreenModal: View {
                                 Text("スペクトル幅の閾値")
                                     .foregroundStyle(.white)
                                 Spacer()
-                                Text(String(format: String(localized: "tuner.settings.ensemble.spectralWidth.value.format", defaultValue: "%.1f ビン"), viewModel.settings.ensembleSpectralWidthThreshold))
+                                Text(String(format: "%.1f ビン", viewModel.settings.ensembleSpectralWidthThreshold))
                                     .foregroundStyle(.green)
                                     .fontWeight(.semibold)
                             }
@@ -165,7 +159,7 @@ struct TunerSettingsFullScreenModal: View {
                                 Text("安定性スコアの閾値")
                                     .foregroundStyle(.white)
                                 Spacer()
-                                Text(String(format: String(localized: "tuner.settings.ensemble.stabilityScore.value.format", defaultValue: "%.0f セント"), viewModel.settings.ensembleStabilityScoreThreshold))
+                                Text(String(format: "%.0f セント", viewModel.settings.ensembleStabilityScoreThreshold))
                                     .foregroundStyle(.green)
                                     .fontWeight(.semibold)
                             }
@@ -212,11 +206,6 @@ struct TunerSettingsFullScreenModal: View {
                 }
             }
         }
-    }
-
-    /// 「調子」の意味を解説する外部サイトのURL（ロケールに応じて日本語/英語のサイトを切り替える）
-    private var tuningExplainerURL: URL {
-        URL(string: String(localized: "url.tuningExplainer", defaultValue: "https://note.com/fuefukitake4/n/n4f7440595e80"))!
     }
 }
 
