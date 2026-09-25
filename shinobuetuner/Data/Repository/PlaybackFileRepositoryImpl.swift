@@ -148,7 +148,7 @@ final class PlaybackFileRepositoryImpl: PlaybackFileRepository {
         // 保存先: "[頭出し]元のファイル名.m4a"（非破壊・出力フォーマットに合わせて拡張子を m4a に統一）
         let baseName = url.deletingPathExtension().lastPathComponent
         let destURL = url.deletingLastPathComponent()
-            .appendingPathComponent("[頭出し]" + baseName)
+            .appendingPathComponent(String(localized: "[頭出し]") + baseName)
             .appendingPathExtension("m4a")
         if fileManager.fileExists(atPath: destURL.path) {
             try fileManager.removeItem(at: destURL)
@@ -207,7 +207,7 @@ enum TrimError: LocalizedError {
     var errorDescription: String? {
         switch self {
         case .exportSessionCreationFailed:
-            return "エクスポートセッションの作成に失敗しました"
+            return String(localized: "エクスポートセッションの作成に失敗しました")
         }
     }
 }
