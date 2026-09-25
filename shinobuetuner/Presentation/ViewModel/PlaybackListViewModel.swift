@@ -111,7 +111,7 @@ final class PlaybackListViewModel: ObservableObject {
             }
             loadPlaybackFiles()
         } catch {
-            errorMessage = String(format: String(localized: "playback.error.delete.format", defaultValue: "削除に失敗しました: %@"), error.localizedDescription)
+            errorMessage = "削除に失敗しました: \(error.localizedDescription)"
         }
     }
 
@@ -127,7 +127,7 @@ final class PlaybackListViewModel: ObservableObject {
             }
             loadPlaybackFiles()
         } catch {
-            errorMessage = String(format: String(localized: "playback.error.rename.format", defaultValue: "名前の変更に失敗しました: %@"), error.localizedDescription)
+            errorMessage = "名前の変更に失敗しました: \(error.localizedDescription)"
         }
     }
 
@@ -138,7 +138,7 @@ final class PlaybackListViewModel: ObservableObject {
             selectedPlaybackFile = playbackFile
             try playbackUseCase.play(file: playbackFile)
         } catch {
-            errorMessage = String(format: String(localized: "playback.error.play.format", defaultValue: "再生に失敗しました: %@"), error.localizedDescription)
+            errorMessage = "再生に失敗しました: \(error.localizedDescription)"
         }
     }
 
@@ -166,7 +166,7 @@ final class PlaybackListViewModel: ObservableObject {
                 try await trimUseCase(file: playbackFile)
                 loadPlaybackFiles()
             } catch {
-                errorMessage = String(format: String(localized: "playback.error.trim.format", defaultValue: "頭出しに失敗しました: %@"), error.localizedDescription)
+                errorMessage = "頭出しに失敗しました: \(error.localizedDescription)"
             }
         }
     }
@@ -182,7 +182,7 @@ final class PlaybackListViewModel: ObservableObject {
             _ = try importUseCase(from: url)
             loadPlaybackFiles()
         } catch {
-            errorMessage = String(format: String(localized: "playback.error.import.format", defaultValue: "ファイルのインポートに失敗しました: %@"), error.localizedDescription)
+            errorMessage = "ファイルのインポートに失敗しました: \(error.localizedDescription)"
         }
     }
 
