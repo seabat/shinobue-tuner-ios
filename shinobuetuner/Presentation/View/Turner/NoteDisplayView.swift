@@ -104,7 +104,7 @@ struct NoteDisplayView: View {
 
 #Preview {
     VStack(spacing: 0) {
-        // チューニング完了（±10セント以内 → 緑）: 一 = A4 = 442Hz
+        // チューニング完了（±10セント以内 → 緑）: 一（メリ） = A4 = 442Hz
         NoteDisplayView(
             noteResult: NoteHelper.closestNote(for: 442.0),
             currentPitch: 442.0

@@ -1398,6 +1398,22 @@
         }
       }
     },
+    "一（メリ）" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1 meri"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "一（メリ）"
+          }
+        }
+      }
+    },
     "七" : {
       "localizations" : {
         "en" : {
@@ -1938,6 +1954,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "筒音"
+          }
+        }
+      }
+    },
+    "筒音（半）" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open½"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "筒音（半）"
           }
         }
       }

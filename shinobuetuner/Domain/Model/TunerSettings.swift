@@ -29,7 +29,7 @@ enum ShinobueTuning: Int, CaseIterable, Identifiable {
         return String(format: format, rawValue)
     }
 
-    /// 筒音（シ）の基準周波数（Hz）。六本調子 = 442Hz
+    /// 基準音 A4（一（メリ）・シ）の周波数（Hz）。六本調子 = 442Hz
     /// ※ 他の調子は未対応（将来実装予定）
     var referenceFrequency: Double {
         switch self {

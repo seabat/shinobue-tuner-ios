@@ -43,7 +43,9 @@ struct FrequencyTableScreen: View {
         FrequencyRow("二",       "レ",     525.630, "C5"),
         FrequencyRow("一（半）", "ド♯",    496.128, "B4"),
         FrequencyRow("一",       "ド",     468.283, "Bb4"),
-        FrequencyRow("筒音",     "シ",     442.000, "A4", isHighlighted: true),
+        FrequencyRow("一（メリ）", "シ",   442.000, "A4", isHighlighted: true),
+        FrequencyRow("筒音（半）", "ラ♯",  417.192, "Ab4"),
+        FrequencyRow("筒音",     "ラ",     393.777, "G4"),
     ]
 
     var body: some View {

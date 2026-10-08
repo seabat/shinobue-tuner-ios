@@ -41,12 +41,14 @@ enum NoteHelper {
     ]
 
     /// MIDIノート番号から運指名へのマッピング（六本調子）
-    /// 呂音（低音域）: 筒音・一〜七  漢数字
+    /// 呂音（低音域）: 筒音・一（メリ）・一〜七  漢数字
     /// 甲音（高音域）: １〜７        アラビア数字（全角）
     /// 大甲（最高音域）: 1'〜4'      アラビア数字＋アポストロフィ
     /// ローカライズ: 英語ロケールでは呂音=接頭辞なし数字、甲音="K"接頭辞、大甲="K"接頭辞＋アポストロフィで表記
     static let fingeringNoteNames: [Int: String] = [
-        69: String(localized: "筒音"),        // A4  シ（起点・基準音）
+        67: String(localized: "筒音"),        // G4  ラ（最低音）
+        68: String(localized: "筒音（半）"),  // A♭4 ラ♯
+        69: String(localized: "一（メリ）"),  // A4  シ（基準音）
         70: String(localized: "一"),          // B♭4 ド
         71: String(localized: "一（半）"),    // B4  ド♯
         72: String(localized: "二"),          // C5  レ
