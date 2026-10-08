@@ -15,12 +15,15 @@ struct ControlBarView: View {
     @Binding var showEnsembleCountdown: Bool
 
     var body: some View {
-        ZStack {
-            // 計測/停止ボタン（中央固定）
+        // 計測/停止ボタンとモード切替を同じ行に並べる（ZStackでの重ね配置だと
+        // ローカライズでラベル文字数が増えた際にモード切替と衝突するため、
+        // HStack + maxWidth: .infinity でボタン側に余白を吸収させる）
+        HStack(spacing: 12) {
             TunerModeButton(
                 isRunning: viewModel.isRunning,
                 accentColor: modeColor(for: selectedMode),
-                startIcon: icon(for: selectedMode)
+                startIcon: icon(for: selectedMode),
+                isRecording: selectedMode == .recording
             ) {
                 switch selectedMode {
                 case .soloMonitoring:
@@ -36,14 +39,11 @@ struct ControlBarView: View {
                 }
             }
 
-            // モード切替（右端）
-            HStack {
-                Spacer()
-                ModeSwitcher(selectedMode: $selectedMode)
-                    .disabled(viewModel.isRunning)
-                    .padding(.trailing, 20)
-            }
+            ModeSwitcher(selectedMode: $selectedMode)
+                .disabled(viewModel.isRunning)
         }
+        .padding(.leading, 20)
+        .padding(.trailing, 20)
         .padding(.top, 8)
         .padding(.bottom, 24)
     }
@@ -68,26 +68,37 @@ struct ControlBarView: View {
 // MARK: - ModeSwitcher
 
 /// 計測(単)/計測(複)/録音 モード切替コンポーネント（ボタンの右側に配置）
+/// タップすると現在のモードをポップオーバーのドラムロール（.wheel ピッカー）で切替できる
 private struct ModeSwitcher: View {
     @Binding var selectedMode: TunerMode
+    @State private var showPicker = false
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 6) {
-            ForEach(TunerMode.allCases, id: \.self) { mode in
-                Button {
-                    selectedMode = mode
-                } label: {
-                    HStack(spacing: 4) {
-                        Image(systemName: icon(for: mode))
-                            .font(.system(size: 12))
-                        Text(mode.rawValue)
-                            .font(.system(size: 11, weight: .medium))
-                    }
-                    .foregroundStyle(selectedMode == mode
-                        ? modeColor(for: mode)
-                        : Color(white: 0.4)
-                    )
+        Button {
+            showPicker = true
+        } label: {
+            HStack(spacing: 5) {
+                Image(systemName: icon(for: selectedMode))
+                    .font(.system(size: 15))
+                Text(selectedMode.displayName)
+                    .font(.system(size: 14, weight: .medium))
+                Image(systemName: "chevron.up.chevron.down")
+                    .font(.system(size: 11, weight: .semibold))
+            }
+            .foregroundStyle(modeColor(for: selectedMode))
+        }
+        .popover(isPresented: $showPicker) {
+            Picker("", selection: $selectedMode) {
+                ForEach(TunerMode.allCases, id: \.self) { mode in
+                    Text(mode.displayName).tag(mode)
                 }
+            }
+            .pickerStyle(.wheel)
+            .frame(width: 160, height: 180)
+            .presentationCompactAdaptation(.popover)
+            .onChange(of: selectedMode) { _, _ in
+                // ホイールで選択したら自動的にポップオーバーを閉じる
+                showPicker = false
             }
         }
     }

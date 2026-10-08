@@ -145,7 +145,7 @@ struct PlaybackListScreen: View {
             }
         } message: {
             if let file = deletingFile {
-                Text("「\(file.fileName.replacingOccurrences(of: ".m4a", with: ""))」を削除しますか？\nこの操作は元に戻せません。")
+                Text(String(format: String(localized: "playback.delete.confirm.format", defaultValue: "「%@」を削除しますか？\nこの操作は元に戻せません。"), file.fileName.replacingOccurrences(of: ".m4a", with: "")))
             }
         }
         // リネームアラート

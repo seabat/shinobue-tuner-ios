@@ -59,7 +59,7 @@ struct CentsMeterView: View {
         VStack(spacing: 2) {
             // セント値(音程のズレを表す単位)テキスト（バー上方に控えめに表示）
             if isActive {
-                Text(String(format: "%+.1f セント", cents))
+                Text(String(format: String(localized: "cents.meter.value.format", defaultValue: "%+.1f セント"), cents))
                     .font(.system(size: 11, design: .monospaced))
                     .foregroundStyle(.white.opacity(0.4))
                     .frame(maxWidth: .infinity, alignment: .center)
