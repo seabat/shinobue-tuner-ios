@@ -56,9 +56,9 @@ struct TunerMainScreen: View {
 
             // ─── 開始/停止ボタン + モード切替 ───
             ControlBarView(
-                viewModel: viewModel,
+                isRunning: viewModel.isRunning,
                 selectedMode: $selectedMode,
-                showEnsembleCountdown: $showEnsembleCountdown
+                onPrimaryAction: handlePrimaryAction
             )
         }
         .overlay(alignment: .topLeading) {
@@ -128,6 +128,23 @@ struct TunerMainScreen: View {
                 ? "30秒間音が検出されなかったため、録音を自動的に停止しました。"
                 : "30秒間音が検出されなかったため、計測を自動的に停止しました。"
             )
+        }
+    }
+
+    /// 開始/停止ボタンのタップ時の処理（選択中のモードに応じて開始・停止を切り替える）
+    private func handlePrimaryAction() {
+        switch selectedMode {
+        case .soloMonitoring:
+            viewModel.isRunning ? viewModel.stopMonitoring() : viewModel.startMonitoring()
+        case .ensembleMonitoring:
+            if viewModel.isRunning {
+                viewModel.stopMonitoring()
+            } else {
+                // 計測(複)はカウントダウン後に開始する
+                showEnsembleCountdown = true
+            }
+        case .recording:
+            viewModel.isRunning ? viewModel.stopRecording() : viewModel.startRecording()
         }
     }
 }
