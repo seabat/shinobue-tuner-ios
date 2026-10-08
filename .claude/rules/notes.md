@@ -32,7 +32,7 @@ A4 = **442 Hz**（一般的な440 Hzではなく篠笛用）、12平均律。調
 ## スレッド安全性
 
 - `SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor` — 全型がデフォルト `@MainActor`
-- `detectPitch` は `nonisolated static func` でバックグラウンド実行
+- `MicrophoneDataSource.detectPitchWithSpectrum`（タップコールバックから呼ぶ本体）と `detectPitch` は `nonisolated static func` でバックグラウンド実行
 - タップコールバック → `Task { @MainActor [weak self] in subject.send(pitch) }` でメインスレッドに切り替え
 - `MicrophoneDataSource.recordingFile` は `nonisolated(unsafe) var` — タップコールバック（バックグラウンド）から直接 `AVAudioFile.write(from:)` を呼ぶ
 
@@ -47,7 +47,9 @@ A4 = **442 Hz**（一般的な440 Hzではなく篠笛用）、12平均律。調
 ## UseCase の設計方針
 
 - Fetch/Delete/Rename 系は **`callAsFunction`** パターンを採用（インスタンスを関数として呼び出せる）
-- `MonitorPitchUseCase` のみ例外 — start/stop/requestPermission/startRecording/stopRecording と複数の操作を束ねる必要があるため `callAsFunction` 非採用
+- 例外は複数の操作を束ねる UseCase で、`callAsFunction` 非採用:
+  - `MonitorPitchUseCase` — start/stop/requestPermission/startRecording/stopRecording
+  - `PlaybackUseCase` — play/pause/resume/stop/seek
 
 ## 設定系の標準アーキテクチャパターン
 
