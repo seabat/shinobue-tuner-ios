@@ -7,7 +7,19 @@
 
 ## 基準音
 
-A4 = **442 Hz**（一般的な440 Hzではなく篠笛六本調子専用）、12平均律
+A4 = **442 Hz**（一般的な440 Hzではなく篠笛用）、12平均律。調子によらず共通
+
+## 調子（六本調子・八本調子）の扱い
+
+- 運指は調子によらず共通。各調子の値は **六本調子のデータ（`NoteHelper.fingeringNoteNames` の MIDI 番号）を `ShinobueTuning.semitoneOffset`（八本調子 = +2）だけずらして** 求める。調子ごとの表を直書きしない
+- 周波数・MIDI 番号は絶対値で調子に依存しない。調子に依存するのは名称（運指名・音名・階名）だけ
+- 音名の ♯/♭ は `ShinobueTuning.westernNoteNames`（調子ごとの12音表）で決める。固定ドの階名はこの音名から作る（E♭ → ミ♭）
+- 新しい調子に対応するときは `isSupported` と `westernNoteNames` を追加し、`NoteHelperTuningTests` に比較表を足す
+- 調子・階名はチューナー／周波数表の両タブで変更できる（保存先は共通の `TunerSettings`）。両画面とも `onAppear` で `reloadSettings()` する
+
+## テスト
+
+- `NoteHelperTuningTests` は運指名・階名のローカライズ文字列を検証するため、**日本語ロケールで実行する**: `xcodebuild test -scheme shinobuetuner -destination '...' -testLanguage ja -testRegion JP`
 
 ## Xcode プロジェクト管理
 

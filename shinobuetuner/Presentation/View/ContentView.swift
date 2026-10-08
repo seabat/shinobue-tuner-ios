@@ -54,8 +54,6 @@ struct ContentView: View {
             Tab("周波数表", systemImage: "music.note.list") {
                 NavigationStack {
                     FrequencyTableScreen()
-                        .navigationTitle("六本調子 周波数表")
-                        .navigationBarTitleDisplayMode(.inline)
                 }
             }
         }

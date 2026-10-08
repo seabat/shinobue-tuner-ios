@@ -10,7 +10,6 @@ import SwiftUI
 struct TunerSettingsFullScreenModal: View {
     @StateObject private var viewModel = TunerSettingsViewModel()
     @Environment(\.dismiss) private var dismiss
-    @State private var showUnsupportedAlert = false
 
     var body: some View {
         NavigationStack {
@@ -19,37 +18,12 @@ struct TunerSettingsFullScreenModal: View {
                     .ignoresSafeArea()
 
                 Form {
-                    Section {
-                        Picker("調子", selection: $viewModel.settings.tuning) {
-                            ForEach(ShinobueTuning.allCases) { tuning in
-                                Text(tuning.displayName).tag(tuning)
-                            }
-                        }
-                        .pickerStyle(.wheel)
-                        .onChange(of: viewModel.settings.tuning) { _, newValue in
-                            if !newValue.isSupported {
-                                showUnsupportedAlert = true
-                                viewModel.settings.tuning = .rokuHon
-                            }
-                        }
-                    } header: {
-                        Link(destination: tuningExplainerURL) {
-                            HStack(spacing: 4) {
-                                Text("調子")
-                                Image(systemName: "info.circle")
-                                    .font(.caption2)
-                            }
-                        }
-                        .foregroundStyle(Color("AssistantText"))
-                    } footer: {
-                        Text("現在は六本調子のみ対応しています。")
-                            .foregroundStyle(Color("AssistantText").opacity(0.7))
-                    }
-                    .alert("未対応の調子", isPresented: $showUnsupportedAlert) {
-                        Button("OK") { }
-                    } message: {
-                        Text("この調子は近日対応予定です。")
-                    }
+                    TuningPickerSection(tuning: $viewModel.settings.tuning)
+
+                    SolfegeSystemSection(
+                        solfegeSystem: $viewModel.settings.solfegeSystem,
+                        tuning: viewModel.settings.tuning
+                    )
 
                     Section {
                         Toggle(isOn: $viewModel.settings.showPitchGraph) {
@@ -57,21 +31,9 @@ struct TunerSettingsFullScreenModal: View {
                                 .foregroundStyle(.white)
                         }
                         .tint(Color.accentColor)
-
-                        Picker(selection: $viewModel.settings.solfegeSystem) {
-                            ForEach(SolfegeSystem.allCases) { system in
-                                Text(system.displayName).tag(system)
-                            }
-                        } label: {
-                            Text("階名")
-                                .foregroundStyle(.white)
-                        }
                     } header: {
                         Text("表示設定")
                             .foregroundStyle(Color("AssistantText"))
-                    } footer: {
-                        Text("移動ド：六本調子の主音 B♭ をドとして表示します。固定ド：C をドとして表示します。")
-                            .foregroundStyle(Color("AssistantText").opacity(0.7))
                     }
 
                     Section {
@@ -224,11 +186,6 @@ struct TunerSettingsFullScreenModal: View {
                 }
             }
         }
-    }
-
-    /// 「調子」の意味を解説する外部サイトのURL（ロケールに応じて日本語/英語のサイトを切り替える）
-    private var tuningExplainerURL: URL {
-        URL(string: String(localized: "url.tuningExplainer", defaultValue: "https://note.com/fuefukitake4/n/n4f7440595e80"))!
     }
 }
 

@@ -29,6 +29,57 @@
         }
       }
     },
+    "frequencyTable.legend.movable.format" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Solfège: movable do (Do = %@)"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "階名：移動ド（ド＝%@）"
+          }
+        }
+      }
+    },
+    "frequencyTable.title.format" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ Frequency Table"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ 周波数表"
+          }
+        }
+      }
+    },
+    "settings.solfege.description.format" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Movable do: shows %2$@, the tonic of the %1$@ flute, as Do. Fixed do: shows C as Do."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "移動ド：%1$@の主音 %2$@ をドとして表示します。固定ド：C をドとして表示します。"
+          }
+        }
+      }
+    },
     "「計測(単)」モードを選択し、計測開始ボタンを押してください。篠笛を吹くと、音名とセントが表示されます。メーターが中央（0セント）に近づくようにチューニングしてください。" : {
       "localizations" : {
         "en" : {
@@ -143,6 +194,38 @@
     "1" : {
 
     },
+    "この設定はチューナーと共通です。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "These settings are shared with the tuner."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "この設定はチューナーと共通です。"
+          }
+        }
+      }
+    },
+    "周波数表の設定" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Frequency Table Settings"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "周波数表の設定"
+          }
+        }
+      }
+    },
     "固定ド" : {
       "localizations" : {
         "en" : {
@@ -159,6 +242,22 @@
         }
       }
     },
+    "現在は六本調子・八本調子に対応しています。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Currently No. 6 and No. 8 are supported."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "現在は六本調子・八本調子に対応しています。"
+          }
+        }
+      }
+    },
     "移動ド" : {
       "localizations" : {
         "en" : {
@@ -171,22 +270,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "移動ド"
-          }
-        }
-      }
-    },
-    "移動ド：六本調子の主音 B♭ をドとして表示します。固定ド：C をドとして表示します。" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Movable do: shows B♭, the tonic of the No. 6 flute, as Do. Fixed do: shows C as Do."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "移動ド：六本調子の主音 B♭ をドとして表示します。固定ド：C をドとして表示します。"
           }
         }
       }
@@ -219,22 +302,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "階名：固定ド（ド＝C）"
-          }
-        }
-      }
-    },
-    "階名：移動ド（ド＝B♭）" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Solfège: movable do (Do = B♭)"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "階名：移動ド（ド＝B♭）"
           }
         }
       }
@@ -1734,22 +1801,6 @@
         }
       }
     },
-    "六本調子 周波数表" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "No. 6 Frequency Table"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "六本調子 周波数表"
-          }
-        }
-      }
-    },
     "共有" : {
       "localizations" : {
         "en" : {
@@ -2018,22 +2069,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "決めた音をみんなで一緒に吹いてください。\n音が揃ったら成功です！"
-          }
-        }
-      }
-    },
-    "現在は六本調子のみ対応しています。" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Currently only No. 6 is supported."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "現在は六本調子のみ対応しています。"
           }
         }
       }

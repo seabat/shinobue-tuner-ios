@@ -13,9 +13,9 @@ enum ShinobueTuning: Int, CaseIterable, Identifiable {
     case sanHon  = 3   // 三本調子
     case yonHon  = 4   // 四本調子
     case goHon   = 5   // 五本調子
-    case rokuHon = 6   // 六本調子（現在対応済み）
+    case rokuHon = 6   // 六本調子（対応済み）
     case nanahon = 7   // 七本調子
-    case hachihon = 8  // 八本調子
+    case hachihon = 8  // 八本調子（対応済み）
     case kyuhon  = 9   // 九本調子
     case juppon  = 10  // 十本調子
     case juippon = 11  // 十一本調子
@@ -29,22 +29,34 @@ enum ShinobueTuning: Int, CaseIterable, Identifiable {
         return String(format: format, rawValue)
     }
 
-    /// 基準音 A4（一（メリ）・シ）の周波数（Hz）。六本調子 = 442Hz
-    /// ※ 他の調子は未対応（将来実装予定）
-    var referenceFrequency: Double {
+    /// 六本調子からの半音差（一本増えるごとに半音高くなる。八本調子 = +2）
+    /// 運指は調子によらず共通のため、六本調子のデータをこの差だけずらして各調子の値を求める
+    var semitoneOffset: Int { rawValue - ShinobueTuning.rokuHon.rawValue }
+
+    /// 主音（移動ドの「ド」・運指「一」の音）の音高クラス（C=0）。六本調子 = B♭(10)、八本調子 = C(0)
+    var tonicPitchClass: Int { ((10 + semitoneOffset) % 12 + 12) % 12 }
+
+    /// 半音ごとの音名表記（C=0 ... B=11）。♯/♭ の書き分けは調子ごとに決める
+    /// ※ 未対応の調子は六本調子の表記を仮に使う（対応時にこの表を追加する）
+    var westernNoteNames: [String] {
         switch self {
-        case .rokuHon: return 442.0
-        default:       return 442.0  // 未対応のため六本調子と同じ値を返す
+        case .hachihon:
+            return ["C", "C♯", "D", "E♭", "E", "F", "F♯", "G", "A♭", "A", "B♭", "B"]
+        default:
+            return ["C", "D♭", "D", "E♭", "E", "F", "G♭", "G", "A♭", "A", "B♭", "B"]
         }
     }
 
+    /// 主音の音名（例: 六本調子 = "B♭"、八本調子 = "C"）
+    var tonicName: String { westernNoteNames[tonicPitchClass] }
+
     /// 現在アプリが対応している調子かどうか
-    var isSupported: Bool { self == .rokuHon }
+    var isSupported: Bool { self == .rokuHon || self == .hachihon }
 }
 
 /// 階名の表示方式
 enum SolfegeSystem: Int, CaseIterable, Identifiable {
-    /// 移動ド（六本調子の主音 B♭ をドとする）
+    /// 移動ド（調子の主音をドとする。六本調子 = B♭、八本調子 = C）
     case movable = 0
     /// 固定ド（C をドとする）
     case fixed   = 1

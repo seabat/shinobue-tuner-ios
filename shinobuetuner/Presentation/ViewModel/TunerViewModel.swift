@@ -59,7 +59,7 @@ final class TunerViewModel: ObservableObject {
     /// 現在の音の階名（設定の移動ド／固定ドに従う）。無音時は空文字
     var solfegeName: String {
         guard let midiNote = noteResult?.note.midiNote else { return "" }
-        return NoteHelper.solfegeName(midiNote: midiNote, system: tunerSettings.solfegeSystem)
+        return NoteHelper.solfegeName(midiNote: midiNote, system: tunerSettings.solfegeSystem, tuning: tunerSettings.tuning)
     }
 
     /// 現在のチューナーモード（View から設定される）
@@ -128,7 +128,7 @@ final class TunerViewModel: ObservableObject {
         permissionGranted = granted
     }
 
-    /// 設定モーダルを閉じた後に設定値を再読み込みする
+    /// 設定値を再読み込みする（設定モーダルを閉じた後・タブ表示時。周波数表タブでも同じ設定を変更できるため）
     func reloadSettings() {
         tunerSettings = fetchTunerSettingsUseCase()
     }
@@ -224,7 +224,7 @@ final class TunerViewModel: ObservableObject {
             lastSoundTime = currentTime
 
             // 音符情報を更新
-            let result = NoteHelper.closestNote(for: pitch)
+            let result = NoteHelper.closestNote(for: pitch, tuning: tunerSettings.tuning)
             noteResult = result
 
             // ピッチ履歴を更新（currentTime はタイマーが管理）
