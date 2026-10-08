@@ -56,6 +56,12 @@ final class TunerViewModel: ObservableObject {
     /// チューナー設定値（設定モーダルを閉じたタイミングで reloadSettings() により更新）
     @Published var tunerSettings: TunerSettings
 
+    /// 現在の音の階名（設定の移動ド／固定ドに従う）。無音時は空文字
+    var solfegeName: String {
+        guard let midiNote = noteResult?.note.midiNote else { return "" }
+        return NoteHelper.solfegeName(midiNote: midiNote, system: tunerSettings.solfegeSystem)
+    }
+
     /// 現在のチューナーモード（View から設定される）
     @Published var tunerMode: TunerMode = .soloMonitoring
 

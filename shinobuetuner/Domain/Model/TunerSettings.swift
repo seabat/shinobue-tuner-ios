@@ -42,6 +42,23 @@ enum ShinobueTuning: Int, CaseIterable, Identifiable {
     var isSupported: Bool { self == .rokuHon }
 }
 
+/// 階名の表示方式
+enum SolfegeSystem: Int, CaseIterable, Identifiable {
+    /// 移動ド（六本調子の主音 B♭ をドとする）
+    case movable = 0
+    /// 固定ド（C をドとする）
+    case fixed   = 1
+
+    var id: Int { rawValue }
+
+    var displayName: String {
+        switch self {
+        case .movable: return String(localized: "移動ド")
+        case .fixed:   return String(localized: "固定ド")
+        }
+    }
+}
+
 /// チューナーの設定値
 struct TunerSettings {
     /// チューニング成功とみなすセント閾値（デフォルト: 10セント）
@@ -52,6 +69,8 @@ struct TunerSettings {
     var tuning: ShinobueTuning = .rokuHon
     /// ピッチグラフを表示するかどうか（デフォルト: true）
     var showPitchGraph: Bool = true
+    /// 階名の表示方式（デフォルト: 移動ド）
+    var solfegeSystem: SolfegeSystem = .movable
 
     /// アンサンブル用高難度オプション（非推奨・実機テスト中）
     /// スペクトル幅の閾値（ビン数）：値が小さいほど判定が厳しい

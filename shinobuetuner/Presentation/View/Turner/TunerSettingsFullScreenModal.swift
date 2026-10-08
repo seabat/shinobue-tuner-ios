@@ -57,9 +57,21 @@ struct TunerSettingsFullScreenModal: View {
                                 .foregroundStyle(.white)
                         }
                         .tint(Color.accentColor)
+
+                        Picker(selection: $viewModel.settings.solfegeSystem) {
+                            ForEach(SolfegeSystem.allCases) { system in
+                                Text(system.displayName).tag(system)
+                            }
+                        } label: {
+                            Text("階名")
+                                .foregroundStyle(.white)
+                        }
                     } header: {
                         Text("表示設定")
                             .foregroundStyle(Color("AssistantText"))
+                    } footer: {
+                        Text("移動ド：六本調子の主音 B♭ をドとして表示します。固定ド：C をドとして表示します。")
+                            .foregroundStyle(Color("AssistantText").opacity(0.7))
                     }
 
                     Section {

@@ -143,6 +143,118 @@
     "1" : {
 
     },
+    "固定ド" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fixed do"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "固定ド"
+          }
+        }
+      }
+    },
+    "移動ド" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Movable do"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "移動ド"
+          }
+        }
+      }
+    },
+    "移動ド：六本調子の主音 B♭ をドとして表示します。固定ド：C をドとして表示します。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Movable do: shows B♭, the tonic of the No. 6 flute, as Do. Fixed do: shows C as Do."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "移動ド：六本調子の主音 B♭ をドとして表示します。固定ド：C をドとして表示します。"
+          }
+        }
+      }
+    },
+    "階名" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Solfège"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "階名"
+          }
+        }
+      }
+    },
+    "階名：固定ド（ド＝C）" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Solfège: fixed do (Do = C)"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "階名：固定ド（ド＝C）"
+          }
+        }
+      }
+    },
+    "階名：移動ド（ド＝B♭）" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Solfège: movable do (Do = B♭)"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "階名：移動ド（ド＝B♭）"
+          }
+        }
+      }
+    },
+    "音名" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Note"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "音名"
+          }
+        }
+      }
+    },
     "１" : {
       "localizations" : {
         "en" : {
@@ -1878,22 +1990,6 @@
         }
       }
     },
-    "日本" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Solfège"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "日本"
-          }
-        }
-      }
-    },
     "未対応の調子" : {
       "localizations" : {
         "en" : {
@@ -2034,22 +2130,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "表示設定"
-          }
-        }
-      }
-    },
-    "西洋" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Western"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "西洋"
           }
         }
       }

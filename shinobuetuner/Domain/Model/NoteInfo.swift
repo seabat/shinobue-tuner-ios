@@ -31,14 +31,31 @@ enum NoteHelper {
         "G♭", "G", "A♭", "A", "B♭", "B"
     ]
 
-    /// 半音ごとの日本音階名（篠笛６本調子の読み方。A=シ, B♭=ド, C=レ … G=ラ）
-    /// ローカライズ: 英語ロケールでは固定ド式ソルフェージュ（Do/Re/Mi...）表記になる
+    /// 半音ごとの日本音階名（移動ド。六本調子の主音 B♭=ド, C=レ … G=ラ, A=シ）
+    /// ローカライズ: 英語ロケールでも移動ド式ソルフェージュ（Do/Re/Mi...）表記になる
     static let japaneseNoteNames = [
         String(localized: "レ"), String(localized: "レ♯"), String(localized: "ミ"),
         String(localized: "ファ"), String(localized: "ファ♯"), String(localized: "ソ"),
         String(localized: "ソ♯"), String(localized: "ラ"), String(localized: "ラ♯"),
         String(localized: "シ"), String(localized: "ド"), String(localized: "ド♯")
     ]
+
+    /// 半音ごとの固定ド音階名（C=ド, D=レ … A=ラ, B=シ）
+    static let fixedDoNoteNames = [
+        String(localized: "ド"), String(localized: "ド♯"), String(localized: "レ"),
+        String(localized: "レ♯"), String(localized: "ミ"), String(localized: "ファ"),
+        String(localized: "ファ♯"), String(localized: "ソ"), String(localized: "ソ♯"),
+        String(localized: "ラ"), String(localized: "ラ♯"), String(localized: "シ")
+    ]
+
+    /// MIDIノート番号と表示方式から階名を返す
+    static func solfegeName(midiNote: Int, system: SolfegeSystem) -> String {
+        let noteIndex = ((midiNote % 12) + 12) % 12
+        switch system {
+        case .movable: return japaneseNoteNames[noteIndex]
+        case .fixed:   return fixedDoNoteNames[noteIndex]
+        }
+    }
 
     /// MIDIノート番号から運指名へのマッピング（六本調子）
     /// 呂音（低音域）: 筒音・一（メリ）・一〜七  漢数字

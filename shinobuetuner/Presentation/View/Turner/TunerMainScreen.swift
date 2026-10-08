@@ -23,6 +23,7 @@ struct TunerMainScreen: View {
             // ─── 音階名表示エリア ───
             NoteDisplayView(
                 noteResult: viewModel.noteResult,
+                solfegeName: viewModel.solfegeName,
                 currentPitch: viewModel.currentPitch
             )
             .frame(height: 160)

@@ -11,6 +11,8 @@ import SwiftUI
 /// 音階名表示ビュー
 struct NoteDisplayView: View {
     let noteResult: (note: NoteInfo, cents: Float)?
+    /// 表示する階名（設定の移動ド／固定ドに応じて呼び出し元で決める）
+    let solfegeName: String
     let currentPitch: Float
 
     private var accentColor: Color {
@@ -31,9 +33,9 @@ struct NoteDisplayView: View {
                         .foregroundStyle(.white.opacity(0.85))
 
                     // 日本音階名（大・カラー）
-                    noteText(result.note.japaneseName, size: 72, weight: .bold, design: .rounded)
+                    noteText(solfegeName, size: 72, weight: .bold, design: .rounded)
                         .foregroundStyle(accentColor)
-                        .animation(.easeInOut(duration: 0.15), value: result.note.japaneseName)
+                        .animation(.easeInOut(duration: 0.15), value: solfegeName)
 
                     // 西洋音階名（例: "A4", "B♭5"）
                     noteText(result.note.westernName, size: 28, weight: .semibold)
@@ -107,6 +109,7 @@ struct NoteDisplayView: View {
         // チューニング完了（±10セント以内 → 緑）: 一（メリ） = A4 = 442Hz
         NoteDisplayView(
             noteResult: NoteHelper.closestNote(for: 442.0),
+            solfegeName: "シ",
             currentPitch: 442.0
         )
         .frame(height: 160)
@@ -116,6 +119,7 @@ struct NoteDisplayView: View {
         // やや外れ（±25セント以内 → 黄）: 一 を約+23セントシャープ
         NoteDisplayView(
             noteResult: NoteHelper.closestNote(for: 448.0),
+            solfegeName: "シ",
             currentPitch: 448.0
         )
         .frame(height: 160)
@@ -125,6 +129,7 @@ struct NoteDisplayView: View {
         // 大きくズレている（±25セント超 → 赤）: 一 を約+50セントシャープ
         NoteDisplayView(
             noteResult: NoteHelper.closestNote(for: 455.0),
+            solfegeName: "ド",
             currentPitch: 455.0
         )
         .frame(height: 160)
@@ -132,7 +137,7 @@ struct NoteDisplayView: View {
         Divider().background(Color("AssistantText").opacity(0.3))
 
         // 無音
-        NoteDisplayView(noteResult: nil, currentPitch: 0)
+        NoteDisplayView(noteResult: nil, solfegeName: "", currentPitch: 0)
             .frame(height: 160)
     }
     .background(Color("AppBackground"))
