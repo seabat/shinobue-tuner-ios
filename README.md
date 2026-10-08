@@ -11,17 +11,19 @@
 
 - 基準音: **A4 = 442 Hz**（六本調子・八本調子に対応）
 - 音律: **12平均律**
-- 音階名表記: 日本（ドレミファソラシ）と西洋音階名（C D E F G A B）を併記
+- 音階表示: 運指名（筒音・一〜七 など）・階名（ドレミ。移動ド／固定ドを切り替え可）・音名（C D E F G A B）を表示
 
 ---
 
 ## 主な機能
 
 ### チューナー機能
+- **初回起動時の調子選択**: マイク許可の問い合わせ後、お使いの篠笛の調子を選ぶ画面を1回だけ表示する（あとから設定で変更可）。
 - マイクからピッチ（Hz）・音階・セントをリアルタイム表示し、セントメーター・成功エフェクト・5秒ピッチグラフ（表示は設定で On/Off）に対応する。**30秒間無音が続くと自動停止**（計測・録音共通）。
 - **ソロモニタリング（計測・単）**: 単旋律向けのチューニング成功判定（許容セント・継続時間は設定で変更）。
 - **アンサンブルモニタリング（計測・複）**: 合奏向け。開始前にカウントダウンし、スペクトル幅と安定性を含めた判定を行う。
-- **チューニング設定**: 調子・ピッチグラフ表示・成功判定のセント範囲・継続時間・アンサンブル用の調整項目などを変更でき、設定は UserDefaults に保存される。
+- **調子表示**: 画面左上に選択中の調子（例「8本調子」）を表示し、タップでチューニング設定を開く。
+- **チューニング設定**: 調子・階名（移動ド／固定ド）・ピッチグラフ表示・成功判定のセント範囲・継続時間・アンサンブル用の調整項目などを変更でき、設定は UserDefaults に保存される。
 
 ### 録音機能
 - **計測**: ピッチ検出のみ。**録音**: ピッチ検出に加え m4a を保存。モードはボタンで切り替え。
@@ -89,7 +91,7 @@ Presentation ──依存──▶ Domain ◀──依存── Data
 
 ```
 shinobuetuner/
-├── shinobuetunerApp.swift
+├── ShinobuetunerApp.swift
 ├── Domain/                  # ビジネスロジック（外部依存なし）
 │   ├── Model/               # NoteInfo, PitchSample, TunerSettings, PlaybackFile など
 │   ├── Repository/          # Repository プロトコル
@@ -98,11 +100,16 @@ shinobuetuner/
 │   ├── DataSource/          # MicrophoneDataSource, AudioPlayerDataSource
 │   └── Repository/          # Repository プロトコルの具体実装
 └── Presentation/            # 画面表示と状態管理
-    ├── ViewModel/           # TunerViewModel, PlaybackListViewModel
+    ├── ViewModel/           # TunerViewModel, TunerSettingsViewModel, TuningSelectionViewModel,
+    │                        # PlaybackListViewModel, PlaybackSettingsViewModel, FrequencyTableViewModel
     └── View/
+        ├── Common/          # 複数画面で共用する部品（調子・階名の設定セクション）
+        ├── Onboarding/      # 初回起動時の調子選択画面
         ├── Turner/          # チューナー画面（TunerMainScreen, CentsMeterView など）
         ├── Playback/        # 再生一覧・再生コントロール画面
         └── FrequencyTable/  # 篠笛 音階周波数表（調子に合わせて表示）
+
+shinobuetunerTests/          # ユニットテスト（Swift Testing）
 ```
 
 ---
@@ -138,6 +145,7 @@ open shinobue-tuner-ios/shinobuetuner.xcodeproj
 
 - Xcode でターゲットデバイスを選択してビルド（⌘R）
 - マイクの使用許可を求めるダイアログが表示されるので「許可」を選択
+- 続けて調子選択画面が表示されるので、調子を選んで「決定」をタップ（初回のみ）
 
 ### VS Code で開発する場合
 
@@ -164,6 +172,24 @@ xcode-build-server config -project shinobuetuner.xcodeproj -scheme shinobuetuner
 
 - `Cmd + Shift + B` — ビルド（`Debug`）
 - `Cmd + Shift + P` → `SweetPad: Launch App` — シミュレーターで起動
+
+---
+
+## テスト
+
+ユニットテストは Swift Testing で `shinobuetunerTests/` に置いている。運指名・階名などローカライズされた文字列を検証するため、**日本語ロケールで実行する**。
+
+```bash
+xcodebuild test -scheme shinobuetuner \
+  -destination 'platform=iOS Simulator,name=iPhone 17' \
+  -only-testing:shinobuetunerTests \
+  -testLanguage ja -testRegion JP
+```
+
+| テスト | 内容 |
+|---|---|
+| `NoteHelperTuningTests` | 六本調子・八本調子の運指名・音名・階名（移動ド／固定ド）・周波数が比較表と一致すること |
+| `TuningSelectionTests` | 初回起動時の調子選択の表示判定と保存 |
 
 ---
 
