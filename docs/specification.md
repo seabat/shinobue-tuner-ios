@@ -10,7 +10,7 @@
 
 | 階層 | 画面（SwiftUI / 役割） | モーダル |
 |------|-------------------------|------------------------------|
-| ベース | `ContentView` | なし |
+| ベース | `ContentView` | `TuningSelectionFullScreenModal`（初回起動時の調子選択フルモーダル） |
 | 子（チューナータブ・未許可） | `PermissionRequestView` （マイク権限許可） | なし |
 | 子（チューナータブ・許可済） | `TunerMainScreen` （モニタリング機能、チューナー機能） | `TunerSettingsFullScreenModal`（チューニング設定フルモーダル）、`EnsembleCountdownFullScreenModal`（アンサンブル計測開始前のカウントダウンフルモーダル） |
 | 子（プレイリストタブ） | `PlaybackListScreen` （プレイリスト機能） | `PlaybackSettingsFullScreenModal`（プレイリスト設定フルモーダル） |
@@ -62,6 +62,12 @@
 #### 入力・処理・出力
 
 - **入力**: マイク（`AVAudioEngine` 経由）。マイク権限が未許可の場合は `PermissionRequestView` を表示し、許可後にチューナー画面へ遷移する。
+- **初回起動時の調子選択**: 起動時のマイク許可の問い合わせに答えた後（許可・拒否どちらでも）、調子選択が未完了なら `TuningSelectionFullScreenModal` を表示する。
+  - 内容: アイコン（`tuningfork`）・見出し・説明文・調子のドラムロール（設定画面と共通。見出しの「調子 ⓘ」から解説記事へ）・「あとから設定で変更できます。」・「決定」ボタン。
+  - ドラムロールの初期値は現在保存されている調子。「決定」でのみ閉じる（閉じるボタン・スワイプでの終了なし）。
+  - 「決定」で調子を `TunerSettings` に、完了記録（`hasSelectedTuning`）を `OnboardingRepository` に保存する。完了記録は `TunerSettings` と別に保存するため、チューニング設定の「デフォルトに戻す」では消えない。
+  - 既存ユーザーもアップデート後に1回だけ表示される（完了記録が未保存のため）。「決定」前にアプリを終了した場合は次回起動時に再表示。
+  - 閉じた後は許可済みならチューナー画面、未許可なら `PermissionRequestView` が見える。
 - **処理**: FFT + HPS によるピッチ推定。有効音域 **100 Hz 〜 3000 Hz**（`AudioConstants.maxDetectableFrequency`、八本調子の 4'/F7 ≈ 2807 Hz をカバー）。無音判定は **RMS < 0.003**（`AudioConstants.noiseThreshold` と一致）。
 - **出力**:
   - 検出ピッチ **Hz**（無音時は 0）

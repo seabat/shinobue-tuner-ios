@@ -39,6 +39,8 @@ final class TunerViewModel: ObservableObject {
     @Published var isRunning: Bool = false
     /// マイクの許可が得られているかどうか
     @Published var permissionGranted: Bool = false
+    /// 初回起動時の調子選択モーダルを表示するかどうか（マイク許可の問い合わせ後、未選択なら true）
+    @Published var shouldShowTuningSelection: Bool = false
     /// セッション開始からの経過時間（録音中は常に更新される）
     @Published var currentTime: TimeInterval = 0
     /// 録音中かどうか（ピッチ監視とは独立）
@@ -70,6 +72,7 @@ final class TunerViewModel: ObservableObject {
     private let useCase: any MonitorPitchUseCaseProtocol
     private let playbackFileRepository: any PlaybackFileRepository
     private let fetchTunerSettingsUseCase: any FetchTunerSettingsUseCaseProtocol
+    private let fetchHasSelectedTuningUseCase: any FetchHasSelectedTuningUseCaseProtocol
     private var cancellables = Set<AnyCancellable>()
     private var sessionStartTime: Date = Date()
     /// 最後に音を検出した currentTime（無音タイムアウト判定に使用）
@@ -94,7 +97,8 @@ final class TunerViewModel: ObservableObject {
         self.init(
             useCase: MonitorPitchUseCase(repository: PitchRepositoryImpl()),
             playbackFileRepository: PlaybackFileRepositoryImpl(),
-            fetchTunerSettingsUseCase: FetchTunerSettingsUseCase(repository: settingsRepository)
+            fetchTunerSettingsUseCase: FetchTunerSettingsUseCase(repository: settingsRepository),
+            fetchHasSelectedTuningUseCase: FetchHasSelectedTuningUseCase(repository: OnboardingRepositoryImpl())
         )
     }
 
@@ -104,7 +108,8 @@ final class TunerViewModel: ObservableObject {
         self.init(
             useCase: useCase,
             playbackFileRepository: PlaybackFileRepositoryImpl(),
-            fetchTunerSettingsUseCase: FetchTunerSettingsUseCase(repository: settingsRepository)
+            fetchTunerSettingsUseCase: FetchTunerSettingsUseCase(repository: settingsRepository),
+            fetchHasSelectedTuningUseCase: FetchHasSelectedTuningUseCase(repository: OnboardingRepositoryImpl())
         )
     }
 
@@ -112,20 +117,26 @@ final class TunerViewModel: ObservableObject {
     init(
         useCase: any MonitorPitchUseCaseProtocol,
         playbackFileRepository: any PlaybackFileRepository,
-        fetchTunerSettingsUseCase: any FetchTunerSettingsUseCaseProtocol
+        fetchTunerSettingsUseCase: any FetchTunerSettingsUseCaseProtocol,
+        fetchHasSelectedTuningUseCase: any FetchHasSelectedTuningUseCaseProtocol
     ) {
         self.useCase = useCase
         self.playbackFileRepository = playbackFileRepository
         self.fetchTunerSettingsUseCase = fetchTunerSettingsUseCase
+        self.fetchHasSelectedTuningUseCase = fetchHasSelectedTuningUseCase
         self.tunerSettings = fetchTunerSettingsUseCase()
     }
 
     // MARK: - 操作
 
     /// マイクのアクセス許可を要求する
+    /// 許可・拒否にかかわらず、問い合わせ後に調子が未選択なら調子選択モーダルを表示する
     func requestPermission() async {
         let granted = await useCase.requestPermission()
         permissionGranted = granted
+        if !fetchHasSelectedTuningUseCase() {
+            shouldShowTuningSelection = true
+        }
     }
 
     /// 設定値を再読み込みする（設定モーダルを閉じた後・タブ表示時。周波数表タブでも同じ設定を変更できるため）

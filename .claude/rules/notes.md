@@ -17,6 +17,10 @@ A4 = **442 Hz**（一般的な440 Hzではなく篠笛用）、12平均律。調
 - 新しい調子に対応するときは `isSupported` と `westernNoteNames` を追加し、`NoteHelperTuningTests` に比較表を足す
 - 調子・階名はチューナー／周波数表の両タブで変更できる（保存先は共通の `TunerSettings`）。両画面とも `onAppear` で `reloadSettings()` する
 
+## 初回起動時の調子選択
+
+- 表示判定は `TunerViewModel.requestPermission()` の後（許可・拒否どちらでも）。完了記録 `hasSelectedTuning` は **`TunerSettings` に入れず `OnboardingRepository` に保存** する（「デフォルトに戻す」が `TunerSettings()` で全項目を初期化するため、同居させると再表示されてしまう）
+
 ## テスト
 
 - `NoteHelperTuningTests` は運指名・階名のローカライズ文字列を検証するため、**日本語ロケールで実行する**: `xcodebuild test -scheme shinobuetuner -destination '...' -testLanguage ja -testRegion JP`

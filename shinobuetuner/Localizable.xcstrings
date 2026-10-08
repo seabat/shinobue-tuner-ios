@@ -194,6 +194,38 @@
     "1" : {
 
     },
+    "あとから設定で変更できます。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You can change this later in Settings."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "あとから設定で変更できます。"
+          }
+        }
+      }
+    },
+    "お使いの篠笛の調子を選んでください" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Select the key of your shinobue"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "お使いの篠笛の調子を選んでください"
+          }
+        }
+      }
+    },
     "この設定はチューナーと共通です。" : {
       "localizations" : {
         "en" : {
@@ -242,6 +274,22 @@
         }
       }
     },
+    "決定" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Done"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "決定"
+          }
+        }
+      }
+    },
     "現在は六本調子・八本調子に対応しています。" : {
       "localizations" : {
         "en" : {
@@ -270,6 +318,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "移動ド"
+          }
+        }
+      }
+    },
+    "調子は笛の音の高さを表します。笛の本体や購入時の箱に書かれていることが多いです。わからない場合は、お囃子でよく使われる六本調子を選んでください。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The key (number) indicates the pitch of the flute. It is often written on the flute or on the box it came in. If you are not sure, choose No. 6, which is commonly used in festival music (ohayashi)."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "調子は笛の音の高さを表します。笛の本体や購入時の箱に書かれていることが多いです。わからない場合は、お囃子でよく使われる六本調子を選んでください。"
           }
         }
       }
