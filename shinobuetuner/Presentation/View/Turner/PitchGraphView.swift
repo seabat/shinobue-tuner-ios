@@ -13,39 +13,28 @@ struct PitchGraphView: View {
     let pitchHistory: [PitchSample]
     let currentTime: TimeInterval
 
-    // グラフのHz範囲（三/D5 ～ 4'/Eb7）
-    private let minHz: Float = 589.999
-    private let maxHz: Float = 2500.328
+    /// 選択中の調子（音符ラインの位置・ラベルに使う）
+    let tuning: ShinobueTuning
 
-    // グラフに表示する篠笛六本調子の全音符ライン（三/D5 ～ 4'/Eb7）
-    private let noteLines: [(freq: Float, label: String)] = [
-        (590.0,  "D5"),   // 三
-        (625.1,  "Eb5"),  // 四
-        (662.3,  "E5"),   // 四（半）
-        (701.6,  "F5"),   // 五
-        (743.4,  "Gb5"),  // 五（半）
-        (787.6,  "G5"),   // 六
-        (834.4,  "Ab5"),  // 六（半）
-        (884.0,  "A5"),   // 七
-        (936.6,  "Bb5"),  // １
-        (992.3,  "B5"),   // １（半）
-        (1051.3, "C6"),   // ２
-        (1113.8, "Db6"),  // ２（半）
-        (1180.0, "D6"),   // ３
-        (1250.2, "Eb6"),  // ４
-        (1324.5, "E6"),   // ４（半）
-        (1403.3, "F6"),   // ５
-        (1486.8, "Gb6"),  // ５（半）
-        (1575.1, "G6"),   // ６
-        (1668.8, "Ab6"),  // ６（半）
-        (1768.0, "A6"),   // ７
-        (1873.1, "Bb6"),  // 1'
-        (1984.5, "B6"),   // 1'（半）
-        (2102.5, "C7"),   // 2'
-        (2227.5, "Db7"),  // 2'（半）
-        (2360.0, "D7"),   // 3'
-        (2500.3, "Eb7")   // 4'
-    ]
+    /// グラフに表示する運指の範囲（六本調子の MIDI ノート番号: 三/D5 ～ 4'/E♭7）
+    private static let rokuHonGraphMidiRange: ClosedRange<Int> = 74...99
+
+    /// 選択中の調子でのグラフ表示 MIDI ノート番号の範囲（六本調子 D5〜E♭7、八本調子 E5〜F7）
+    private var graphMidiRange: ClosedRange<Int> {
+        let offset = tuning.semitoneOffset
+        return (Self.rokuHonGraphMidiRange.lowerBound + offset)...(Self.rokuHonGraphMidiRange.upperBound + offset)
+    }
+
+    // グラフのHz範囲（三 ～ 4'）
+    private var minHz: Float { Float(NoteHelper.frequency(midiNote: graphMidiRange.lowerBound)) }
+    private var maxHz: Float { Float(NoteHelper.frequency(midiNote: graphMidiRange.upperBound)) }
+
+    // グラフに表示する全音符ライン（三 ～ 4'）
+    private var noteLines: [(freq: Float, label: String)] {
+        graphMidiRange.map { midiNote in
+            (Float(NoteHelper.frequency(midiNote: midiNote)), NoteHelper.westernName(midiNote: midiNote, tuning: tuning))
+        }
+    }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
@@ -179,7 +168,7 @@ struct PitchGraphView: View {
         let freq = base + 8.0 * sin(t * 4.0)          // サイン波で揺れ
         return PitchSample(time: t, frequency: Float(freq))
     }
-    return PitchGraphView(pitchHistory: history, currentTime: 5.0)
+    return PitchGraphView(pitchHistory: history, currentTime: 5.0, tuning: .rokuHon)
         .frame(height: 240)
         .padding(16)
         .background(Color("AppBackground"))
@@ -187,7 +176,7 @@ struct PitchGraphView: View {
 }
 
 #Preview("データなし（無音）") {
-    PitchGraphView(pitchHistory: [], currentTime: 0)
+    PitchGraphView(pitchHistory: [], currentTime: 0, tuning: .hachihon)
         .frame(height: 240)
         .padding(16)
         .background(Color("AppBackground"))

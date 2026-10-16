@@ -5,14 +5,14 @@
 //  開始/停止ボタン + モード切替コンポーネント
 
 import SwiftUI
-import Combine
 
 /// 開始/停止ボタン + モード切替コンポーネント
 struct ControlBarView: View {
-    @ObservedObject var viewModel: TunerViewModel
+    /// 計測・録音の動作中かどうか（ボタン表示の切替とモード切替の無効化に使用）
+    let isRunning: Bool
     @Binding var selectedMode: TunerMode
-    /// アンサンブルカウントダウンモーダルの表示フラグ（TunerMainScreen から @Binding で受け取る）
-    @Binding var showEnsembleCountdown: Bool
+    /// 開始/停止ボタンのタップ時の処理（モードごとの開始・停止は呼び出し元で決める）
+    let onPrimaryAction: () -> Void
 
     var body: some View {
         // 計測/停止ボタンとモード切替を同じ行に並べる（ZStackでの重ね配置だと
@@ -20,27 +20,15 @@ struct ControlBarView: View {
         // HStack + maxWidth: .infinity でボタン側に余白を吸収させる）
         HStack(spacing: 12) {
             TunerModeButton(
-                isRunning: viewModel.isRunning,
+                isRunning: isRunning,
                 accentColor: modeColor(for: selectedMode),
                 startIcon: icon(for: selectedMode),
-                isRecording: selectedMode == .recording
-            ) {
-                switch selectedMode {
-                case .soloMonitoring:
-                    viewModel.isRunning ? viewModel.stopMonitoring() : viewModel.startMonitoring()
-                case .ensembleMonitoring:
-                    if viewModel.isRunning {
-                        viewModel.stopMonitoring()
-                    } else {
-                        showEnsembleCountdown = true
-                    }
-                case .recording:
-                    viewModel.isRunning ? viewModel.stopRecording() : viewModel.startRecording()
-                }
-            }
+                isRecording: selectedMode == .recording,
+                action: onPrimaryAction
+            )
 
             ModeSwitcher(selectedMode: $selectedMode)
-                .disabled(viewModel.isRunning)
+                .disabled(isRunning)
         }
         .padding(.leading, 20)
         .padding(.trailing, 20)
@@ -122,27 +110,11 @@ private struct ModeSwitcher: View {
 
 // MARK: - Preview
 
-private final class PreviewUseCase: MonitorPitchUseCaseProtocol {
-    var pitchPublisher: AnyPublisher<Float, Never> { Empty().eraseToAnyPublisher() }
-    var spectrumPublisher: AnyPublisher<(pitch: Float, magnitudes: [Float], binWidth: Float), Never> {
-        Empty().eraseToAnyPublisher()
-    }
-    func start() {}
-    func stop() {}
-    func requestPermission() async -> Bool { true }
-    func startRecording(to url: URL) throws {}
-    func stopRecording() {}
-}
-
 #Preview("ソロ計測モード・停止中") {
     ZStack {
         Color("PreviewBackground").ignoresSafeArea()
-        ControlBarView(
-            viewModel: TunerViewModel(useCase: PreviewUseCase()),
-            selectedMode: .constant(.soloMonitoring),
-            showEnsembleCountdown: .constant(false)
-        )
-        .background(Color("AppBackground"))
+        ControlBarView(isRunning: false, selectedMode: .constant(.soloMonitoring)) {}
+            .background(Color("AppBackground"))
     }
     .preferredColorScheme(.light)
 }
@@ -150,12 +122,8 @@ private final class PreviewUseCase: MonitorPitchUseCaseProtocol {
 #Preview("アンサンブル計測モード・停止中") {
     ZStack {
         Color("PreviewBackground").ignoresSafeArea()
-        ControlBarView(
-            viewModel: TunerViewModel(useCase: PreviewUseCase()),
-            selectedMode: .constant(.ensembleMonitoring),
-            showEnsembleCountdown: .constant(false)
-        )
-        .background(Color("AppBackground"))
+        ControlBarView(isRunning: false, selectedMode: .constant(.ensembleMonitoring)) {}
+            .background(Color("AppBackground"))
     }
     .preferredColorScheme(.dark)
 }
@@ -163,34 +131,22 @@ private final class PreviewUseCase: MonitorPitchUseCaseProtocol {
 #Preview("録音モード・停止中") {
     ZStack {
         Color("PreviewBackground").ignoresSafeArea()
-        ControlBarView(
-            viewModel: TunerViewModel(useCase: PreviewUseCase()),
-            selectedMode: .constant(.recording),
-            showEnsembleCountdown: .constant(false)
-        )
-        .background(Color("AppBackground"))
+        ControlBarView(isRunning: false, selectedMode: .constant(.recording)) {}
+            .background(Color("AppBackground"))
     }
     .preferredColorScheme(.dark)
 }
 
 #Preview("録音モード・動作中") {
-    struct Wrapper: View {
-        @StateObject private var vm: TunerViewModel = {
-            let vm = TunerViewModel(useCase: PreviewUseCase())
-            vm.isRunning = true
-            return vm
-        }()
-        @State private var mode: TunerMode = .recording
-        @State private var showCountdown = false
+    @Previewable @State var isRunning = true
+    @Previewable @State var mode: TunerMode = .recording
 
-        var body: some View {
-            ZStack {
-                Color("PreviewBackground").ignoresSafeArea() // うすいピンク色
-                ControlBarView(viewModel: vm, selectedMode: $mode, showEnsembleCountdown: $showCountdown)
-                    .background(Color("AppBackground"))
-            }
-            .preferredColorScheme(.dark)
+    ZStack {
+        Color("PreviewBackground").ignoresSafeArea() // うすいピンク色
+        ControlBarView(isRunning: isRunning, selectedMode: $mode) {
+            isRunning.toggle()
         }
+        .background(Color("AppBackground"))
     }
-    return Wrapper()
+    .preferredColorScheme(.dark)
 }
