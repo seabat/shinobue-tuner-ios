@@ -207,16 +207,36 @@ final class MicrophoneDataSource {
         vDSP_meanv(hpsSpectrum, 1, &avgMag, vDSP_Length(hpsMaxBin))
         guard maxMag > avgMag * 8 else { return (0, hpsSpectrum) }
 
-        guard peakBin > 0 && peakBin < hpsMaxBin - 1 else {
-            return (Float(peakBin) * binWidth, hpsSpectrum)
+        // サブビン精度の補正は HPS ではなく元のパワースペクトルで行う
+        // （HPS は3つのスペクトルの積でピークが極端に鋭く、隣のビンがほぼ 0 になるため補間が効かない）
+        return (refinedPeakBin(magnitudes: magnitudes, peakBin: peakBin) * binWidth, hpsSpectrum)
+    }
+
+    /// HPS で決めたピーク付近を元のパワースペクトルで放物線補間し、サブビン精度のビン位置を返す
+    /// - パワーの対数で補間する（ハン窓のピークは対数をとると放物線に近く、誤差が 1 セント未満になる）
+    /// - Parameters:
+    ///   - magnitudes: FFT のパワースペクトル（vDSP_zvmags の結果）
+    ///   - peakBin: HPS で求めた基音のビン
+    /// - Returns: 補間後のビン位置（小数）
+    nonisolated private static func refinedPeakBin(magnitudes: [Float], peakBin: Int) -> Float {
+        // HPS のピークと元スペクトルの極大は1ビンずれることがあるため、前後1ビンから極大を探す
+        let candidates = max(1, peakBin - 1)...min(magnitudes.count - 2, peakBin + 1)
+        guard !candidates.isEmpty,
+              let bin = candidates.max(by: { magnitudes[$0] < magnitudes[$1] }) else {
+            return Float(peakBin)
         }
-        let alpha = hpsSpectrum[peakBin - 1]
-        let beta  = hpsSpectrum[peakBin]
-        let gamma = hpsSpectrum[peakBin + 1]
+        let left = magnitudes[bin - 1]
+        let center = magnitudes[bin]
+        let right = magnitudes[bin + 1]
+        // 対数がとれない（0 以下）場合は補正しない
+        guard left > 0, center > 0, right > 0 else { return Float(bin) }
+
+        let alpha = logf(left)
+        let beta  = logf(center)
+        let gamma = logf(right)
         let denominator = alpha - 2 * beta + gamma
         let offset: Float = abs(denominator) > 1e-6 ? 0.5 * (alpha - gamma) / denominator : 0
-
-        return ((Float(peakBin) + offset) * binWidth, hpsSpectrum)
+        return Float(bin) + offset
     }
 
     /// FFT + HPSアルゴリズムによるピッチ検出
@@ -226,99 +246,6 @@ final class MicrophoneDataSource {
     ///   - fftSize: FFTサイズ（2の累乗）
     /// - Returns: 検出されたピッチ周波数（Hz）、無音時は0
     nonisolated static func detectPitch(buffer: AVAudioPCMBuffer, sampleRate: Float, fftSize: Int) -> Float {
-        guard let channelData = buffer.floatChannelData?[0] else { return 0 }
-        let frameLength = Int(buffer.frameLength)
-        guard frameLength > 0 else { return 0 }
-
-        let halfSize = fftSize / 2
-        let log2n = vDSP_Length(log2f(Float(fftSize)))
-
-        // 信号をコピー（不足分はゼロパディング）
-        var signal = [Float](repeating: 0, count: fftSize)
-        let copyCount = min(frameLength, fftSize)
-        for i in 0..<copyCount {
-            signal[i] = channelData[i]
-        }
-
-        // RMSでノイズレベルチェック（無音は0を返す）
-        var rms: Float = 0
-        vDSP_rmsqv(signal, 1, &rms, vDSP_Length(copyCount))
-        guard rms > AudioConstants.noiseThreshold else { return 0 }
-
-        // ハン窓を適用してスペクトル漏れを軽減
-        var window = [Float](repeating: 0, count: fftSize)
-        vDSP_hann_window(&window, vDSP_Length(fftSize), Int32(vDSP_HANN_NORM))
-        vDSP_vmul(signal, 1, window, 1, &signal, 1, vDSP_Length(fftSize))
-
-        // FFTセットアップ
-        guard let fftSetup = vDSP_create_fftsetup(log2n, FFTRadix(kFFTRadix2)) else { return 0 }
-        defer { vDSP_destroy_fftsetup(fftSetup) }
-
-        // 実数信号をDSPSplitComplexに変換してFFT実行
-        var realParts = [Float](repeating: 0, count: halfSize)
-        var imagParts = [Float](repeating: 0, count: halfSize)
-        var magnitudes = [Float](repeating: 0, count: halfSize)
-
-        signal.withUnsafeBytes { rawPtr in
-            let complexPtr = rawPtr.baseAddress!.assumingMemoryBound(to: DSPComplex.self)
-            realParts.withUnsafeMutableBufferPointer { realBuf in
-                imagParts.withUnsafeMutableBufferPointer { imagBuf in
-                    var split = DSPSplitComplex(
-                        realp: realBuf.baseAddress!,
-                        imagp: imagBuf.baseAddress!
-                    )
-                    // 実数信号を複素数形式に変換
-                    vDSP_ctoz(complexPtr, 2, &split, 1, vDSP_Length(halfSize))
-                    // 高速フーリエ変換
-                    vDSP_fft_zrip(fftSetup, &split, 1, log2n, FFTDirection(FFT_FORWARD))
-                    // 振幅スペクトルを計算
-                    vDSP_zvmags(&split, 1, &magnitudes, 1, vDSP_Length(halfSize))
-                }
-            }
-        }
-
-        // HPS（倍音積スペクトル法）で基音を強調
-        // 篠笛の倍音成分が強い場合でも基音を正確に検出できる
-        var hpsSpectrum = magnitudes
-        let numHarmonics = 3
-        let hpsMaxBin = halfSize / numHarmonics
-        for harmonic in 2...numHarmonics {
-            for i in 0..<hpsMaxBin {
-                hpsSpectrum[i] *= magnitudes[i * harmonic]
-            }
-        }
-
-        // 篠笛の有効音域: 100Hz ～ 3000Hz（八本調子の大甲 4'/F7=約2807Hzをカバー）
-        let binWidth = sampleRate / Float(fftSize)
-        let minBin = max(1, Int(100.0 / binWidth))
-        let maxBin = min(Int(AudioConstants.maxDetectableFrequency / binWidth), hpsMaxBin - 2)
-        guard minBin < maxBin else { return 0 }
-
-        // HPSスペクトルのピーク（最大値）を探す
-        var maxMag: Float = 0
-        var peakBin = minBin
-        for i in minBin...maxBin {
-            if hpsSpectrum[i] > maxMag {
-                maxMag = hpsSpectrum[i]
-                peakBin = i
-            }
-        }
-
-        // 平均値との比較でノイズ判定
-        var avgMag: Float = 0
-        vDSP_meanv(hpsSpectrum, 1, &avgMag, vDSP_Length(hpsMaxBin))
-        guard maxMag > avgMag * 8 else { return 0 }
-
-        // 放物線補間でサブビン精度の周波数を計算
-        guard peakBin > 0 && peakBin < hpsMaxBin - 1 else {
-            return Float(peakBin) * binWidth
-        }
-        let alpha = hpsSpectrum[peakBin - 1]
-        let beta  = hpsSpectrum[peakBin]
-        let gamma = hpsSpectrum[peakBin + 1]
-        let denominator = alpha - 2 * beta + gamma
-        let offset: Float = abs(denominator) > 1e-6 ? 0.5 * (alpha - gamma) / denominator : 0
-
-        return (Float(peakBin) + offset) * binWidth
+        detectPitchWithSpectrum(buffer: buffer, sampleRate: sampleRate, fftSize: fftSize).pitch
     }
 }
