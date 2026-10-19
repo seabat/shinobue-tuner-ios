@@ -65,7 +65,7 @@
 ### ピッチ検出アルゴリズム
 - **FFT**（高速フーリエ変換）: Accelerate の `vDSP_fft_zrip` / ハン窓 / FFTサイズ 4096
 - **HPS**（倍音積スペクトル法）: 倍音数3で基音を正確に検出
-- **放物線補間**: サブビン精度の周波数を算出
+- **放物線補間**: HPS で求めたピーク付近を元のパワースペクトル（対数）で補間し、サブビン精度の周波数を算出
 - 有効音域: **100 Hz 〜 3000 Hz**（八本調子の大甲音域 4'/F7 ≈ 2807 Hz をカバー）
 - ノイズ判定: RMS < 0.003 で無音とみなす
 
@@ -97,7 +97,8 @@ shinobuetuner/
 │   ├── Repository/          # Repository プロトコル
 │   └── UseCase/             # MonitorPitchUseCase, FetchPlaybackFilesUseCase など
 ├── Data/                    # AVAudioEngine / FFT などの実装詳細
-│   ├── DataSource/          # MicrophoneDataSource, AudioPlayerDataSource
+│   ├── DataSource/          # MicrophoneDataSource, AudioPlayerDataSource,
+│   │                        # AudioFileDataSource（テスト用・Debug のみ）
 │   └── Repository/          # Repository プロトコルの具体実装
 └── Presentation/            # 画面表示と状態管理
     ├── ViewModel/           # TunerViewModel, TunerSettingsViewModel, TuningSelectionViewModel,
@@ -110,6 +111,11 @@ shinobuetuner/
         └── FrequencyTable/  # 篠笛 音階周波数表（調子に合わせて表示）
 
 shinobuetunerTests/          # ユニットテスト（Swift Testing）
+└── Resources/               # テスト用音源（音階の .m4a）
+
+docs/test/
+├── maestro/                 # Maestro の E2E テストフロー
+└── scripts/                 # テスト用音源の生成スクリプト
 ```
 
 ---
@@ -177,7 +183,32 @@ xcode-build-server config -project shinobuetuner.xcodeproj -scheme shinobuetuner
 
 ## テスト
 
-ユニットテストは Swift Testing で `shinobuetunerTests/` に置いている。運指名・階名などローカライズされた文字列を検証するため、**日本語ロケールで実行する**。
+テストは次の2種類がある。
+
+| 種類 | 手段 | 確認すること |
+|---|---|---|
+| ユニットテスト | Swift Testing（`shinobuetunerTests/`） | 音名・運指名・階名の変換、調子選択、ピッチ検出の精度 |
+| 画面表示の E2E テスト | Maestro（`docs/test/maestro/`） | 音を入力したとき、チューナー画面に正しい名前が表示されること |
+
+### テスト用音源
+
+ピッチ検出と画面表示のテストでは、音階（移動ドの ド〜ド）を1音1秒ずつ鳴らした 8 秒の .m4a を使う。音源は `shinobuetunerTests/Resources/` にある。
+
+| ファイル | 調子 | 音 |
+|---|---|---|
+| `rokuhon_scale.m4a` | 六本調子 | B♭5 C6 D6 E♭6 F6 G6 A6 B♭6 |
+| `hachihon_scale.m4a` | 八本調子 | C6 D6 E6 F6 G6 A6 B6 C7 |
+
+作り直すときは ffmpeg を使うスクリプトを実行する（引数は調子の本数）。
+
+```bash
+docs/test/scripts/generate_scale_m4a.sh 6   # 六本調子
+docs/test/scripts/generate_scale_m4a.sh 8   # 八本調子
+```
+
+### A. ユニットテスト（ピッチ検出を含む）
+
+運指名・階名などローカライズされた文字列を検証するため、**日本語ロケールで実行する**。
 
 ```bash
 xcodebuild test -scheme shinobuetuner \
@@ -190,6 +221,47 @@ xcodebuild test -scheme shinobuetuner \
 |---|---|
 | `NoteHelperTuningTests` | 六本調子・八本調子の運指名・音名・階名（移動ド／固定ド）・周波数が比較表と一致すること |
 | `TuningSelectionTests` | 初回起動時の調子選択の表示判定と保存 |
+| `ScaleAudioPitchDetectionTests` | テスト用音源をピッチ検出に通し、8音が順番どおりに検出され、運指名・階名・音名が正しく、ずれが ±5 セント以内であること（六本調子・八本調子） |
+
+### B. 画面表示の E2E テスト（Maestro）
+
+テスト用音源をマイクの代わりに入力し、チューナー画面に 8 音それぞれの「運指名 → 階名 → 音名」が並んで表示されることを確認する。
+
+シミュレータのマイクに音声ファイルを流し込む標準の方法はないので、**Debug ビルドの起動引数 `-UITestAudioFile <ファイル名>`** でマイクの代わりに音声ファイルを入力にしている（`AudioFileDataSource`）。音源はループ再生し、スピーカーからは鳴らさない。ピッチ検出は本番と同じ処理を通る。
+
+| フロー | 内容 |
+|---|---|
+| `docs/test/maestro/tuner_scale_rokuhon.yaml` | 六本調子の音源で確認する |
+| `docs/test/maestro/tuner_scale_hachihon.yaml` | 八本調子の音源で確認する |
+
+事前に [Maestro](https://maestro.dev/) をインストールしておく。
+
+```bash
+# 1. Debug ビルドをシミュレータにインストールする
+xcodebuild -project shinobuetuner.xcodeproj -scheme shinobuetuner -configuration Debug \
+  -destination 'platform=iOS Simulator,name=iPhone 17' build
+APP_PATH=$(ls -dt ~/Library/Developer/Xcode/DerivedData/shinobuetuner-*/Build/Products/Debug-iphonesimulator/shinobuetuner.app | head -1)
+xcrun simctl install "iPhone 17" "$APP_PATH"
+
+# 2. マイク権限を許可する（音源を使うときも起動時に権限を確認するため）
+xcrun simctl privacy "iPhone 17" grant microphone dev.seabat.ios.shinobuetuner
+
+# 3. 音源をアプリのデータ領域の Library/UITestAudio/ にコピーする
+DATA_DIR=$(xcrun simctl get_app_container "iPhone 17" dev.seabat.ios.shinobuetuner data)
+mkdir -p "$DATA_DIR/Library/UITestAudio"
+cp shinobuetunerTests/Resources/*_scale.m4a "$DATA_DIR/Library/UITestAudio/"
+
+# 4. フローを実行する（UDID は xcrun simctl list devices booted で確認）
+maestro --device <UDID> test docs/test/maestro/tuner_scale_rokuhon.yaml docs/test/maestro/tuner_scale_hachihon.yaml
+```
+
+- 調子・階名（移動ド）・初回の調子選択済みは、フローが起動引数で指定する。事前に設定画面を操作する必要はない
+- 1フローあたり約30秒かかる。成功すると `[Passed] チューナー音階テスト（六本調子）` のように表示される
+- スクリーンショットは `~/.maestro/tests/<日時>/<フロー名>/takeScreenshot/` に保存される
+- 起動引数で渡した設定は保存されている設定より優先される。普段どおり使うときは、引数なしで起動し直す
+- アプリをアンインストールするとコピーした音源も消えるので、もう一度コピーする
+
+詳しい経緯と設計は [docs/plans/scale_audio_tuner_test_implementation.md](docs/plans/scale_audio_tuner_test_implementation.md) を参照する。
 
 ---
 
