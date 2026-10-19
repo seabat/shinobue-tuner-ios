@@ -25,6 +25,11 @@ A4 = **442 Hz**（一般的な440 Hzではなく篠笛用）、12平均律。調
 
 - `NoteHelperTuningTests` は運指名・階名のローカライズ文字列を検証するため、**日本語ロケールで実行する**: `xcodebuild test -scheme shinobuetuner -destination '...' -testLanguage ja -testRegion JP`
 
+## テスト用の音声ファイル入力
+
+- Debug ビルドでは起動引数 `-UITestAudioFile <ファイル名>` があると、`PitchRepositoryImpl` がマイク（`MicrophoneDataSource`）の代わりに `AudioFileDataSource` を使う（どちらも `PitchDataSource` に準拠）。ファイルはアプリの `Library/UITestAudio/` に置く。Release ビルドには含まれない（`#if DEBUG`）
+- テスト用音源は `shinobuetunerTests/Resources/` に置く（`shinobuetuner/` 配下に置くとアプリ本体に同梱されてしまう）。生成は `docs/test/scripts/generate_scale_m4a.sh`。純音だと HPS（倍音の積）で基音を拾えないため、第2・第3倍音を含めて生成している
+
 ## Xcode プロジェクト管理
 
 - `PBXFileSystemSynchronizedRootGroup` を使用 → **フォルダにファイルを追加するだけで自動コンパイル対象**（手動で pbxproj 編集不要）

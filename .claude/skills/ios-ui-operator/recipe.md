@@ -144,7 +144,8 @@ say -r 120 -o /tmp/test_A.m4a --file-format=m4af --data-format=aac \
 
 ## このアプリ特有の注意点
 
-1. **シミュレータのマイク入力は Mac の入力デバイスを拾う**。周囲の音や Mac の入力設定次第で検出ピッチが不安定・あるいは常に無音になるため、**音程判定・セントメーター・祝福エフェクト（「いいね！」）の発火は UI 操作テストの検証対象にしない**。検証するのは、ボタンラベル・モード・画面遷移・無音時表示（`---` / 「音を鳴らしてください」）など、入力に依存しない部分に限る。音程判定はユニットテスト（`shinobuetunerTests`）の担当
+1. **シミュレータのマイク入力は Mac の入力デバイスを拾う**。周囲の音や Mac の入力設定次第で検出ピッチが不安定・あるいは常に無音になるため、**音程判定・セントメーター・祝福エフェクト（「いいね！」）の発火は UI 操作テストの検証対象にしない**。検証するのは、ボタンラベル・モード・画面遷移・無音時表示（`---` / 「音を鳴らしてください」）など、入力に依存しない部分に限る。音程判定はユニットテスト（`shinobuetunerTests`）の担当。
+   ただし、マイクの代わりに音声ファイルを入力にする場合（後述「音声ファイルによるチューナー確認」）は入力が一定なので、音名などの表示を検証対象にしてよい
 2. **計測・録音中は設定系が無効**。左上の調子表示・右上の歯車・モード切替は `disabled` になる。設定を開く前に必ず停止する
 3. **30 秒無音で自動停止しアラートが出る**。計測を開始したまま放置すると、次の `inspect_screen` でアラート（「OK」ボタン）が出ていることがある。想定外のアラートが出ていたら閉じてから続行する
 4. **モード切替は popover のホイール Picker**。モード切替ボタンをタップ → ホイールの目的の項目をタップすると自動で popover が閉じる。**ホイールの項目は `inspect_screen` に出てこない**ため、座標でタップする。iPhone 17 での実測値（2026-10-09）:
@@ -209,6 +210,26 @@ say -r 120 -o /tmp/test_A.m4a --file-format=m4af --data-format=aac \
 2. **計測(複)**: モード切替で「計測(複)」→「計測開始」→ カウントダウンモーダル（3 → 2 → 1 → はい！）→ 自動で閉じて計測中になる。計測中はモード切替が無効
 3. **録音**: モード切替で「録音」→「録音開始」→ 数秒待つ →「録音停止」→ プレイリストタブに `yyyy-MM-dd_HH-mm-ss.m4a` 形式の行が追加される
 4. **ヘルプ / ピッチグラフ**: タブ表示直後（計測未開始）は「使い方」ヘルプ（3ページ、横スワイプで切替）。ピッチグラフ設定 On なら計測開始後に「ピッチグラフ（5秒間）」に切り替わる。Off ならヘルプのまま
+
+### 音声ファイルによるチューナー確認（音階テスト）
+
+シミュレータのマイクは Mac の入力デバイスをそのまま使い、音声ファイルを流し込む標準の方法がない。そこで **Debug ビルドの起動引数 `-UITestAudioFile <ファイル名>` でマイクの代わりに音声ファイルをループ再生して入力にする**（`AudioFileDataSource`。ピッチ検出は本番と同じ `detectPitchWithSpectrum`）。スピーカーからは鳴らない。
+
+1. テスト用音源（ド〜ドを1音1秒ずつ）は `shinobuetunerTests/Resources/{rokuhon,hachihon}_scale.m4a`。作り直すときは `docs/test/scripts/generate_scale_m4a.sh <6|8>`
+2. Debug ビルドをインストールし、マイクを `grant` しておく（`requestPermission` はそのまま通るため）。**初回の調子選択も済ませておく**（フローは調子選択画面を飛ばさない。未選択だと「計測開始」が出ずに失敗する）。アプリを起動して調子選択画面の「決定」を押せばよい（選ぶ調子はどれでもよい）
+3. 音源をアプリのデータコンテナの `Library/UITestAudio/` にコピーする（Documents に置くとプレイリストに出てしまう）
+   ```bash
+   DATA_DIR=$(xcrun simctl get_app_container "iPhone 17" dev.seabat.ios.shinobuetuner data)
+   mkdir -p "$DATA_DIR/Library/UITestAudio"
+   cp shinobuetunerTests/Resources/*_scale.m4a "$DATA_DIR/Library/UITestAudio/"
+   ```
+4. Maestro フロー `docs/test/maestro/tuner_scale_rokuhon.yaml`（六本調子）/ `docs/test/maestro/tuner_scale_hachihon.yaml`（八本調子）を実行する（MCP なら `run` に `files` で渡す。CLI なら `maestro --device <UDID> test docs/test/maestro/tuner_scale_*.yaml`）。調子・階名は起動引数（UserDefaults の引数ドメイン）で上書きするので、設定画面の操作は不要
+   - 各音について「運指名 → 階名 → 音名」の並び（`rightOf` / `leftOf`）が表示されるまで待つ。1音1秒なので取りこぼしても、ループの次の周回で拾えるよう timeout は 20 秒にしている
+- フローはスクリーンショットを撮らない（成否は UI 階層で判定する）。失敗時は Maestro が失敗した時点の画面を自動保存する（CLI では `~/.maestro/tests/<日時>/<フロー名>/screenshots/`）
+- 単体テスト（`xcodebuild test`）の後はシミュレータが一度停止しており、MCP が「Device became unreachable」になる（注意点「Maestro 特有の操作クセ」5）。単体テストと続けて流すときは CLI を使う
+- 起動引数で Bool を渡すときは `YES` / `1` を使う。`true` は文字列 "true" として入り、`UserDefaults.bool(forKey:)` が false を返す（2026-10-19 確認）
+- 引数ドメインの値は保存値より優先されるため、このモードで設定画面から調子を変えても反映されないように見える。通常の確認に戻るときは引数なしで起動し直す
+- 音の順序・セント精度の厳密な確認は単体テスト `ScaleAudioPitchDetectionTests` で行う（Maestro は画面に正しく出るかの確認）
 
 ### チューニング設定
 
