@@ -51,7 +51,6 @@
 | 新規作成 | `docs/test/maestro/tuner_scale_hachihon.yaml` |
 | 修正 | `.claude/skills/ios-ui-operator/recipe.md`（実行手順） |
 | 修正 | `.claude/rules/notes.md`（設計メモ） |
-| 修正 | `.gitignore`（Maestro のスクリーンショット） |
 
 ### 1. テスト用音源（`docs/test/scripts/generate_scale_m4a.sh`）
 
@@ -98,12 +97,13 @@
 
 - 起動引数を付けてアプリを起動する
   - `UITestAudioFile`：入力にする音源のファイル名
-  - `selectedTuning`、`solfegeSystem`、`hasSelectedTuning`：設定を UserDefaults の引数ドメインで上書きする。調子・移動ドを指定し、初回の調子選択画面を飛ばすため、事前に設定画面を操作する必要がない
+  - `selectedTuning`、`solfegeSystem`：設定を UserDefaults の引数ドメインで上書きする。調子・移動ドを指定するので、設定画面を操作する必要がない
+  - 初回の調子選択画面は飛ばさない。テスト前に人（または ios-ui-operator スキル）がマイク権限の許可と調子選択を済ませておく。当初は `hasSelectedTuning: true` で飛ばしていたが、値 `true` は文字列として入り `UserDefaults.bool(forKey:)` が false を返すため効いていなかった（調子選択済みの状態でしか試していなかったので気づかなかった）
 - 左上の調子表示を確かめてから「計測開始」を押す
 - 各音について、`extendedWaitUntil` で `text: <階名>` / `rightOf: <運指名>` / `leftOf: <音名>` が表示されるまで待つ（timeout は 20 秒）
   - 3つの条件を1回の問い合わせで確かめるので、確認の途中で音が切り替わっても組み合わせを取り違えない
   - わざと誤った組み合わせ（運指「１」の右に「レ」）を指定すると失敗することも確かめた
-- 音ごとに `takeScreenshot` を撮り、最後に「計測停止」を押す
+- 最後に「計測停止」を押す。スクリーンショットは撮らない（成否は UI 階層で判定するため不要。失敗時は Maestro が失敗した時点の画面を自動保存する）
 
 ---
 
@@ -182,9 +182,6 @@ xcodebuild test -project shinobuetuner.xcodeproj -scheme shinobuetuner \
 
 - 起動引数で渡した設定は、保存されている設定より優先される。このテストで起動している間は、設定画面で調子を変えても反映されない。普段どおり確認したいときは、引数なしで起動し直す
 - `xcodebuild test` で単体テストを流した直後は、シミュレータが一度止まっているため Maestro MCP がつながらない。単体テストと続けて流すときは Maestro CLI を使う
-- `takeScreenshot` の保存先は実行方法で変わる
-  - CLI：`~/.maestro/tests/<日時>/<フロー名>/takeScreenshot/`
-  - MCP：実行時のカレントディレクトリ（リポジトリ直下。`.gitignore` 済み）
 - アプリをアンインストールすると `Library/UITestAudio/` の音源も消える。その後はもう一度コピーする
 
 ---

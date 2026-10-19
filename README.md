@@ -234,30 +234,26 @@ xcodebuild test -scheme shinobuetuner \
 | `docs/test/maestro/tuner_scale_rokuhon.yaml` | 六本調子の音源で確認する |
 | `docs/test/maestro/tuner_scale_hachihon.yaml` | 八本調子の音源で確認する |
 
-事前に [Maestro](https://maestro.dev/) をインストールしておく。
+事前に [Maestro](https://maestro.dev/) をインストールしておく。シミュレータは 1 台だけ起動しておく（手順 3・4 は起動中のシミュレータを対象にするため）。
 
-```bash
-# 1. Debug ビルドをシミュレータにインストールする
-xcodebuild -project shinobuetuner.xcodeproj -scheme shinobuetuner -configuration Debug \
-  -destination 'platform=iOS Simulator,name=iPhone 17' build
-APP_PATH=$(ls -dt ~/Library/Developer/Xcode/DerivedData/shinobuetuner-*/Build/Products/Debug-iphonesimulator/shinobuetuner.app | head -1)
-xcrun simctl install "iPhone 17" "$APP_PATH"
+1. Debug ビルドをシミュレータにインストールする
+2. アプリを起動してマイク権限を許可し、調子を選択する
+3. 音源をアプリのデータ領域の `Library/UITestAudio/` にコピーする（起動中のシミュレータが対象）
 
-# 2. マイク権限を許可する（音源を使うときも起動時に権限を確認するため）
-xcrun simctl privacy "iPhone 17" grant microphone dev.seabat.ios.shinobuetuner
+   ```bash
+   DATA_DIR=$(xcrun simctl get_app_container booted dev.seabat.ios.shinobuetuner data) &&
+     mkdir -p "$DATA_DIR/Library/UITestAudio" &&
+     cp shinobuetunerTests/Resources/*_scale.m4a "$DATA_DIR/Library/UITestAudio/"
+   ```
 
-# 3. 音源をアプリのデータ領域の Library/UITestAudio/ にコピーする
-DATA_DIR=$(xcrun simctl get_app_container "iPhone 17" dev.seabat.ios.shinobuetuner data)
-mkdir -p "$DATA_DIR/Library/UITestAudio"
-cp shinobuetunerTests/Resources/*_scale.m4a "$DATA_DIR/Library/UITestAudio/"
+4. フローを実行する（`<UDID>` は `xcrun simctl list devices booted` で確認する）
 
-# 4. フローを実行する（UDID は xcrun simctl list devices booted で確認）
-maestro --device <UDID> test docs/test/maestro/tuner_scale_rokuhon.yaml docs/test/maestro/tuner_scale_hachihon.yaml
-```
+   ```bash
+   maestro --device <UDID> test docs/test/maestro/tuner_scale_rokuhon.yaml docs/test/maestro/tuner_scale_hachihon.yaml
+   ```
 
-- 調子・階名（移動ド）・初回の調子選択済みは、フローが起動引数で指定する。事前に設定画面を操作する必要はない
+- 調子・階名（移動ド）はフローが起動引数で指定する。手順 2 で選ぶ調子はどれでもよい
 - 1フローあたり約30秒かかる。成功すると `[Passed] チューナー音階テスト（六本調子）` のように表示される
-- スクリーンショットは `~/.maestro/tests/<日時>/<フロー名>/takeScreenshot/` に保存される
 - 起動引数で渡した設定は保存されている設定より優先される。普段どおり使うときは、引数なしで起動し直す
 - アプリをアンインストールするとコピーした音源も消えるので、もう一度コピーする
 

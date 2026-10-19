@@ -2,7 +2,7 @@
 # TunerMainScreen に運指名・階名（移動ド）・音名が順に表示されることを確認する
 #
 # 事前準備（.claude/skills/ios-ui-operator/recipe.md「音声ファイルによるチューナー確認」参照）:
-#   - Debug ビルドをインストールし、マイク権限を grant しておく
+#   - Debug ビルドをインストールし、マイク権限の許可と初回の調子選択を済ませておく
 #   - shinobuetunerTests/Resources/rokuhon_scale.m4a をアプリの Library/UITestAudio/ にコピーしておく
 appId: dev.seabat.ios.shinobuetuner
 name: チューナー音階テスト（六本調子）
@@ -14,10 +14,9 @@ name: チューナー音階テスト（六本調子）
       AppleLocale: ja_JP
       # マイクの代わりに音声ファイルを入力にする（Debug ビルドのみ有効）
       UITestAudioFile: rokuhon_scale.m4a
-      # 設定を UserDefaults の引数ドメインで上書きする（調子・移動ド・初回の調子選択済み）
+      # 設定を UserDefaults の引数ドメインで上書きする（調子・移動ド）
       selectedTuning: 6
       solfegeSystem: 0
-      hasSelectedTuning: true
 - extendedWaitUntil:
     visible: "計測開始"
     timeout: 10000
@@ -30,55 +29,47 @@ name: チューナー音階テスト（六本調子）
       rightOf: "１"
       leftOf: "B♭5"
     timeout: 20000
-- takeScreenshot: rokuhon_1
 - extendedWaitUntil:
     visible:
       text: "レ"
       rightOf: "２"
       leftOf: "C6"
     timeout: 20000
-- takeScreenshot: rokuhon_2
 - extendedWaitUntil:
     visible:
       text: "ミ"
       rightOf: "３"
       leftOf: "D6"
     timeout: 20000
-- takeScreenshot: rokuhon_3
 - extendedWaitUntil:
     visible:
       text: "ファ"
       rightOf: "４"
       leftOf: "E♭6"
     timeout: 20000
-- takeScreenshot: rokuhon_4
 - extendedWaitUntil:
     visible:
       text: "ソ"
       rightOf: "５"
       leftOf: "F6"
     timeout: 20000
-- takeScreenshot: rokuhon_5
 - extendedWaitUntil:
     visible:
       text: "ラ"
       rightOf: "６"
       leftOf: "G6"
     timeout: 20000
-- takeScreenshot: rokuhon_6
 - extendedWaitUntil:
     visible:
       text: "シ"
       rightOf: "７"
       leftOf: "A6"
     timeout: 20000
-- takeScreenshot: rokuhon_7
 - extendedWaitUntil:
     visible:
       text: "ド"
       rightOf: "1'"
       leftOf: "B♭6"
     timeout: 20000
-- takeScreenshot: rokuhon_8
 - tapOn: "計測停止"
 - assertVisible: "計測開始"

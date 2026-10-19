@@ -215,17 +215,18 @@ say -r 120 -o /tmp/test_A.m4a --file-format=m4af --data-format=aac \
 シミュレータのマイクは Mac の入力デバイスをそのまま使い、音声ファイルを流し込む標準の方法がない。そこで **Debug ビルドの起動引数 `-UITestAudioFile <ファイル名>` でマイクの代わりに音声ファイルをループ再生して入力にする**（`AudioFileDataSource`。ピッチ検出は本番と同じ `detectPitchWithSpectrum`）。スピーカーからは鳴らない。
 
 1. テスト用音源（ド〜ドを1音1秒ずつ）は `shinobuetunerTests/Resources/{rokuhon,hachihon}_scale.m4a`。作り直すときは `docs/test/scripts/generate_scale_m4a.sh <6|8>`
-2. Debug ビルドをインストールし、マイクを `grant` しておく（`requestPermission` はそのまま通るため）
+2. Debug ビルドをインストールし、マイクを `grant` しておく（`requestPermission` はそのまま通るため）。**初回の調子選択も済ませておく**（フローは調子選択画面を飛ばさない。未選択だと「計測開始」が出ずに失敗する）。アプリを起動して調子選択画面の「決定」を押せばよい（選ぶ調子はどれでもよい）
 3. 音源をアプリのデータコンテナの `Library/UITestAudio/` にコピーする（Documents に置くとプレイリストに出てしまう）
    ```bash
    DATA_DIR=$(xcrun simctl get_app_container "iPhone 17" dev.seabat.ios.shinobuetuner data)
    mkdir -p "$DATA_DIR/Library/UITestAudio"
    cp shinobuetunerTests/Resources/*_scale.m4a "$DATA_DIR/Library/UITestAudio/"
    ```
-4. Maestro フロー `docs/test/maestro/tuner_scale_rokuhon.yaml`（六本調子）/ `docs/test/maestro/tuner_scale_hachihon.yaml`（八本調子）を実行する（MCP なら `run` に `files` で渡す。CLI なら `maestro --device <UDID> test docs/test/maestro/tuner_scale_*.yaml`）。調子・階名・初回選択済みは起動引数（UserDefaults の引数ドメイン）で上書きするので、事前の設定操作は不要
+4. Maestro フロー `docs/test/maestro/tuner_scale_rokuhon.yaml`（六本調子）/ `docs/test/maestro/tuner_scale_hachihon.yaml`（八本調子）を実行する（MCP なら `run` に `files` で渡す。CLI なら `maestro --device <UDID> test docs/test/maestro/tuner_scale_*.yaml`）。調子・階名は起動引数（UserDefaults の引数ドメイン）で上書きするので、設定画面の操作は不要
    - 各音について「運指名 → 階名 → 音名」の並び（`rightOf` / `leftOf`）が表示されるまで待つ。1音1秒なので取りこぼしても、ループの次の周回で拾えるよう timeout は 20 秒にしている
-- フローの `takeScreenshot`（`rokuhon_1.png` 〜 `_8.png` / `hachihon_*`）の出力先は、MCP では実行時のカレントディレクトリ（リポジトリ直下。`.gitignore` 済みだが確認後は削除か移動する）、CLI では `~/.maestro/tests/<日時>/<フロー名>/takeScreenshot/`
+- フローはスクリーンショットを撮らない（成否は UI 階層で判定する）。失敗時は Maestro が失敗した時点の画面を自動保存する（CLI では `~/.maestro/tests/<日時>/<フロー名>/screenshots/`）
 - 単体テスト（`xcodebuild test`）の後はシミュレータが一度停止しており、MCP が「Device became unreachable」になる（注意点「Maestro 特有の操作クセ」5）。単体テストと続けて流すときは CLI を使う
+- 起動引数で Bool を渡すときは `YES` / `1` を使う。`true` は文字列 "true" として入り、`UserDefaults.bool(forKey:)` が false を返す（2026-10-19 確認）
 - 引数ドメインの値は保存値より優先されるため、このモードで設定画面から調子を変えても反映されないように見える。通常の確認に戻るときは引数なしで起動し直す
 - 音の順序・セント精度の厳密な確認は単体テスト `ScaleAudioPitchDetectionTests` で行う（Maestro は画面に正しく出るかの確認）
 
