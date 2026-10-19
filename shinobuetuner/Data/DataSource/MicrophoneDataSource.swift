@@ -12,7 +12,7 @@ import AVFoundation
 import Accelerate
 
 /// マイク音声からリアルタイムにピッチを検出するデータソース
-final class MicrophoneDataSource {
+final class MicrophoneDataSource: PitchDataSource {
     /// 検出したピッチとHPSスペクトルをセットでemitするSubject（pitch=0は無音）
     private let subject = PassthroughSubject<(pitch: Float, magnitudes: [Float]), Never>()
 
