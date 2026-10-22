@@ -13,6 +13,7 @@ final class TunerSettingsRepositoryImpl: TunerSettingsRepository {
         static let durationSeconds = "tuningDurationSeconds"
         static let tuning          = "selectedTuning"
         static let showPitchGraph  = "showPitchGraph"
+        static let solfegeSystem   = "solfegeSystem"
         static let ensembleSpectralWidthThreshold  = "ensembleSpectralWidthThreshold"
         static let ensembleStabilityScoreThreshold = "ensembleStabilityScoreThreshold"
     }
@@ -29,6 +30,8 @@ final class TunerSettingsRepositoryImpl: TunerSettingsRepository {
         let savedTuning         = defaults.integer(forKey: Keys.tuning)
         // showPitchGraph は未保存時に object が nil → デフォルト true
         let savedGraph          = defaults.object(forKey: Keys.showPitchGraph) as? Bool ?? true
+        // solfegeSystem は未保存時に 0 → 移動ド
+        let savedSolfege        = defaults.integer(forKey: Keys.solfegeSystem)
         let savedSpectralWidth  = defaults.double(forKey: Keys.ensembleSpectralWidthThreshold)
         let savedStabilityScore = defaults.double(forKey: Keys.ensembleStabilityScoreThreshold)
 
@@ -37,6 +40,7 @@ final class TunerSettingsRepositoryImpl: TunerSettingsRepository {
             durationSeconds:                  savedDuration       > 0 ? savedDuration       : 1.0,
             tuning:                           ShinobueTuning(rawValue: savedTuning) ?? .rokuHon,
             showPitchGraph:                   savedGraph,
+            solfegeSystem:                    SolfegeSystem(rawValue: savedSolfege) ?? .movable,
             ensembleSpectralWidthThreshold:   savedSpectralWidth  > 0 ? Float(savedSpectralWidth)  : 5.0,
             ensembleStabilityScoreThreshold:  savedStabilityScore > 0 ? Float(savedStabilityScore) : 10.0
         )
@@ -47,6 +51,7 @@ final class TunerSettingsRepositoryImpl: TunerSettingsRepository {
         defaults.set(settings.durationSeconds,                  forKey: Keys.durationSeconds)
         defaults.set(settings.tuning.rawValue,                  forKey: Keys.tuning)
         defaults.set(settings.showPitchGraph,                   forKey: Keys.showPitchGraph)
+        defaults.set(settings.solfegeSystem.rawValue,           forKey: Keys.solfegeSystem)
         defaults.set(settings.ensembleSpectralWidthThreshold,   forKey: Keys.ensembleSpectralWidthThreshold)
         defaults.set(settings.ensembleStabilityScoreThreshold,  forKey: Keys.ensembleStabilityScoreThreshold)
     }

@@ -23,6 +23,7 @@ struct TunerMainScreen: View {
             // ─── 音階名表示エリア ───
             NoteDisplayView(
                 noteResult: viewModel.noteResult,
+                solfegeName: viewModel.solfegeName,
                 currentPitch: viewModel.currentPitch
             )
             .frame(height: 160)
@@ -40,7 +41,8 @@ struct TunerMainScreen: View {
             if viewModel.tunerSettings.showPitchGraph && hasStartedMonitoring {
                 PitchGraphView(
                     pitchHistory: viewModel.pitchHistory,
-                    currentTime: viewModel.currentTime
+                    currentTime: viewModel.currentTime,
+                    tuning: viewModel.tunerSettings.tuning
                 )
                 .frame(maxHeight: .infinity)
                 .padding(.horizontal, 16)
@@ -54,10 +56,28 @@ struct TunerMainScreen: View {
 
             // ─── 開始/停止ボタン + モード切替 ───
             ControlBarView(
-                viewModel: viewModel,
+                isRunning: viewModel.isRunning,
                 selectedMode: $selectedMode,
-                showEnsembleCountdown: $showEnsembleCountdown
+                onPrimaryAction: handlePrimaryAction
             )
+        }
+        .overlay(alignment: .topLeading) {
+            // ─── 選択中の調子（タップで設定を開く）───
+            Button {
+                isSettingsPresented = true
+            } label: {
+                Text(viewModel.tunerSettings.tuning.displayName)
+                    .font(.caption)
+                    .fontWeight(.semibold)
+                    .foregroundStyle(Color("InactiveMode"))
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 4)
+                    .overlay(
+                        Capsule().stroke(Color("InactiveMode").opacity(0.5), lineWidth: 1)
+                    )
+                    .padding(12)
+            }
+            .disabled(viewModel.isRunning)
         }
         .overlay(alignment: .topTrailing) {
             // ─── 設定ボタン ───
@@ -86,6 +106,8 @@ struct TunerMainScreen: View {
         // タブ表示のたびにヘルプをリセット
         .onAppear {
             hasStartedMonitoring = false
+            // 周波数表タブで調子・階名が変更されている可能性があるため読み直す
+            viewModel.reloadSettings()
         }
         // アンサンブルカウントダウンモーダル
         .fullScreenCover(isPresented: $showEnsembleCountdown) {
@@ -106,6 +128,23 @@ struct TunerMainScreen: View {
                 ? "30秒間音が検出されなかったため、録音を自動的に停止しました。"
                 : "30秒間音が検出されなかったため、計測を自動的に停止しました。"
             )
+        }
+    }
+
+    /// 開始/停止ボタンのタップ時の処理（選択中のモードに応じて開始・停止を切り替える）
+    private func handlePrimaryAction() {
+        switch selectedMode {
+        case .soloMonitoring:
+            viewModel.isRunning ? viewModel.stopMonitoring() : viewModel.startMonitoring()
+        case .ensembleMonitoring:
+            if viewModel.isRunning {
+                viewModel.stopMonitoring()
+            } else {
+                // 計測(複)はカウントダウン後に開始する
+                showEnsembleCountdown = true
+            }
+        case .recording:
+            viewModel.isRunning ? viewModel.stopRecording() : viewModel.startRecording()
         }
     }
 }

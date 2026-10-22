@@ -6,12 +6,22 @@
 //
 //  音声一覧画面の下部に表示する再生コントロールバー
 
-import Combine
 import SwiftUI
 
 /// 再生コントロールバー（選択中の音声ファイルがある場合に表示）
 struct PlaybackControlView: View {
-    @ObservedObject var viewModel: PlaybackListViewModel
+    /// 再生対象の音声ファイル
+    let file: PlaybackFile
+    /// 現在の再生位置（秒）
+    let playbackTime: TimeInterval
+    /// 再生中かどうか（再生/一時停止ボタンのアイコン切替に使用）
+    let isPlaying: Bool
+    /// シークバーのドラッグ終了時の処理（引数はシーク先の秒数）
+    let onSeek: (TimeInterval) -> Void
+    /// 再生/一時停止ボタンのタップ時の処理
+    let onTogglePlayPause: () -> Void
+    /// 停止ボタン（×）のタップ時の処理
+    let onStop: () -> Void
 
     /// ドラッグ操作中かどうか
     @State private var isDragging = false
@@ -19,7 +29,7 @@ struct PlaybackControlView: View {
     @State private var sliderValue: TimeInterval = 0
 
     private var duration: TimeInterval {
-        viewModel.selectedPlaybackFile?.duration ?? 1
+        file.duration
     }
 
     var body: some View {
@@ -28,12 +38,12 @@ struct PlaybackControlView: View {
             Slider(value: $sliderValue, in: 0...max(duration, 1)) { editing in
                 isDragging = editing
                 if !editing {
-                    viewModel.seek(to: sliderValue)
+                    onSeek(sliderValue)
                 }
             }
             .tint(Color.accentColor)
             .padding(.horizontal, 4)
-            .onChange(of: viewModel.playbackTime) { _, newTime in
+            .onChange(of: playbackTime) { _, newTime in
                 // ドラッグ中以外は再生位置に追従してシークバーを動かす
                 if !isDragging {
                     sliderValue = newTime
@@ -42,7 +52,7 @@ struct PlaybackControlView: View {
 
             HStack {
                 // 現在の再生位置
-                Text(formattedTime(viewModel.playbackTime))
+                Text(formattedTime(playbackTime))
                     .font(.caption.monospacedDigit())
                     .foregroundStyle(Color("AssistantText"))
                     .frame(width: 44, alignment: .leading)
@@ -50,19 +60,15 @@ struct PlaybackControlView: View {
                 Spacer()
 
                 // 停止ボタン（×）
-                Button {
-                    viewModel.stopPlayback()
-                } label: {
+                Button(action: onStop) {
                     Image(systemName: "xmark.circle.fill")
                         .font(.title2)
                         .foregroundStyle(Color("InactiveMode"))
                 }
 
                 // 再生/一時停止ボタン
-                Button {
-                    viewModel.togglePlayPause()
-                } label: {
-                    Image(systemName: viewModel.isPlaying ? "pause.circle.fill" : "play.circle.fill")
+                Button(action: onTogglePlayPause) {
+                    Image(systemName: isPlaying ? "pause.circle.fill" : "play.circle.fill")
                         .font(.system(size: 48))
                         .foregroundStyle(.cyan)
                 }
@@ -100,85 +106,26 @@ private let previewPlaybackFile = PlaybackFile(
     fileSize: 312_320
 )
 
-/// プレビュー用スタブ（一覧取得）
-private final class PreviewFetchUseCase: FetchPlaybackFilesUseCaseProtocol {
-    func callAsFunction() -> [PlaybackFile] { [] }
-}
-
-/// プレビュー用スタブ（削除）
-private final class PreviewDeleteUseCase: DeletePlaybackFileUseCaseProtocol {
-    func callAsFunction(file: PlaybackFile) throws {}
-}
-
-/// プレビュー用スタブ（リネーム）
-private final class PreviewRenameUseCase: RenamePlaybackFileUseCaseProtocol {
-    func callAsFunction(file: PlaybackFile, newName: String) throws -> PlaybackFile { file }
-}
-
-/// プレビュー用スタブ（頭出し）
-private final class PreviewTrimUseCase: TrimLeadingSilenceUseCaseProtocol {
-    func callAsFunction(file: PlaybackFile) async throws {}
-}
-
-/// プレビュー用スタブ（再生）
-private final class PreviewPlaybackUseCase: PlaybackUseCaseProtocol {
-    var playbackTimePublisher: AnyPublisher<TimeInterval, Never> {
-        Just(0).eraseToAnyPublisher()
-    }
-    var isPlayingPublisher: AnyPublisher<Bool, Never> {
-        Just(false).eraseToAnyPublisher()
-    }
-    func play(file: PlaybackFile) throws {}
-    func pause() {}
-    func resume() {}
-    func stop() {}
-    func seek(to time: TimeInterval) {}
-}
-
-@MainActor
-private func makePreviewVM(
-    selected: PlaybackFile? = nil,
-    playing: Bool = false,
-    time: TimeInterval = 0
-) -> PlaybackListViewModel {
-    let vm = PlaybackListViewModel(
-        fetchUseCase: PreviewFetchUseCase(),
-        deleteUseCase: PreviewDeleteUseCase(),
-        renameUseCase: PreviewRenameUseCase(),
-        trimUseCase: PreviewTrimUseCase(),
-        playbackUseCase: PreviewPlaybackUseCase(),
-        fetchSettingsUseCase: FetchPlaybackSettingsUseCase(repository: PlaybackSettingsRepositoryImpl()),
-        importUseCase: ImportPlaybackFileUseCase(repository: PlaybackFileRepositoryImpl())
-    )
-    vm.selectedPlaybackFile = selected
-    vm.isPlaying = playing
-    vm.playbackTime = time
-    return vm
-}
-
 #Preview("再生中（途中）") {
-    PlaybackControlView(viewModel: makePreviewVM(
-        selected: previewPlaybackFile,
-        playing: true,
-        time: 34
-    ))
+    PlaybackControlView(
+        file: previewPlaybackFile, playbackTime: 34, isPlaying: true,
+        onSeek: { _ in }, onTogglePlayPause: {}, onStop: {}
+    )
     .preferredColorScheme(.dark)
 }
 
 #Preview("一時停止中") {
-    PlaybackControlView(viewModel: makePreviewVM(
-        selected: previewPlaybackFile,
-        playing: false,
-        time: 34
-    ))
+    PlaybackControlView(
+        file: previewPlaybackFile, playbackTime: 34, isPlaying: false,
+        onSeek: { _ in }, onTogglePlayPause: {}, onStop: {}
+    )
     .preferredColorScheme(.dark)
 }
 
 #Preview("再生開始直後") {
-    PlaybackControlView(viewModel: makePreviewVM(
-        selected: previewPlaybackFile,
-        playing: true,
-        time: 0
-    ))
+    PlaybackControlView(
+        file: previewPlaybackFile, playbackTime: 0, isPlaying: true,
+        onSeek: { _ in }, onTogglePlayPause: {}, onStop: {}
+    )
     .preferredColorScheme(.dark)
 }

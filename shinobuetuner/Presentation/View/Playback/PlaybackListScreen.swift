@@ -105,8 +105,15 @@ struct PlaybackListScreen: View {
                         .scrollContentBackground(.hidden)
 
                         // 再生コントロールバー（選択中ファイルがある場合のみ）
-                        if viewModel.selectedPlaybackFile != nil {
-                            PlaybackControlView(viewModel: viewModel)
+                        if let selectedFile = viewModel.selectedPlaybackFile {
+                            PlaybackControlView(
+                                file: selectedFile,
+                                playbackTime: viewModel.playbackTime,
+                                isPlaying: viewModel.isPlaying,
+                                onSeek: { viewModel.seek(to: $0) },
+                                onTogglePlayPause: viewModel.togglePlayPause,
+                                onStop: viewModel.stopPlayback
+                            )
                         }
                     }
                 }

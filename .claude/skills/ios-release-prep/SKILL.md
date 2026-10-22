@@ -75,7 +75,7 @@ git log refs/tags/<前回タグ>..HEAD --oneline --merges
 ユーザーが確定した内容を以下のパスに保存する：
 
 ```
-metadata/release-notes/<versionName>.md
+docs/release-notes/<versionName>.md
 ```
 
 ファイルの内容フォーマット：

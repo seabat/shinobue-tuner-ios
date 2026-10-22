@@ -54,8 +54,6 @@ struct ContentView: View {
             Tab("周波数表", systemImage: "music.note.list") {
                 NavigationStack {
                     FrequencyTableScreen()
-                        .navigationTitle("六本調子 周波数表")
-                        .navigationBarTitleDisplayMode(.inline)
                 }
             }
         }
@@ -63,6 +61,12 @@ struct ContentView: View {
         .task {
             // 起動時にマイク権限を確認
             await viewModel.requestPermission()
+        }
+        // 初回起動時（マイク許可の問い合わせ後）の調子選択。閉じたら選択した調子を反映する
+        .fullScreenCover(isPresented: $viewModel.shouldShowTuningSelection, onDismiss: {
+            viewModel.reloadSettings()
+        }) {
+            TuningSelectionFullScreenModal()
         }
         .onChange(of: viewModel.lastSavedRecording) { _, _ in
             // 録音保存後に一覧を自動更新

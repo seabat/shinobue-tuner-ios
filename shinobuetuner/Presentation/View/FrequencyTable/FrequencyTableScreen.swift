@@ -4,47 +4,14 @@
 //
 //  Created by ryouta on 2026/03/01.
 //
-//  篠笛六本調子 音階周波数表
+//  篠笛 音階周波数表（選択中の調子に合わせて表示）
 
 import SwiftUI
 
-/// 篠笛六本調子の音階周波数表を表示するビュー
+/// 篠笛の音階周波数表を表示するビュー（調子・階名はチューナーと共通の設定に従う）
 struct FrequencyTableScreen: View {
-
-    // 六本調子（シ=442Hz基準）音階周波数表（高い音から順）
-    private let rows: [FrequencyRow] = [
-        FrequencyRow("4'",       "ファ",  2500.328, "Eb7"),
-        FrequencyRow("3'",       "ミ",    2360.029, "D7"),
-        FrequencyRow("2'（半）", "レ♯",  2227.540, "Db7"),
-        FrequencyRow("2'",       "レ",    2102.519, "C7"),
-        FrequencyRow("1'（半）", "ド♯",  1984.512, "B6"),
-        FrequencyRow("1'",       "ド",    1873.131, "Bb6", isHighlighted: true),
-        FrequencyRow("７",       "シ",    1768.000, "A6"),
-        FrequencyRow("６（半）", "ラ♯",  1668.770, "Ab6"),
-        FrequencyRow("６",       "ラ",    1575.116, "G6"),
-        FrequencyRow("５（半）", "ソ♯",  1486.784, "Gb6"),
-        FrequencyRow("５",       "ソ",    1403.262, "F6"),
-        FrequencyRow("４（半）", "ファ♯", 1324.504, "E6"),
-        FrequencyRow("４",       "ファ",  1250.164, "Eb6"),
-        FrequencyRow("３",       "ミ",    1179.998, "D6"),
-        FrequencyRow("２（半）", "レ♯",   1113.770, "Db6"),
-        FrequencyRow("２",       "レ",    1051.260, "C6"),
-        FrequencyRow("１（半）", "ド♯",    992.256, "B5"),
-        FrequencyRow("１",       "ド",     936.566, "Bb5"),
-        FrequencyRow("七",       "シ",     884.000, "A5"),
-        FrequencyRow("六（半）", "ラ♯",    834.385, "Ab5"),
-        FrequencyRow("六",       "ラ",     787.558, "G5"),
-        FrequencyRow("五（半）", "ソ♯",   743.352, "Gb5"),
-        FrequencyRow("五",       "ソ",     701.631, "F5"),
-        FrequencyRow("四（半）", "ファ♯",  662.252, "E5"),
-        FrequencyRow("四",       "ファ",   625.082, "Eb5"),
-        FrequencyRow("三",       "ミ",     589.999, "D5"),
-        FrequencyRow("二（半）", "レ♯",    556.885, "Db5"),
-        FrequencyRow("二",       "レ",     525.630, "C5"),
-        FrequencyRow("一（半）", "ド♯",    496.128, "B4"),
-        FrequencyRow("一",       "ド",     468.283, "Bb4"),
-        FrequencyRow("筒音",     "シ",     442.000, "A4", isHighlighted: true),
-    ]
+    @StateObject private var viewModel = FrequencyTableViewModel()
+    @State private var isSettingsPresented: Bool = false
 
     var body: some View {
         ZStack {
@@ -58,15 +25,23 @@ struct FrequencyTableScreen: View {
                     .foregroundStyle(.white.opacity(0.5))
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(.horizontal, 16)
-                    .padding(.vertical, 6)
+                    .padding(.top, 6)
+
+                // ─── 階名の表示方式 ───
+                Text(solfegeLegend)
+                    .font(.caption2)
+                    .foregroundStyle(.white.opacity(0.5))
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.horizontal, 16)
+                    .padding(.bottom, 6)
 
                 ScrollView {
                     LazyVStack(spacing: 0) {
                         // ─── ヘッダー行 ───
                         HStack(spacing: 0) {
                             Text("運指").headerStyle()
-                            Text("日本").headerStyle()
-                            Text("西洋").headerStyle()
+                            Text("階名").headerStyle()
+                            Text("音名").headerStyle()
                             Text("Hz").headerStyle(alignment: .trailing)
                         }
                         .frame(height: 32)
@@ -74,7 +49,7 @@ struct FrequencyTableScreen: View {
                         .background(Color(red: 0.12, green: 0.12, blue: 0.18))
 
                         // ─── データ行 ───
-                        ForEach(rows) { row in
+                        ForEach(viewModel.rows) { row in
                             HStack(spacing: 0) {
                                 // 運指名
                                 Text(row.fingeringName)
@@ -82,13 +57,13 @@ struct FrequencyTableScreen: View {
                                     .foregroundStyle(row.isHighlighted ? Color.cyan : .white)
                                     .frame(maxWidth: .infinity, alignment: .leading)
 
-                                // 日本音階名
-                                Text(row.japaneseName)
+                                // 階名（設定の移動ド／固定ドに従う）
+                                Text(row.solfegeName)
                                     .font(.system(.subheadline, design: .rounded))
                                     .foregroundStyle(row.isHighlighted ? Color.cyan : .white.opacity(0.85))
                                     .frame(maxWidth: .infinity, alignment: .leading)
 
-                                // 西洋音階名
+                                // 音名
                                 Text(row.westernName)
                                     .font(.system(.subheadline, design: .monospaced))
                                     .foregroundStyle(row.isHighlighted ? Color.cyan : .white.opacity(0.85))
@@ -113,25 +88,39 @@ struct FrequencyTableScreen: View {
                 .background(Color(red: 0.08, green: 0.08, blue: 0.12))
             }
         }
+        .navigationTitle(viewModel.title)
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                // ─── 設定ボタン（調子・階名）───
+                Button {
+                    isSettingsPresented = true
+                } label: {
+                    Image(systemName: "gearshape")
+                        .foregroundStyle(Color("InactiveMode"))
+                }
+            }
+        }
+        // チューナータブで設定が変わる可能性があるため、表示のたびに読み直す
+        .onAppear {
+            viewModel.reloadSettings()
+        }
+        // 設定モーダルを閉じたタイミングで設定値を再読み込みする
+        .fullScreenCover(isPresented: $isSettingsPresented, onDismiss: {
+            viewModel.reloadSettings()
+        }) {
+            FrequencyTableSettingsFullScreenModal()
+        }
     }
-}
 
-// MARK: - FrequencyRow
-
-private struct FrequencyRow: Identifiable {
-    let id = UUID()
-    let fingeringName: LocalizedStringResource
-    let japaneseName: LocalizedStringResource
-    let frequency: Double
-    let westernName: String
-    let isHighlighted: Bool
-
-    init(_ fingeringName: LocalizedStringResource, _ japaneseName: LocalizedStringResource, _ frequency: Double, _ westernName: String, isHighlighted: Bool = false) {
-        self.fingeringName = fingeringName
-        self.japaneseName = japaneseName
-        self.frequency = frequency
-        self.westernName = westernName
-        self.isHighlighted = isHighlighted
+    /// 階名の表示方式の凡例（例: "階名：移動ド（ド＝C）"）
+    private var solfegeLegend: String {
+        switch viewModel.solfegeSystem {
+        case .movable:
+            return String(format: String(localized: "frequencyTable.legend.movable.format", defaultValue: "階名：移動ド（ド＝%@）"), viewModel.tuning.tonicName)
+        case .fixed:
+            return String(localized: "階名：固定ド（ド＝C）")
+        }
     }
 }
 
@@ -151,8 +140,6 @@ private extension Text {
 #Preview {
     NavigationStack {
         FrequencyTableScreen()
-            .navigationTitle("周波数表")
-            .navigationBarTitleDisplayMode(.inline)
     }
     .preferredColorScheme(.dark)
 }
