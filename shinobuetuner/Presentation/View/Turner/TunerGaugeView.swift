@@ -177,7 +177,8 @@ struct TunerGaugeView: View {
     /// 中央のメイン表示（階名／運指名）に重なる区間だけを細く薄くして、文字を読めるようにする。
     /// セント値は細い文字なので太いままの先端が重なってよい（可読性に影響しないため）。
     private func needle(radius: CGFloat, pivot: CGPoint) -> some View {
-        let length = radius - stroke / 2 - 4
+        // 針先はアークの帯を横切って外縁の少し手前まで伸ばす（タコメーターらしい見た目にするため）
+        let length = radius + stroke / 2 - 3
         // 中央テキスト全体の上端からメイン表示の上端・下端をピボットからの距離で求める
         let blockTop = radius * centerContentRatio + (mainDisplayHeight + centsRowHeight) / 2
         let thinTop = min(length, blockTop - centsRowHeight)
