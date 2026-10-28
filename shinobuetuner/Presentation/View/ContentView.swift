@@ -62,11 +62,20 @@ struct ContentView: View {
             // 起動時にマイク権限を確認
             await viewModel.requestPermission()
         }
-        // 初回起動時（マイク許可の問い合わせ後）の調子選択。閉じたら選択した調子を反映する
+        // 初回起動時（マイク許可の問い合わせ後）の調子選択
+        // 閉じたら選択した調子を反映し、続けてゲージ表示方式の選択が必要かを判定する
         .fullScreenCover(isPresented: $viewModel.shouldShowTuningSelection, onDismiss: {
             viewModel.reloadSettings()
+            viewModel.evaluateGaugeDisplayModeSelection()
         }) {
             TuningSelectionFullScreenModal()
+        }
+        // 初回起動時のゲージ表示方式の選択。閉じたら選択した表示方式を反映する
+        // ※ 既存ユーザー（調子は選択済み）にはこちらだけが表示される
+        .fullScreenCover(isPresented: $viewModel.shouldShowGaugeDisplayModeSelection, onDismiss: {
+            viewModel.reloadSettings()
+        }) {
+            GaugeDisplayModeSelectionFullScreenModal()
         }
         .onChange(of: viewModel.lastSavedRecording) { _, _ in
             // 録音保存後に一覧を自動更新

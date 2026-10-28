@@ -25,6 +25,10 @@ struct TunerSettingsFullScreenModal: View {
                         tuning: viewModel.settings.tuning
                     )
 
+                    GaugeDisplayModeSection(
+                        gaugeDisplayMode: $viewModel.settings.gaugeDisplayMode
+                    )
+
                     Section {
                         Toggle(isOn: $viewModel.settings.showPitchGraph) {
                             Text("ピッチグラフを表示")

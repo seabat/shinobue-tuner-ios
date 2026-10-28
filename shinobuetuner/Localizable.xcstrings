@@ -7,12 +7,6 @@
     "---" : {
 
     },
-    "-25" : {
-
-    },
-    "-50" : {
-
-    },
     "[頭出し]" : {
       "localizations" : {
         "en" : {
@@ -25,57 +19,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "[頭出し]"
-          }
-        }
-      }
-    },
-    "frequencyTable.legend.movable.format" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Solfège: movable do (Do = %@)"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "階名：移動ド（ド＝%@）"
-          }
-        }
-      }
-    },
-    "frequencyTable.title.format" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@ Frequency Table"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@ 周波数表"
-          }
-        }
-      }
-    },
-    "settings.solfege.description.format" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Movable do: shows %2$@, the tonic of the %1$@ flute, as Do. Fixed do: shows C as Do."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "移動ド：%1$@の主音 %2$@ をドとして表示します。固定ド：C をドとして表示します。"
           }
         }
       }
@@ -127,12 +70,6 @@
           }
         }
       }
-    },
-    "+25" : {
-
-    },
-    "+50" : {
-
     },
     "±1" : {
 
@@ -193,198 +130,6 @@
     },
     "1" : {
 
-    },
-    "あとから設定で変更できます。" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "You can change this later in Settings."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "あとから設定で変更できます。"
-          }
-        }
-      }
-    },
-    "お使いの篠笛の調子を選んでください" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Select the key of your shinobue"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "お使いの篠笛の調子を選んでください"
-          }
-        }
-      }
-    },
-    "この設定はチューナーと共通です。" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "These settings are shared with the tuner."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "この設定はチューナーと共通です。"
-          }
-        }
-      }
-    },
-    "周波数表の設定" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Frequency Table Settings"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "周波数表の設定"
-          }
-        }
-      }
-    },
-    "固定ド" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Fixed do"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "固定ド"
-          }
-        }
-      }
-    },
-    "決定" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Done"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "決定"
-          }
-        }
-      }
-    },
-    "現在は六本調子・八本調子に対応しています。" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Currently No. 6 and No. 8 are supported."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "現在は六本調子・八本調子に対応しています。"
-          }
-        }
-      }
-    },
-    "移動ド" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Movable do"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "移動ド"
-          }
-        }
-      }
-    },
-    "調子は笛の音の高さを表します。笛の本体や購入時の箱に書かれていることが多いです。わからない場合は、お囃子でよく使われる六本調子を選んでください。" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "The key (number) indicates the pitch of the flute. It is often written on the flute or on the box it came in. If you are not sure, choose No. 6, which is commonly used in festival music (ohayashi)."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "調子は笛の音の高さを表します。笛の本体や購入時の箱に書かれていることが多いです。わからない場合は、お囃子でよく使われる六本調子を選んでください。"
-          }
-        }
-      }
-    },
-    "階名" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Solfège"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "階名"
-          }
-        }
-      }
-    },
-    "階名：固定ド（ド＝C）" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Solfège: fixed do (Do = C)"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "階名：固定ド（ド＝C）"
-          }
-        }
-      }
-    },
-    "音名" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Note"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "音名"
-          }
-        }
-      }
     },
     "１" : {
       "localizations" : {
@@ -788,19 +533,36 @@
         }
       }
     },
-    "cents.meter.value.format" : {
+    "frequencyTable.legend.movable.format" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%+.1f cents"
+            "value" : "Solfège: movable do (Do = %@)"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%+.1f セント"
+            "value" : "階名：移動ド（ド＝%@）"
+          }
+        }
+      }
+    },
+    "frequencyTable.title.format" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ Frequency Table"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ 周波数表"
           }
         }
       }
@@ -909,6 +671,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "頭出しに失敗しました: %@"
+          }
+        }
+      }
+    },
+    "settings.solfege.description.format" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Movable do: shows %2$@, the tonic of the %1$@ flute, as Do. Fixed do: shows C as Do."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "移動ド：%1$@の主音 %2$@ をドとして表示します。固定ド：C をドとして表示します。"
           }
         }
       }
@@ -1049,6 +828,22 @@
         }
       }
     },
+    "あとから設定で変更できます。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You can change this later in Settings."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "あとから設定で変更できます。"
+          }
+        }
+      }
+    },
     "アンサンブル 調整オプション（非推奨）" : {
       "localizations" : {
         "en" : {
@@ -1113,6 +908,22 @@
         }
       }
     },
+    "お使いの篠笛の調子を選んでください" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Select the key of your shinobue"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "お使いの篠笛の調子を選んでください"
+          }
+        }
+      }
+    },
     "キャンセル" : {
       "localizations" : {
         "en" : {
@@ -1141,6 +952,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "この機能は改善中です。判定結果はご参考までにお使いください。"
+          }
+        }
+      }
+    },
+    "この設定はチューナーと共通です。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "These settings are shared with the tuner."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "この設定はチューナーと共通です。"
           }
         }
       }
@@ -1545,6 +1372,38 @@
         }
       }
     },
+    "メーターに表示する内容を選んでください" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choose what the meter shows"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "メーターに表示する内容を選んでください"
+          }
+        }
+      }
+    },
+    "メーターの表示" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Meter display"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "メーターの表示"
+          }
+        }
+      }
+    },
     "ラ" : {
       "localizations" : {
         "en" : {
@@ -1625,22 +1484,6 @@
         }
       }
     },
-    "一（半）" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "1½"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "一（半）"
-          }
-        }
-      }
-    },
     "一（メリ）" : {
       "localizations" : {
         "en" : {
@@ -1653,6 +1496,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "一（メリ）"
+          }
+        }
+      }
+    },
+    "一（半）" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1½"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "一（半）"
           }
         }
       }
@@ -1977,6 +1836,22 @@
         }
       }
     },
+    "周波数表の設定" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Frequency Table Settings"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "周波数表の設定"
+          }
+        }
+      }
+    },
     "四" : {
       "localizations" : {
         "en" : {
@@ -2005,6 +1880,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "四（半）"
+          }
+        }
+      }
+    },
+    "固定ド" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fixed do"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "固定ド"
           }
         }
       }
@@ -2137,6 +2028,54 @@
         }
       }
     },
+    "決定" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Done"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "決定"
+          }
+        }
+      }
+    },
+    "現在は六本調子・八本調子に対応しています。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Currently No. 6 and No. 8 are supported."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "現在は六本調子・八本調子に対応しています。"
+          }
+        }
+      }
+    },
+    "移動ド" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Movable do"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "移動ド"
+          }
+        }
+      }
+    },
     "筒音" : {
       "localizations" : {
         "en" : {
@@ -2213,6 +2152,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "自動停止"
+          }
+        }
+      }
+    },
+    "表示イメージ" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Preview"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "表示イメージ"
           }
         }
       }
@@ -2345,6 +2300,22 @@
         }
       }
     },
+    "調子は笛の音の高さを表します。笛の本体や購入時の箱に書かれていることが多いです。わからない場合は、お囃子でよく使われる六本調子を選んでください。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The key (number) indicates the pitch of the flute. It is often written on the flute or on the box it came in. If you are not sure, choose No. 6, which is commonly used in festival music (ohayashi)."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "調子は笛の音の高さを表します。笛の本体や購入時の箱に書かれていることが多いです。わからない場合は、お囃子でよく使われる六本調子を選んでください。"
+          }
+        }
+      }
+    },
     "運指" : {
       "localizations" : {
         "en" : {
@@ -2357,6 +2328,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "運指"
+          }
+        }
+      }
+    },
+    "運指名" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fingering"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "運指名"
           }
         }
       }
@@ -2425,6 +2412,38 @@
         }
       }
     },
+    "階名" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Solfège"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "階名"
+          }
+        }
+      }
+    },
+    "階名：固定ド（ド＝C）" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Solfège: fixed do (Do = C)"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "階名：固定ド（ド＝C）"
+          }
+        }
+      }
+    },
     "音を鳴らしてください" : {
       "localizations" : {
         "en" : {
@@ -2437,6 +2456,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "音を鳴らしてください"
+          }
+        }
+      }
+    },
+    "音名" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Note"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "音名"
           }
         }
       }
@@ -2469,6 +2504,38 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "音声ファイル設定"
+          }
+        }
+      }
+    },
+    "音階名" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Note name"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "音階名"
+          }
+        }
+      }
+    },
+    "音階名：階名と西洋音階名（例: シ・A4）を表示します。運指名：篠笛の運指（例: 一・七の甲）を表示します。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Note name: shows the solfège and Western note name (e.g. Si, A4). Fingering: shows the shinobue fingering (e.g. 一, 七の甲)."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "音階名：階名と西洋音階名（例: シ・A4）を表示します。運指名：篠笛の運指（例: 一・七の甲）を表示します。"
           }
         }
       }

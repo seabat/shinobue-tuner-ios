@@ -41,6 +41,8 @@ final class TunerViewModel: ObservableObject {
     @Published var permissionGranted: Bool = false
     /// 初回起動時の調子選択モーダルを表示するかどうか（マイク許可の問い合わせ後、未選択なら true）
     @Published var shouldShowTuningSelection: Bool = false
+    /// 初回起動時のゲージ表示方式選択モーダルを表示するかどうか（調子選択の後、未選択なら true）
+    @Published var shouldShowGaugeDisplayModeSelection: Bool = false
     /// セッション開始からの経過時間（録音中は常に更新される）
     @Published var currentTime: TimeInterval = 0
     /// 録音中かどうか（ピッチ監視とは独立）
@@ -73,6 +75,7 @@ final class TunerViewModel: ObservableObject {
     private let playbackFileRepository: any PlaybackFileRepository
     private let fetchTunerSettingsUseCase: any FetchTunerSettingsUseCaseProtocol
     private let fetchHasSelectedTuningUseCase: any FetchHasSelectedTuningUseCaseProtocol
+    private let fetchHasSelectedGaugeDisplayModeUseCase: any FetchHasSelectedGaugeDisplayModeUseCaseProtocol
     private var cancellables = Set<AnyCancellable>()
     private var sessionStartTime: Date = Date()
     /// 最後に音を検出した currentTime（無音タイムアウト判定に使用）
@@ -94,22 +97,26 @@ final class TunerViewModel: ObservableObject {
     /// デフォルトの依存性を使って初期化（本番用）
     convenience init() {
         let settingsRepository = TunerSettingsRepositoryImpl()
+        let onboardingRepository = OnboardingRepositoryImpl()
         self.init(
             useCase: MonitorPitchUseCase(repository: PitchRepositoryImpl()),
             playbackFileRepository: PlaybackFileRepositoryImpl(),
             fetchTunerSettingsUseCase: FetchTunerSettingsUseCase(repository: settingsRepository),
-            fetchHasSelectedTuningUseCase: FetchHasSelectedTuningUseCase(repository: OnboardingRepositoryImpl())
+            fetchHasSelectedTuningUseCase: FetchHasSelectedTuningUseCase(repository: onboardingRepository),
+            fetchHasSelectedGaugeDisplayModeUseCase: FetchHasSelectedGaugeDisplayModeUseCase(repository: onboardingRepository)
         )
     }
 
     /// テスト・Preview 用にモック UseCase だけを差し替えられる便利イニシャライザ
     convenience init(useCase: any MonitorPitchUseCaseProtocol) {
         let settingsRepository = TunerSettingsRepositoryImpl()
+        let onboardingRepository = OnboardingRepositoryImpl()
         self.init(
             useCase: useCase,
             playbackFileRepository: PlaybackFileRepositoryImpl(),
             fetchTunerSettingsUseCase: FetchTunerSettingsUseCase(repository: settingsRepository),
-            fetchHasSelectedTuningUseCase: FetchHasSelectedTuningUseCase(repository: OnboardingRepositoryImpl())
+            fetchHasSelectedTuningUseCase: FetchHasSelectedTuningUseCase(repository: onboardingRepository),
+            fetchHasSelectedGaugeDisplayModeUseCase: FetchHasSelectedGaugeDisplayModeUseCase(repository: onboardingRepository)
         )
     }
 
@@ -118,12 +125,14 @@ final class TunerViewModel: ObservableObject {
         useCase: any MonitorPitchUseCaseProtocol,
         playbackFileRepository: any PlaybackFileRepository,
         fetchTunerSettingsUseCase: any FetchTunerSettingsUseCaseProtocol,
-        fetchHasSelectedTuningUseCase: any FetchHasSelectedTuningUseCaseProtocol
+        fetchHasSelectedTuningUseCase: any FetchHasSelectedTuningUseCaseProtocol,
+        fetchHasSelectedGaugeDisplayModeUseCase: any FetchHasSelectedGaugeDisplayModeUseCaseProtocol
     ) {
         self.useCase = useCase
         self.playbackFileRepository = playbackFileRepository
         self.fetchTunerSettingsUseCase = fetchTunerSettingsUseCase
         self.fetchHasSelectedTuningUseCase = fetchHasSelectedTuningUseCase
+        self.fetchHasSelectedGaugeDisplayModeUseCase = fetchHasSelectedGaugeDisplayModeUseCase
         self.tunerSettings = fetchTunerSettingsUseCase()
     }
 
@@ -131,11 +140,22 @@ final class TunerViewModel: ObservableObject {
 
     /// マイクのアクセス許可を要求する
     /// 許可・拒否にかかわらず、問い合わせ後に調子が未選択なら調子選択モーダルを表示する
+    /// 調子が選択済みなら、続けてゲージ表示方式の選択が必要かを判定する
     func requestPermission() async {
         let granted = await useCase.requestPermission()
         permissionGranted = granted
         if !fetchHasSelectedTuningUseCase() {
             shouldShowTuningSelection = true
+        } else {
+            evaluateGaugeDisplayModeSelection()
+        }
+    }
+
+    /// ゲージ表示方式の選択モーダルが必要かを判定する
+    /// 調子選択モーダルを閉じた直後（ContentView の onDismiss）と、調子選択が不要だった場合に呼ぶ
+    func evaluateGaugeDisplayModeSelection() {
+        if !fetchHasSelectedGaugeDisplayModeUseCase() {
+            shouldShowGaugeDisplayModeSelection = true
         }
     }
 

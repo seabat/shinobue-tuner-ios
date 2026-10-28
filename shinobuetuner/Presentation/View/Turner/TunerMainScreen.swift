@@ -20,20 +20,14 @@ struct TunerMainScreen: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            // ─── 音階名表示エリア ───
-            NoteDisplayView(
+            // ─── チューナーゲージ（周波数・音名・メーターを内包）───
+            TunerGaugeView(
                 noteResult: viewModel.noteResult,
                 solfegeName: viewModel.solfegeName,
-                currentPitch: viewModel.currentPitch
+                currentPitch: viewModel.currentPitch,
+                displayMode: viewModel.tunerSettings.gaugeDisplayMode
             )
-            .frame(height: 160)
-
-            // ─── チューナーメーター ───
-            CentsMeterView(
-                cents: viewModel.noteResult?.cents ?? 0,
-                isActive: viewModel.currentPitch > 0
-            )
-            .frame(height: 90)
+            .frame(height: 223)
             .padding(.horizontal, 24)
             .padding(.vertical, 4)
 

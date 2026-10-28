@@ -116,24 +116,56 @@ def meter_color(t):
     return stops[-1][1]
 
 
-def draw_meter(img, cx, top, width, height, label_font):
+def _needle_segment(cx, cy, ux, uy, r0, r1, width):
+    """ピボットからの距離 r0〜r1 を幅 width の帯として結ぶ四角形の頂点を返す"""
+    px, py = -uy, ux  # 進行方向に垂直な単位ベクトル
+    hw = width / 2
+    return [
+        (cx + ux * r0 + px * hw, cy + uy * r0 + py * hw),
+        (cx + ux * r1 + px * hw, cy + uy * r1 + py * hw),
+        (cx + ux * r1 - px * hw, cy + uy * r1 - py * hw),
+        (cx + ux * r0 - px * hw, cy + uy * r0 - py * hw),
+    ]
+
+
+def draw_gauge(img, cx, cy, radius, stroke, cents, label_font, main_height):
+    """アプリのチューナーゲージ（半円タコメーター）を描く。
+
+    cx, cy はピボット（針の回転中心）。cents は針が指すセント値（-50〜+50）。
+    main_height は中央に置く階名の行高さで、針を細くする区間の算出に使う。
+    """
     d = ImageDraw.Draw(img)
-    x0 = int(cx - width / 2)
-    bar = Image.new("RGB", (int(width), int(height)))
-    bd = ImageDraw.Draw(bar)
-    for x in range(int(width)):
-        bd.line([x, 0, x, height], fill=meter_color(x / (width - 1)))
-    mask = Image.new("L", bar.size, 0)
-    ImageDraw.Draw(mask).rounded_rectangle([0, 0, width - 1, height - 1], radius=height / 2, fill=255)
-    img.paste(bar, (x0, int(top)), mask)
-    # 中央線と針（三角）
-    d.line([cx, top, cx, top + height], fill=WHITE, width=int(6 * SS))
-    tri_h = height * 0.95
-    d.polygon([(cx, top + height * 0.15), (cx - tri_h * 0.62, top + height * 0.15 + tri_h), (cx + tri_h * 0.62, top + height * 0.15 + tri_h)],
-              fill=WHITE, outline=(60, 60, 70))
-    for i, label in enumerate(["-50", "-25", "0", "+25", "+50"]):
-        lx = x0 + width * (0.02 + 0.24 * i)
-        d.text((lx, top + height + 40 * SS), label, font=label_font, fill=GRAY, anchor="mt")
+    bbox = [cx - radius, cy - radius, cx + radius, cy + radius]
+
+    # アーク: 180°(9時) 〜 360°(3時) を細かく分割して角度グラデーションにする
+    steps = 540
+    for i in range(steps):
+        a0 = 180 + 180 * i / steps
+        a1 = 180 + 180 * (i + 1) / steps + 0.4  # わずかに重ねて継ぎ目を消す
+        d.arc(bbox, a0, a1, fill=meter_color(i / (steps - 1)), width=int(stroke))
+
+    # 目盛り線とラベル
+    label_r = radius + stroke / 2 + 80 * SS
+    for cent, label in [(-50, "-50"), (-25, "-25"), (0, "0"), (25, "+25"), (50, "+50")]:
+        ang = math.radians(cent / 50 * 90)
+        ux, uy = math.sin(ang), -math.cos(ang)
+        d.polygon(_needle_segment(cx, cy, ux, uy, radius - 22 * SS, radius + 22 * SS, 12 * SS),
+                  fill=(255, 255, 255, 180))
+        d.text((cx + label_r * ux, cy + label_r * uy), label, font=label_font, fill=GRAY, anchor="mm")
+
+    # 針: 先端(太) → 階名に重なる区間(細) → ハブ側(太)
+    ang = math.radians(cents / 50 * 90)
+    ux, uy = math.sin(ang), -math.cos(ang)
+    length = radius + stroke / 2 - 20 * SS
+    center_off = radius * 0.44           # 中央テキストの位置（アプリと同じ比率）
+    thin_lo = center_off - main_height / 2
+    thin_hi = center_off + main_height / 2
+    thick_w, thin_w = radius * 0.040, radius * 0.016
+    d.polygon(_needle_segment(cx, cy, ux, uy, thin_hi, length, thick_w), fill=WHITE)
+    d.polygon(_needle_segment(cx, cy, ux, uy, thin_lo, thin_hi, thin_w), fill=(255, 255, 255, 115))
+    d.polygon(_needle_segment(cx, cy, ux, uy, 0, thin_lo, thick_w), fill=WHITE)
+    hub = radius * 0.056
+    d.ellipse([cx - hub, cy - hub, cx + hub, cy + hub], fill=WHITE)
 
 
 def text(d, xy, s, f, fill):
@@ -163,38 +195,40 @@ def make_search(lang):
     if lang == "ja":
         text(d, (w / 2, 290 * SS), "篠笛専用チューナー", font(HIRA_W6, 210), WHITE)
         text(d, (w / 2, 500 * SS), "六本調子・八本調子に対応　A4 = 442 Hz", font(HIRA_W3, 96), GOLD)
-        fingering, solfege = "一", "ド"
-        captions = ["運指", "階名", "音名"]
-        cap_font = font(HIRA_W3, 70)
-        chips = ["運指・階名・音名", "セントメーター", "ピッチグラフ", "録音・再生"]
+        solfege = "ド"
+        chips = ["音階名・運指名を選択", "セントメーター", "ピッチグラフ", "録音・再生"]
         chip_font = font(HIRA_W6, 84)
     else:
         text(d, (w / 2, 290 * SS), "The Tuner Made for Shinobue", font(SFNS, 190, "Bold"), WHITE)
         text(d, (w / 2, 500 * SS), "Supports No. 6 & No. 8 keys  ·  A4 = 442 Hz", font(SFNS, 96, "Regular"), GOLD)
-        fingering, solfege = "1", "Do"
-        captions = ["Fingering", "Solfège", "Note"]
-        cap_font = font(SFNS, 70, "Regular")
-        chips = ["Fingering & notes", "Cent meter", "Pitch graph", "Record & play"]
+        solfege = "Do"
+        chips = ["Note or fingering", "Cent meter", "Pitch graph", "Record & play"]
         chip_font = font(SFNS, 84, "Semibold")
 
-    # 音の表示（チューナー画面の上部と同じ並び：運指・階名・音名）。六本調子の一 = B♭4
-    big = font(HIRA_W6, 400)
-    mid = font(HIRA_W6, 250)
-    row_y = 960 * SS
-    text(d, (w / 2 - 860 * SS, row_y), fingering, mid, WHITE)
-    text(d, (w / 2, row_y), solfege, big, GREEN)
-    text(d, (w / 2 + 860 * SS, row_y), "B♭4", font(SFNS, 250, "Semibold"), WHITE)
-    for dx, c in zip([-860, 0, 860], captions):
-        text(d, (w / 2 + dx * SS, 1250 * SS), c, cap_font, GRAY)
-    text(d, (w / 2, 1370 * SS), "468.3 Hz", font(SFNS, 100, "Regular"), GRAY)
+    # 周波数（アプリではゲージの上に出る）
+    text(d, (w / 2, 700 * SS), "468.3 Hz", font(SFNS, 120, "Regular"), GRAY)
 
-    draw_meter(img, w / 2, 1530 * SS, 2700 * SS, 120 * SS, font(SFNS, 70, "Regular"))
+    # チューナーゲージ。中央に階名＋音名（六本調子の運指「一」= B♭4）
+    gauge_cy, radius, stroke = 1950 * SS, 920 * SS, 155 * SS
+    solfege_size = 440
+    main_h = solfege_size * SS * 1.2
+    draw_gauge(img, w / 2, gauge_cy, radius, stroke, 0, font(SFNS, 92, "Regular"), main_h)
+
+    big = font(HIRA_W6, solfege_size)
+    note_font = font(SFNS, int(solfege_size * 0.4), "Semibold")
+    center_y = gauge_cy - radius * 0.44
+    gap = solfege_size * 0.13 * SS
+    sw = d.textlength(solfege, font=big)
+    nw = d.textlength("B♭4", font=note_font)
+    left = w / 2 - (sw + gap + nw) / 2
+    text(d, (left + sw / 2, center_y), solfege, big, GREEN)
+    text(d, (left + sw + gap + nw / 2, center_y + solfege_size * 0.22 * SS), "B♭4", note_font, WHITE)
 
     # 機能のチップ
     pad_x, chip_h, gap = 80 * SS, 170 * SS, 60 * SS
     widths = [d.textlength(c, font=chip_font) + pad_x * 2 for c in chips]
     x = w / 2 - (sum(widths) + gap * (len(chips) - 1)) / 2
-    cy = 2130 * SS
+    cy = 2320 * SS
     for c, cw in zip(chips, widths):
         d.rounded_rectangle([x, cy - chip_h / 2, x + cw, cy + chip_h / 2], radius=chip_h / 2,
                             fill=(38, 42, 64), outline=GOLD_DARK, width=4 * SS)

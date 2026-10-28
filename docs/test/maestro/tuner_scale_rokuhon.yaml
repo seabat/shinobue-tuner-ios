@@ -1,8 +1,13 @@
 # 六本調子のテスト用音源（ド〜ドを1音1秒ずつ、ループ再生）をマイクの代わりに入力し、
-# TunerMainScreen に運指名・階名（移動ド）・音名が順に表示されることを確認する
+# TunerMainScreen のゲージ中央に階名（移動ド）・音名が順に表示されることを確認する
+#
+# ゲージ中央は設定（gaugeDisplayMode）で「音階名」「運指名」が切り替わる。このフローは音階名モード。
+# 運指名モードと、オクターブ違いの同じ階名（ド = １ と 1'）の区別は
+# tuner_scale_rokuhon_fingering.yaml が担当する
 #
 # 事前準備（.claude/skills/ios-ui-operator/recipe.md「音声ファイルによるチューナー確認」参照）:
-#   - Debug ビルドをインストールし、マイク権限の許可と初回の調子選択を済ませておく
+#   - Debug ビルドをインストールし、マイク権限を許可しておく
+#     （初回の調子選択・表示方式選択は起動引数で完了済みにするため、手動操作は不要）
 #   - shinobuetunerTests/Resources/rokuhon_scale.m4a をアプリの Library/UITestAudio/ にコピーしておく
 appId: dev.seabat.ios.shinobuetuner
 name: チューナー音階テスト（六本調子）
@@ -14,61 +19,60 @@ name: チューナー音階テスト（六本調子）
       AppleLocale: ja_JP
       # マイクの代わりに音声ファイルを入力にする（Debug ビルドのみ有効）
       UITestAudioFile: rokuhon_scale.m4a
-      # 設定を UserDefaults の引数ドメインで上書きする（調子・移動ド）
+      # 設定を UserDefaults の引数ドメインで上書きする（調子・移動ド・ゲージ中央は音階名）
       selectedTuning: 6
       solfegeSystem: 0
+      gaugeDisplayMode: 0
+      # オンボーディングのモーダルを飛ばす（出たままだと「計測開始」に到達できない）
+      # Maestro は裸の YES を真偽値として解釈し、起動引数には "true" として渡す。
+      # この2つは UserDefaults.bool(forKey:) で読むため "true" でも真として扱われる（2026-10-28 実測）
+      hasSelectedTuning: YES
+      hasSelectedGaugeDisplayMode: YES
 - extendedWaitUntil:
     visible: "計測開始"
     timeout: 10000
 - assertVisible: "6本調子"
 - tapOn: "計測開始"
 # 音源はループ再生なので、1秒の音を取りこぼしても次の周回（8秒後）で確認できるよう timeout を 20 秒にする
+# leftOf の音名はピッチグラフの目盛りにも出るため弱いアンカー。判定の主体は階名（ゲージ中央にしか出ない）
 - extendedWaitUntil:
     visible:
       text: "ド"
-      rightOf: "１"
       leftOf: "B♭5"
     timeout: 20000
 - extendedWaitUntil:
     visible:
       text: "レ"
-      rightOf: "２"
       leftOf: "C6"
     timeout: 20000
 - extendedWaitUntil:
     visible:
       text: "ミ"
-      rightOf: "３"
       leftOf: "D6"
     timeout: 20000
 - extendedWaitUntil:
     visible:
       text: "ファ"
-      rightOf: "４"
       leftOf: "E♭6"
     timeout: 20000
 - extendedWaitUntil:
     visible:
       text: "ソ"
-      rightOf: "５"
       leftOf: "F6"
     timeout: 20000
 - extendedWaitUntil:
     visible:
       text: "ラ"
-      rightOf: "６"
       leftOf: "G6"
     timeout: 20000
 - extendedWaitUntil:
     visible:
       text: "シ"
-      rightOf: "７"
       leftOf: "A6"
     timeout: 20000
 - extendedWaitUntil:
     visible:
       text: "ド"
-      rightOf: "1'"
       leftOf: "B♭6"
     timeout: 20000
 - tapOn: "計測停止"

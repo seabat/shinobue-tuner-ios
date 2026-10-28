@@ -10,6 +10,7 @@ import Foundation
 final class OnboardingRepositoryImpl: OnboardingRepository {
     private enum Keys {
         static let hasSelectedTuning = "hasSelectedTuning"
+        static let hasSelectedGaugeDisplayMode = "hasSelectedGaugeDisplayMode"
     }
 
     private let defaults: UserDefaults
@@ -25,5 +26,14 @@ final class OnboardingRepositoryImpl: OnboardingRepository {
 
     func markTuningSelected() {
         defaults.set(true, forKey: Keys.hasSelectedTuning)
+    }
+
+    func hasSelectedGaugeDisplayMode() -> Bool {
+        // 未保存時は false → 既存ユーザーにも初回起動時に表示方式の選択を表示する
+        defaults.bool(forKey: Keys.hasSelectedGaugeDisplayMode)
+    }
+
+    func markGaugeDisplayModeSelected() {
+        defaults.set(true, forKey: Keys.hasSelectedGaugeDisplayMode)
     }
 }

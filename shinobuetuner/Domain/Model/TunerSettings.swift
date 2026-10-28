@@ -71,6 +71,23 @@ enum SolfegeSystem: Int, CaseIterable, Identifiable {
     }
 }
 
+/// チューナーのゲージ中央に表示する内容
+enum GaugeDisplayMode: Int, CaseIterable, Identifiable {
+    /// 日本音階名（階名）＋ 西洋音階名
+    case noteName  = 0
+    /// 運指名
+    case fingering = 1
+
+    var id: Int { rawValue }
+
+    var displayName: String {
+        switch self {
+        case .noteName:  return String(localized: "音階名")
+        case .fingering: return String(localized: "運指名")
+        }
+    }
+}
+
 /// チューナーの設定値
 struct TunerSettings {
     /// チューニング成功とみなすセント閾値（デフォルト: 10セント）
@@ -83,6 +100,8 @@ struct TunerSettings {
     var showPitchGraph: Bool = true
     /// 階名の表示方式（デフォルト: 移動ド）
     var solfegeSystem: SolfegeSystem = .movable
+    /// ゲージ中央に表示する内容（デフォルト: 音階名）
+    var gaugeDisplayMode: GaugeDisplayMode = .noteName
 
     /// アンサンブル用高難度オプション（非推奨・実機テスト中）
     /// スペクトル幅の閾値（ビン数）：値が小さいほど判定が厳しい

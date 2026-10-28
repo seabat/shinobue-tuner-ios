@@ -71,10 +71,23 @@ xcrun simctl privacy "iPhone 17" reset microphone dev.seabat.ios.shinobuetuner  
 
 - 権限変更後はアプリを再起動（`launch --terminate-running-process`）しないと反映されない
 - OS の許可ダイアログ（「"ぞめきチューナー"がマイクへのアクセスを求めています」等）は Springboard 側の要素だが、`inspect_screen` で拾えれば `tapOn: "許可"` で押せる。拾えない・不安定な場合は事前に `grant` しておく方が確実
+- ⚠️ **iOS 27.0 シミュレータでは `revoke` が効かない**（2026-10-28 確認）。`revoke` してもアプリは許可済みのまま起動し、`PermissionRequestView` が出ない。拒否状態を作るには次の手順を踏む:
+  1. `xcrun simctl terminate <device> <bundle>` でアプリを終了する
+  2. `xcrun simctl privacy <device> reset microphone <bundle>`
+  3. **5〜6秒待つ**（待ちが短いとダイアログが出ずに許可済みで起動してしまう。タイミング依存で数回の再試行が必要）
+  4. アプリを起動し、OS ダイアログの「許可しない」をタップする
+- 拒否状態はアプリを再起動すると解除されることがある（同じく iOS 27.0 で確認）。許可要求画面の確認は**拒否した直後の1回**で済ませる
 
-### 初回起動時の調子選択（オンボーディング）を出し直す
+### 初回起動時のオンボーディング（調子選択・表示方式選択）を出し直す
 
-完了記録 `hasSelectedTuning` は `OnboardingRepository`（UserDefaults）に保存されるため、**アプリをアンインストールして再インストール**するのが最も確実。
+完了記録 `hasSelectedTuning` と `hasSelectedGaugeDisplayMode` は `OnboardingRepository`（UserDefaults）に保存されるため、**アプリをアンインストールして再インストール**するのが最も確実。
+
+Maestro フローなど「モーダルを出したくない」場合は、逆に起動引数で完了済みにできる（引数ドメインが保存値より優先される）。Bool は `YES` / `1` で渡すこと。
+
+```
+hasSelectedTuning: YES
+hasSelectedGaugeDisplayMode: YES
+```
 
 ```bash
 xcrun simctl uninstall "iPhone 17" dev.seabat.ios.shinobuetuner
@@ -115,8 +128,11 @@ say -r 120 -o /tmp/test_A.m4a --file-format=m4af --data-format=aac \
 起動
 ├─ スプラッシュ（約1秒）
 ├─ マイク許可の問い合わせ（未決定時のみ OS ダイアログ）
-└─ 調子選択が未完了なら 初回調子選択 (TuningSelectionFullScreenModal) を全画面表示（タブバーも隠れる）
-    └─ 調子ドラムロール → 「決定」でのみ閉じる
+├─ 調子選択が未完了なら 初回調子選択 (TuningSelectionFullScreenModal) を全画面表示（タブバーも隠れる）
+│   └─ 調子ドラムロール → 「決定」でのみ閉じる
+└─ 続けて 表示方式選択 (GaugeDisplayModeSelectionFullScreenModal) が未完了なら全画面表示
+    └─ 「音階名」/「運指名」のセグメント + 表示イメージのサンプル → 「決定」でのみ閉じる
+    ※ 調子選択の onDismiss で連鎖する。既存ユーザー（調子は選択済み）にはこちらだけが出る
 
 チューナー
 ├─ マイク未許可 → PermissionRequestView（「マイクの使用を許可」ボタン）
@@ -124,6 +140,9 @@ say -r 120 -o /tmp/test_A.m4a --file-format=m4af --data-format=aac \
     ├─ 左上: 調子表示（例「6本調子」）→ チューニング設定 (TunerSettingsFullScreenModal)
     ├─ 右上: 歯車 → チューニング設定 (TunerSettingsFullScreenModal)
     │   ※ 計測中・録音中は左上・右上とも無効
+    ├─ 上部: チューナーゲージ (TunerGaugeView) … 周波数(Hz) + 半円メーター
+    │   └─ ゲージ中央: セント値 + メイン表示。設定「メーターの表示」で
+    │       「音階名」（階名 + 西洋音名。既定）/「運指名」が切り替わる。無音時は `---` /「音を鳴らしてください」
     ├─ 中央下部: 使い方ヘルプ（3ページ TabView、横スワイプ）または ピッチグラフ
     └─ 下部コントロールバー
         ├─ 開始/停止ボタン（「計測開始」/「計測停止」、録音モードは「録音開始」/「録音停止」）
@@ -140,11 +159,11 @@ say -r 120 -o /tmp/test_A.m4a --file-format=m4af --data-format=aac \
 └─ 右上: 歯車 → 周波数表の設定 (FrequencyTableSettingsFullScreenModal: 調子・階名のみ)
 ```
 
-設定の保存先: チューニング設定と周波数表設定の「調子」「階名」は共通（`TunerSettings`）。どちらで変えても両画面に反映される（各画面の `onAppear` / モーダルの `onDismiss` で読み直す）。
+設定の保存先: チューニング設定と周波数表設定の「調子」「階名」は共通（`TunerSettings`）。どちらで変えても両画面に反映される（各画面の `onAppear` / モーダルの `onDismiss` で読み直す）。「メーターの表示」も `TunerSettings` だが、チューナー設定にのみ表示される（周波数表は運指・階名・音名を常に全列表示するため）。
 
 ## このアプリ特有の注意点
 
-1. **シミュレータのマイク入力は Mac の入力デバイスを拾う**。周囲の音や Mac の入力設定次第で検出ピッチが不安定・あるいは常に無音になるため、**音程判定・セントメーター・祝福エフェクト（「いいね！」）の発火は UI 操作テストの検証対象にしない**。検証するのは、ボタンラベル・モード・画面遷移・無音時表示（`---` / 「音を鳴らしてください」）など、入力に依存しない部分に限る。音程判定はユニットテスト（`shinobuetunerTests`）の担当。
+1. **シミュレータのマイク入力は Mac の入力デバイスを拾う**。周囲の音や Mac の入力設定次第で検出ピッチが不安定・あるいは常に無音になるため、**音程判定・チューナーゲージの針の位置・祝福エフェクト（「いいね！」）の発火は UI 操作テストの検証対象にしない**。検証するのは、ボタンラベル・モード・画面遷移・無音時表示（`---` / 「音を鳴らしてください」）など、入力に依存しない部分に限る。音程判定はユニットテスト（`shinobuetunerTests`）の担当。
    ただし、マイクの代わりに音声ファイルを入力にする場合（後述「音声ファイルによるチューナー確認」）は入力が一定なので、音名などの表示を検証対象にしてよい
 2. **計測・録音中は設定系が無効**。左上の調子表示・右上の歯車・モード切替は `disabled` になる。設定を開く前に必ず停止する
 3. **30 秒無音で自動停止しアラートが出る**。計測を開始したまま放置すると、次の `inspect_screen` でアラート（「OK」ボタン）が出ていることがある。想定外のアラートが出ていたら閉じてから続行する
@@ -195,13 +214,17 @@ say -r 120 -o /tmp/test_A.m4a --file-format=m4af --data-format=aac \
 
 ## 機能別確認レシピ
 
-### 起動フロー（初回の調子選択・マイク許可）
+### 起動フロー（初回の調子選択・表示方式選択・マイク許可）
 
 1. 「状態のリセット」の手順でアンインストール → 再インストール。マイクは `grant` しておく（OS ダイアログ操作を省くため）
 2. 起動 → スプラッシュ後に「お使いの篠笛の調子を選んでください」の全画面モーダルが出る
 3. ドラムロールで調子を選択（初期値は六本調子）→ 「決定」
-4. モーダルが閉じ、チューナー画面左上の調子表示が選んだ調子（例「8本調子」）になっていることを確認
-5. アプリを再起動しても調子選択モーダルが再表示されないことを確認
+4. 続けて「メーターに表示する内容を選んでください」の全画面モーダルが出る（初期値は「音階名」）
+   - セグメントを「運指名」に切り替えると、下の「表示イメージ」のサンプルが運指名（例「一」）に変わる
+   - 「音階名」に戻すと階名 + 西洋音名（例「ド B♭4」）に戻る。サンプルの音は選んだ調子の主音（運指「一」）
+5. 「決定」でモーダルが閉じ、チューナー画面左上の調子表示が選んだ調子（例「8本調子」）になっていることを確認
+6. アプリを再起動してもどちらのモーダルも再表示されないことを確認
+- 既存ユーザー（調子は選択済み・表示方式が未選択）を再現するには、`hasSelectedTuning` だけ起動引数で `YES` にして起動する。表示方式選択のモーダルだけが出る
 - マイク未許可パターン: `revoke` して再起動 → チューナータブに「マイクのアクセスが必要です」「マイクの使用を許可」が出る
 
 ### チューナー（計測・録音）
@@ -216,27 +239,42 @@ say -r 120 -o /tmp/test_A.m4a --file-format=m4af --data-format=aac \
 シミュレータのマイクは Mac の入力デバイスをそのまま使い、音声ファイルを流し込む標準の方法がない。そこで **Debug ビルドの起動引数 `-UITestAudioFile <ファイル名>` でマイクの代わりに音声ファイルをループ再生して入力にする**（`AudioFileDataSource`。ピッチ検出は本番と同じ `detectPitchWithSpectrum`）。スピーカーからは鳴らない。
 
 1. テスト用音源（ド〜ドを1音1秒ずつ）は `shinobuetunerTests/Resources/{rokuhon,hachihon}_scale.m4a`。作り直すときは `docs/test/scripts/generate_scale_m4a.sh <6|8>`
-2. Debug ビルドをインストールし、マイクを `grant` しておく（`requestPermission` はそのまま通るため）。**初回の調子選択も済ませておく**（フローは調子選択画面を飛ばさない。未選択だと「計測開始」が出ずに失敗する）。アプリを起動して調子選択画面の「決定」を押せばよい（選ぶ調子はどれでもよい）
+2. Debug ビルドをインストールし、マイクを `grant` しておく（`requestPermission` はそのまま通るため）。**オンボーディングの手動操作は不要**（フローが起動引数 `hasSelectedTuning: YES` / `hasSelectedGaugeDisplayMode: YES` で完了済みにしてモーダルを飛ばす）
 3. 音源をアプリのデータコンテナの `Library/UITestAudio/` にコピーする（Documents に置くとプレイリストに出てしまう）
    ```bash
    DATA_DIR=$(xcrun simctl get_app_container "iPhone 17" dev.seabat.ios.shinobuetuner data)
    mkdir -p "$DATA_DIR/Library/UITestAudio"
    cp shinobuetunerTests/Resources/*_scale.m4a "$DATA_DIR/Library/UITestAudio/"
    ```
-4. Maestro フロー `docs/test/maestro/tuner_scale_rokuhon.yaml`（六本調子）/ `docs/test/maestro/tuner_scale_hachihon.yaml`（八本調子）を実行する（MCP なら `run` に `files` で渡す。CLI なら `maestro --device <UDID> test docs/test/maestro/tuner_scale_*.yaml`）。調子・階名は起動引数（UserDefaults の引数ドメイン）で上書きするので、設定画面の操作は不要
-   - 各音について「運指名 → 階名 → 音名」の並び（`rightOf` / `leftOf`）が表示されるまで待つ。1音1秒なので取りこぼしても、ループの次の周回で拾えるよう timeout は 20 秒にしている
+4. Maestro フローを実行する（MCP なら `run` に `files` で渡す。CLI なら `maestro --device <UDID> test docs/test/maestro/tuner_scale_*.yaml`）。調子・階名・表示方式は起動引数（UserDefaults の引数ドメイン）で上書きするので、設定画面の操作は不要
+
+   | フロー | モード | 確認内容 |
+   |---|---|---|
+   | `tuner_scale_rokuhon.yaml` | 音階名（`gaugeDisplayMode: 0`） | 六本調子の階名 → 音名 の並び |
+   | `tuner_scale_hachihon.yaml` | 音階名（`gaugeDisplayMode: 0`） | 八本調子の階名 → 音名 の並び |
+   | `tuner_scale_rokuhon_fingering.yaml` | 運指名（`gaugeDisplayMode: 1`） | 運指名（`１`〜`７`・`1'`）。オクターブ違いの判別 |
+
+   - 音階名モードでは**運指名が画面に出ない**ため、アサーションは「階名 → 音名」（`leftOf`）のみ。音名はピッチグラフの目盛りにも出る弱いアンカーで、判定の主体は階名（ゲージ中央にしか出ない）
+   - 階名だけでは `ド`（`１`）と `ド`（`1'`）のオクターブを区別できない。これは運指名モードのフローが担当する
+   - 運指は調子によらず共通（`.claude/rules/notes.md`）なので、運指名モードのフローは六本調子の1本のみ
+   - 1音1秒なので取りこぼしても、ループの次の周回で拾えるよう timeout は 20 秒にしている
 - フローはスクリーンショットを撮らない（成否は UI 階層で判定する）。失敗時は Maestro が失敗した時点の画面を自動保存する（CLI では `~/.maestro/tests/<日時>/<フロー名>/screenshots/`）
 - 単体テスト（`xcodebuild test`）の後はシミュレータが一度停止しており、MCP が「Device became unreachable」になる（注意点「Maestro 特有の操作クセ」5）。単体テストと続けて流すときは CLI を使う
 - 起動引数で Bool を渡すときは `YES` / `1` を使う。`true` は文字列 "true" として入り、`UserDefaults.bool(forKey:)` が false を返す（2026-10-19 確認）
+  - ただし **Maestro の YAML では裸の `YES` が真偽値と解釈され、起動引数には "true" として渡る**（2026-10-28 実測）。
+    読み出し側の実装で挙動が分かれるので注意する:
+    - `defaults.bool(forKey:)` で読むキー（`hasSelectedTuning` / `hasSelectedGaugeDisplayMode`）→ "true" でも真になる（実測で確認済み）
+    - `defaults.object(forKey:) as? Bool` で読むキー（`showPitchGraph`）→ 文字列は `as? Bool` が nil になり**既定値に落ちる**ため、起動引数での上書きはできない
 - 引数ドメインの値は保存値より優先されるため、このモードで設定画面から調子を変えても反映されないように見える。通常の確認に戻るときは引数なしで起動し直す
 - 音の順序・セント精度の厳密な確認は単体テスト `ScaleAudioPitchDetectionTests` で行う（Maestro は画面に正しく出るかの確認）
 
 ### チューニング設定
 
 - 開き方: 停止中に右上の歯車、または左上の調子表示
-- 項目順: 調子（ホイール）→ 階名（移動ド／固定ド）→ 表示設定（「ピッチグラフを表示」トグル）→ セント範囲 → 継続時間 → アンサンブル 調整オプション（非推奨）→「デフォルトに戻す」
+- 項目順: 調子（ホイール）→ 階名（移動ド／固定ド）→ メーターの表示（「音階名」／「運指名」セグメント）→ 表示設定（「ピッチグラフを表示」トグル）→ セント範囲 → 継続時間 → アンサンブル 調整オプション（非推奨）→「デフォルトに戻す」
+- 「メーターの表示」を「運指名」にすると、チューナー画面のゲージ中央が階名 + 西洋音名から運指名に変わる（無音時の `---` は変わらない）
 - フォームは縦に長いので、下の項目は `scroll` してから `inspect_screen` する
-- 「デフォルトに戻す」で調子は六本調子・ピッチグラフ On・移動ド・±10 セント・1.0 秒等に戻る。**初回の調子選択完了記録は消えない**（`.claude/rules/notes.md` 参照）ので、再起動しても調子選択モーダルは出ないのが正しい
+- 「デフォルトに戻す」で調子は六本調子・ピッチグラフ On・移動ド・**メーターの表示は音階名**・±10 セント・1.0 秒等に戻る。**初回のオンボーディング完了記録（調子選択・表示方式選択とも）は消えない**（`.claude/rules/notes.md` 参照）ので、再起動してもどちらのモーダルも出ないのが正しい
 
 ### プレイリスト
 

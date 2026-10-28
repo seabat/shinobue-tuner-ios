@@ -17,9 +17,22 @@ A4 = **442 Hz**（一般的な440 Hzではなく篠笛用）、12平均律。調
 - 新しい調子に対応するときは `isSupported` と `westernNoteNames` を追加し、`NoteHelperTuningTests` に比較表を足す
 - 調子・階名はチューナー／周波数表の両タブで変更できる（保存先は共通の `TunerSettings`）。両画面とも `onAppear` で `reloadSettings()` する
 
-## 初回起動時の調子選択
+## 初回起動時の調子選択・メーター表示方式の選択
 
 - 表示判定は `TunerViewModel.requestPermission()` の後（許可・拒否どちらでも）。完了記録 `hasSelectedTuning` は **`TunerSettings` に入れず `OnboardingRepository` に保存** する（「デフォルトに戻す」が `TunerSettings()` で全項目を初期化するため、同居させると再表示されてしまう）
+- メーター表示方式の選択も同じ理由で `hasSelectedGaugeDisplayMode` を `OnboardingRepository` に置く。**オンボーディングのフラグを増やすときは必ずこちら**
+- 2画面は**連鎖**する。`requestPermission()` で調子が未選択なら調子選択だけを出し、`ContentView` の `onDismiss` から `evaluateGaugeDisplayModeSelection()` を呼んで2枚目を出す。調子が選択済みなら `requestPermission()` から直接2枚目を判定する（既存ユーザーには表示方式の選択だけが出る）
+
+## チューナーゲージ（タコメーター）
+
+- 半円アーク。針の角度は `needleAngle = (cents / 50) * 90`（0セント = 真上 = 0°、+50 = +90°）
+- アークは `Circle().trim(from: 0.5, to: 1.0)`。SwiftUI の Circle は3時起点・時計回りなので 0.5〜1.0 が上半分になる
+- グラデーションは `AngularGradient(startAngle: 180°, endAngle: 360°)` で左右対称（両端が赤・真上が緑）。配分 `0 赤 / .175 橙 / .35 黄 / .50 緑 / .65 黄 / .825 橙 / 1.0 赤` は旧セントメーターの 35/15/15/35 をそのまま角度に移したもの
+- ゲージ中央のメイン表示は `GaugeMainDisplayView` に切り出し、**ゲージ本体と初回起動時の表示方式選択モーダルのサンプルで共用**する（サンプルが実物とズレないようにするため）
+- **針は「太 → 細 → 太」の3分割**。中央のメイン表示（階名／運指名）に重なる区間だけ細く薄くして文字を読めるようにする。区間は `centerContentRatio` / `mainDisplayHeight` / `centsRowHeight` から算出するので、**中央テキストのフォントサイズや位置を変えたらこれらの定数も合わせる**こと
+  - セント値は細い等幅文字なので、太いままの先端が重なってよい（可読性に影響しない）。代わりに**単位は出さず数値のみ**にして針に当たる幅を抑えている
+  - 針を全長そのまま太くすると、英語ロケールで `Sol` `Do` などの階名が縦に分断されて読めなくなる（日本語の1文字の階名では気づきにくい）
+- **音階名モードでは運指名が画面に出ない**。Maestro のアサーションで運指名をアンカーにできないので注意（階名だけではオクターブ違いの `ド` = `１` と `1'` を区別できず、運指名モードのフロー `tuner_scale_rokuhon_fingering.yaml` が判別を担う）
 
 ## テスト
 
