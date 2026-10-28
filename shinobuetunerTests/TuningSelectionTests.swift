@@ -35,6 +35,18 @@ private final class InMemoryOnboarding: FetchHasSelectedTuningUseCaseProtocol, M
     func callAsFunction() { hasSelectedTuning = true }
 }
 
+/// ゲージ表示方式の選択完了状況を保持する UseCase のモック
+private final class InMemoryGaugeDisplayModeOnboarding: FetchHasSelectedGaugeDisplayModeUseCaseProtocol, MarkGaugeDisplayModeSelectedUseCaseProtocol {
+    var hasSelectedGaugeDisplayMode: Bool
+
+    init(hasSelectedGaugeDisplayMode: Bool) {
+        self.hasSelectedGaugeDisplayMode = hasSelectedGaugeDisplayMode
+    }
+
+    func callAsFunction() -> Bool { hasSelectedGaugeDisplayMode }
+    func callAsFunction() { hasSelectedGaugeDisplayMode = true }
+}
+
 /// マイク許可の結果だけを差し替えるピッチ監視 UseCase のモック
 private final class StubMonitorPitchUseCase: MonitorPitchUseCaseProtocol {
     let permissionGranted: Bool
@@ -126,12 +138,17 @@ struct TuningSelectionTests {
         #expect(settingsRepository.fetch().tuning == .rokuHon)
     }
 
-    private func makeTunerViewModel(permissionGranted: Bool, hasSelectedTuning: Bool) -> TunerViewModel {
+    private func makeTunerViewModel(
+        permissionGranted: Bool,
+        hasSelectedTuning: Bool,
+        hasSelectedGaugeDisplayMode: Bool = true
+    ) -> TunerViewModel {
         TunerViewModel(
             useCase: StubMonitorPitchUseCase(permissionGranted: permissionGranted),
             playbackFileRepository: PlaybackFileRepositoryImpl(),
             fetchTunerSettingsUseCase: InMemoryTunerSettings(),
-            fetchHasSelectedTuningUseCase: InMemoryOnboarding(hasSelectedTuning: hasSelectedTuning)
+            fetchHasSelectedTuningUseCase: InMemoryOnboarding(hasSelectedTuning: hasSelectedTuning),
+            fetchHasSelectedGaugeDisplayModeUseCase: InMemoryGaugeDisplayModeOnboarding(hasSelectedGaugeDisplayMode: hasSelectedGaugeDisplayMode)
         )
     }
 }

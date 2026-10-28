@@ -14,4 +14,10 @@ protocol OnboardingRepository {
 
     /// 調子選択を完了済みとして記録する
     func markTuningSelected()
+
+    /// ゲージ表示方式の選択を完了済みかどうかを取得する
+    func hasSelectedGaugeDisplayMode() -> Bool
+
+    /// ゲージ表示方式の選択を完了済みとして記録する
+    func markGaugeDisplayModeSelected()
 }

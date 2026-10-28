@@ -1,0 +1,66 @@
+# 六本調子のテスト用音源（ド〜ドを1音1秒ずつ、ループ再生）をマイクの代わりに入力し、
+# ゲージ中央が「運指名」モードのときに運指名が順に表示されることを確認する
+#
+# 運指は調子によらず共通（.claude/rules/notes.md「調子（六本調子・八本調子）の扱い」）のため、
+# 運指名モードの確認は六本調子の1本だけとする。調子ごとの階名・音名の違いは
+# tuner_scale_rokuhon.yaml / tuner_scale_hachihon.yaml（音階名モード）が担当する。
+#
+# このフローの固有の役割: 階名だけでは区別できないオクターブ違い（ド = １ と 1'）を運指名で判別する
+#
+# 事前準備（.claude/skills/ios-ui-operator/recipe.md「音声ファイルによるチューナー確認」参照）:
+#   - Debug ビルドをインストールし、マイク権限を許可しておく
+#     （初回の調子選択・表示方式選択は起動引数で完了済みにするため、手動操作は不要）
+#   - shinobuetunerTests/Resources/rokuhon_scale.m4a をアプリの Library/UITestAudio/ にコピーしておく
+appId: dev.seabat.ios.shinobuetuner
+name: チューナー音階テスト（六本調子・運指名モード）
+---
+- launchApp:
+    stopApp: true
+    arguments:
+      AppleLanguages: "(ja)"
+      AppleLocale: ja_JP
+      # マイクの代わりに音声ファイルを入力にする（Debug ビルドのみ有効）
+      UITestAudioFile: rokuhon_scale.m4a
+      # 設定を UserDefaults の引数ドメインで上書きする（調子・移動ド・ゲージ中央は運指名）
+      selectedTuning: 6
+      solfegeSystem: 0
+      gaugeDisplayMode: 1
+      # オンボーディングのモーダルを飛ばす（出たままだと「計測開始」に到達できない）
+      # Maestro は裸の YES を真偽値として解釈し、起動引数には "true" として渡す。
+      # この2つは UserDefaults.bool(forKey:) で読むため "true" でも真として扱われる（2026-10-28 実測）
+      hasSelectedTuning: YES
+      hasSelectedGaugeDisplayMode: YES
+- extendedWaitUntil:
+    visible: "計測開始"
+    timeout: 10000
+- assertVisible: "6本調子"
+- tapOn: "計測開始"
+# 運指名モードではゲージ中央に運指名だけが出る。運指名は画面内で一意なので単独のテキスト一致で判定する
+# 音源はループ再生なので、1秒の音を取りこぼしても次の周回（8秒後）で確認できるよう timeout を 20 秒にする
+- extendedWaitUntil:
+    visible: "１"
+    timeout: 20000
+- extendedWaitUntil:
+    visible: "２"
+    timeout: 20000
+- extendedWaitUntil:
+    visible: "３"
+    timeout: 20000
+- extendedWaitUntil:
+    visible: "４"
+    timeout: 20000
+- extendedWaitUntil:
+    visible: "５"
+    timeout: 20000
+- extendedWaitUntil:
+    visible: "６"
+    timeout: 20000
+- extendedWaitUntil:
+    visible: "７"
+    timeout: 20000
+# 1' は正規表現のアポストロフィをそのまま含む。ド（１）と同じ階名だがオクターブが異なる
+- extendedWaitUntil:
+    visible: "1'"
+    timeout: 20000
+- tapOn: "計測停止"
+- assertVisible: "計測開始"

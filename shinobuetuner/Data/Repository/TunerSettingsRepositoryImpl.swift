@@ -14,6 +14,7 @@ final class TunerSettingsRepositoryImpl: TunerSettingsRepository {
         static let tuning          = "selectedTuning"
         static let showPitchGraph  = "showPitchGraph"
         static let solfegeSystem   = "solfegeSystem"
+        static let gaugeDisplayMode = "gaugeDisplayMode"
         static let ensembleSpectralWidthThreshold  = "ensembleSpectralWidthThreshold"
         static let ensembleStabilityScoreThreshold = "ensembleStabilityScoreThreshold"
     }
@@ -32,6 +33,8 @@ final class TunerSettingsRepositoryImpl: TunerSettingsRepository {
         let savedGraph          = defaults.object(forKey: Keys.showPitchGraph) as? Bool ?? true
         // solfegeSystem は未保存時に 0 → 移動ド
         let savedSolfege        = defaults.integer(forKey: Keys.solfegeSystem)
+        // gaugeDisplayMode は未保存時に 0 → 音階名
+        let savedGaugeMode      = defaults.integer(forKey: Keys.gaugeDisplayMode)
         let savedSpectralWidth  = defaults.double(forKey: Keys.ensembleSpectralWidthThreshold)
         let savedStabilityScore = defaults.double(forKey: Keys.ensembleStabilityScoreThreshold)
 
@@ -41,6 +44,7 @@ final class TunerSettingsRepositoryImpl: TunerSettingsRepository {
             tuning:                           ShinobueTuning(rawValue: savedTuning) ?? .rokuHon,
             showPitchGraph:                   savedGraph,
             solfegeSystem:                    SolfegeSystem(rawValue: savedSolfege) ?? .movable,
+            gaugeDisplayMode:                 GaugeDisplayMode(rawValue: savedGaugeMode) ?? .noteName,
             ensembleSpectralWidthThreshold:   savedSpectralWidth  > 0 ? Float(savedSpectralWidth)  : 5.0,
             ensembleStabilityScoreThreshold:  savedStabilityScore > 0 ? Float(savedStabilityScore) : 10.0
         )
@@ -52,6 +56,7 @@ final class TunerSettingsRepositoryImpl: TunerSettingsRepository {
         defaults.set(settings.tuning.rawValue,                  forKey: Keys.tuning)
         defaults.set(settings.showPitchGraph,                   forKey: Keys.showPitchGraph)
         defaults.set(settings.solfegeSystem.rawValue,           forKey: Keys.solfegeSystem)
+        defaults.set(settings.gaugeDisplayMode.rawValue,        forKey: Keys.gaugeDisplayMode)
         defaults.set(settings.ensembleSpectralWidthThreshold,   forKey: Keys.ensembleSpectralWidthThreshold)
         defaults.set(settings.ensembleStabilityScoreThreshold,  forKey: Keys.ensembleStabilityScoreThreshold)
     }
